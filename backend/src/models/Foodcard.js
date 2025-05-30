@@ -33,3 +33,7 @@ const foodcardSchema = new mongoose.Schema({
 }, {
     timestamps: true,
 });
+
+const FoodCard = mongoose.model("FoodCard", foodcardSchema);
+
+export default FoodCard;
