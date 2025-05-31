@@ -4,10 +4,12 @@ import cors from 'cors';
 import authRoutes from './routes/authRoutes.js';
 import foodcardsRoutes from './routes/foodcardsRoutes.js';
 import { connectDB } from './lib/db.js';
+import job  from './lib/cron.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// job.start(); // for cron job 
 app.use(express.json()); // Middleware to parse JSON bodies
 app.use(cors()); 
 
