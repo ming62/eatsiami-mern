@@ -24,16 +24,16 @@ const foodcardSchema = new mongoose.Schema({
         max: 5,
     },
 
-    user: {
+    user: { // Owner of the food card
         type: mongoose.Schema.Types.ObjectId,
         ref: "User", 
         required: true,
     }
     
-}, {
-    timestamps: true,
-});
+}, 
+    {   timestamps: true    }
+);
 
-const FoodCard = mongoose.model("FoodCard", foodcardSchema);
+const Foodcard = mongoose.model("Foodcard", foodcardSchema);
 
-export default FoodCard;
+export default Foodcard;
