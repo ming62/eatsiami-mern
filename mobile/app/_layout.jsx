@@ -30,7 +30,7 @@ export default function RootLayout() {
     const isSignedIn = user && token;
 
     if (!isSignedIn && !inAuthScreen) {
-      router.replace("/(auth)/login");
+      router.replace("/(auth)");
     } else if (isSignedIn && inAuthScreen) {
       router.replace("/(tabs)");
     } 
