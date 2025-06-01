@@ -19,7 +19,7 @@ app.use("/api/auth", authRoutes); // login, register
 app.use("/api/foodcards", foodcardsRoutes);
 
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    console.log(`Server is running on port http://localhost:${PORT}`);
     connectDB().catch(err => {
         console.error('Database connection failed:', err);
     });

@@ -15,7 +15,7 @@ router.post("/", protectRoute, async (req, res) => {
             return res.status(400).json({ message: "Please provide all fields" });
         }
 
-        const uploadResponse = await cloudinary.uploader.uploade(image);
+        const uploadResponse = await cloudinary.uploader.upload(image);
         const imageUrl = uploadResponse.secure_url;
 
         const newFoodcard = new Foodcard({
