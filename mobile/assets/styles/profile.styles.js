@@ -172,4 +172,3 @@ const styles = StyleSheet.create({
 });
 
 export default styles;
-signup.styles.js
