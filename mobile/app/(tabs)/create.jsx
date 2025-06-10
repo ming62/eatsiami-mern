@@ -74,7 +74,7 @@ export default function Create() {
         const imageType = fileType ? `image/${fileType.toLowerCase()}` : "image/jpeg";
         const imageDataUrl = `data:${imageType};base64,${imageBase64}`;
 
-        const response = await fetch(`${API_URL}/foodcards`, {
+        const response = await fetch(`${API_URL}/foodcards/`, {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
