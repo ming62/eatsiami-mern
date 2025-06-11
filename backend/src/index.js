@@ -23,6 +23,11 @@ app.listen(PORT, () => {
     connectDB().catch(err => {
         console.error('Database connection failed:', err);
     });
+    console.log('Cloudinary config:', {
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    // Don't log the secret for security
+});
 });
 
 app.get('/api/test', (req, res) => {
