@@ -16,12 +16,12 @@
 // RETRO
 
 const COLORS = {
-  primary: "#e17055",
+  primary: "#ff6c36",
   textPrimary: "#784e2d",
-  textSecondary: "#a58e7c",
+  textSecondary: "#b3b3b3",
   textDark: "#50372a",
   placeholderText: "#767676",
-  background: "#ede1d1",
+  background: "#ffffff",
   cardBackground: "#faf5eb",
   inputBackground: "#f7f2ea",
   border: "#e2d6c1",

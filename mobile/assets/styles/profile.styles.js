@@ -45,6 +45,10 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
     marginBottom: 4,
   },
+  location: {
+    fontSize: 14,
+    color: 'gray',
+  },
   email: {
     fontSize: 14,
     color: COLORS.textSecondary,

@@ -1,6 +1,7 @@
 // styles/home.styles.js
 import { StyleSheet } from "react-native";
 import COLORS from "../../constants/colors";
+import { ImageBackground } from "expo-image";
 
 const styles = StyleSheet.create({
   container: {
@@ -76,8 +77,9 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.border,
   },
   bookImage: {
-    width: "100%",
-    height: "100%",
+    position: 'relative',
+    top: -183,
+    left: 0,
   },
   bookDetails: {
     padding: 4,
@@ -97,6 +99,10 @@ const styles = StyleSheet.create({
     color: COLORS.textDark,
     marginBottom: 8,
     lineHeight: 20,
+  },
+  location: {
+    fontSize: 14,
+    color: COLORS.textDark,
   },
   date: {
     fontSize: 12,
@@ -126,3 +132,4 @@ const styles = StyleSheet.create({
 });
 
 export default styles;
+
