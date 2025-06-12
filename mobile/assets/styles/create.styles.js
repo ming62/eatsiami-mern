@@ -25,18 +25,15 @@ const styles = StyleSheet.create({
     borderColor: COLORS.border,
   },
   header: {
-    backgroundColor: '#FFFFFF',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '100%',
-    height: 55,
+    marginBottom: 20,
+    alignItems: "center",
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
     color: COLORS.black,
     marginBottom: 10,
+    marginTop:-20,
     fontFamily: "Konkhmer_Sleokchher-Regular",
   },
   subtitle: {
@@ -126,7 +123,7 @@ const styles = StyleSheet.create({
   },
   placeholderText: {
     color: "#8e8e8e",
-    fontSize: 14,
+    fontSize: 13,
     marginTop: 8,
     fontFamily: "Konkhmer_Sleokchher-Regular",
   },
