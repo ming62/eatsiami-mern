@@ -6,20 +6,17 @@ import { use, useEffect, useState } from "react";
 import { useAuthStore } from "../store/authStore";
 import { useFonts } from "expo-font";
 
-
-
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  
   const router = useRouter();
   const segments = useSegments();
   const [isReady, setIsReady] = useState(false);
 
-  const {checkAuth, user, token} = useAuthStore();
+  const { checkAuth, user, token } = useAuthStore();
 
   const [fontsLoaded] = useFonts({
-    "JetBrainsMono-Medium": require("../assets/fonts/JetBrainsMono-Medium.ttf"),
+    "Konkhmer_Sleokchher-Regular": require("../assets/fonts/KonkhmerSleokchher-Regular.ttf"),
   });
 
   useEffect(() => {
@@ -32,14 +29,13 @@ export default function RootLayout() {
     const initAuth = async () => {
       await checkAuth();
       setIsReady(true);
-    }
+    };
     initAuth();
   }, []);
 
   // handle navigation based on auth state
   useEffect(() => {
-
-    if (!isReady) return; 
+    if (!isReady) return;
     const inAuthScreen = segments[0] === "(auth)";
     const isSignedIn = user && token;
 
@@ -47,27 +43,22 @@ export default function RootLayout() {
       router.replace("/(auth)");
     } else if (isSignedIn && inAuthScreen) {
       router.replace("/(tabs)");
-    } 
-
+    }
   }, [user, token, segments, isReady]);
 
   if (!isReady) {
-    return null; 
+    return null;
   }
 
-
-  
   return (
     <SafeAreaProvider>
       <SafeScreen>
-
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="(tabs)"/>
-      <Stack.Screen name="(auth)"/>
-    </Stack>
-
-    </SafeScreen>
-    <StatusBar style="dark" />
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="(auth)" />
+        </Stack>
+      </SafeScreen>
+      <StatusBar style="dark" />
     </SafeAreaProvider>
   );
 }

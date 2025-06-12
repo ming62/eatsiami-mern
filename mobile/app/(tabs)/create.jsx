@@ -157,9 +157,9 @@ export default function Create() {
         contentContainerStyle={styles.scrollViewContainer}
         style={styles.scrollViewStyle}
       >
+        {/* header */}
         <View style={styles.container}>
           <View style={styles.header}>
-            {/* Header */}
             <Text style={styles.title}>Create</Text>
           </View>
           {/* Image */}
