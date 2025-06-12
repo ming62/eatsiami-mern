@@ -14,9 +14,12 @@ export default function RootLayout() {
   const [isReady, setIsReady] = useState(false);
 
   const { checkAuth, user, token } = useAuthStore();
+  SplashScreen.preventAutoHideAsync();
+
 
   const [fontsLoaded] = useFonts({
     "Konkhmer_Sleokchher-Regular": require("../assets/fonts/KonkhmerSleokchher-Regular.ttf"),
+    "YoungSerif-Regular": require("../assets/fonts/YoungSerif-Regular.ttf"),
   });
 
   useEffect(() => {
