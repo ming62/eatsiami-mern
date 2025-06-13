@@ -17,8 +17,6 @@ import COLORS from "../../constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
-import { useAuthStore } from "../../store/authStore";
-import { API_URL } from "../../constants/api";
 
 export default function Create() {
   const [title, setTitle] = useState("");
@@ -30,7 +28,36 @@ export default function Create() {
   const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
-  const { token } = useAuthStore();
+
+  const handleBack = () => {
+    if (title || location || caption || image || rating !== 3) {
+      Alert.alert(
+        "Discard Changes?",
+        "Would you want to discard your changes?",
+        [
+          {
+            text: "Cancel",
+            style: "cancel",
+          },
+          {
+            text: "Discard",
+            style: "destructive",
+            onPress: () => {
+              setTitle("");
+              setLocation("");
+              setCaption("");
+              setImage(null);
+              setImageBase64(null);
+              setRating(3);
+              router.back();
+            },
+          },
+        ]
+      );
+    } else {
+      router.back();
+    }
+  };
 
   const pickImage = async () => {
     try {
@@ -49,7 +76,7 @@ export default function Create() {
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: "images",
         allowsEditing: true,
-        aspect: [4, 3],
+        aspect: [9, 16],
         quality: 0.5,
         base64: true,
       });
@@ -76,56 +103,22 @@ export default function Create() {
     }
   };
 
-  const handleSubmit = async () => {
+  const handlePreview = async () => {
     if (!title || !caption || !imageBase64 || !rating || !location) {
       Alert.alert("Error", "Please fill in all fields");
       return;
     }
-
-    try {
-      setIsLoading(true);
-
-      const uriParts = image.split(".");
-      const fileType = uriParts[uriParts.length - 1];
-      const imageType = fileType
-        ? `image/${fileType.toLowerCase()}`
-        : "image/jpeg";
-      const imageDataUrl = `data:${imageType};base64,${imageBase64}`;
-
-      const response = await fetch(`${API_URL}/foodcards/`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title,
-          location,
-          caption,
-          rating: rating.toString(),
-          image: imageDataUrl,
-        }),
-      });
-
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.message || "Something went wrong");
-      }
-
-      Alert.alert("Success", "Food card created successfully!");
-      setTitle("");
-      setLocation("");
-      setCaption("");
-      setImage(null);
-      setImageBase64(null);
-      setRating(3);
-      router.push("/");
-    } catch (error) {
-      console.error("Error creating food card:", error);
-      Alert.alert("Error", "Could not create food card. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
+    router.push({
+      pathname: "otherpage/preview",
+      params: {
+        title,
+        location,
+        caption,
+        image,
+        imageBase64,
+        rating: rating.toString(),
+      },
+    });
   };
 
   const renderRatingPicker = () => {
@@ -160,7 +153,11 @@ export default function Create() {
         {/* header */}
         <View style={styles.container}>
           <View style={styles.header}>
+            <TouchableOpacity onPress={handleBack} style={styles.backButton}>
+              <Ionicons name="arrow-back" size={24} color={COLORS.black} />
+            </TouchableOpacity>
             <Text style={styles.title}>Create</Text>
+            <View style={styles.backButton} />
           </View>
           {/* Image */}
           <View style={styles.formGroup}>
@@ -228,10 +225,10 @@ export default function Create() {
               {renderRatingPicker()}
             </View>
 
-            {/* Submit Button */}
+            {/* Preview Button */}
             <TouchableOpacity
               style={styles.button}
-              onPress={handleSubmit}
+              onPress={handlePreview}
               disabled={isLoading}
             >
               {isLoading ? (
