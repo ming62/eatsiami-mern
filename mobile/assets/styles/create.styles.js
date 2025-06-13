@@ -25,15 +25,22 @@ const styles = StyleSheet.create({
     borderColor: COLORS.border,
   },
   header: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 20,
-    alignItems: "center",
+    marginTop: -20,
+    position: 'relative',
+  },
+  backButton: {
+    zIndex: 2,
+    padding: 8,
   },
   title: {
+    flex: 1,
+    textAlign: 'center',
     fontSize: 24,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     color: COLORS.black,
-    marginBottom: 10,
-    marginTop:-20,
     fontFamily: "Konkhmer_Sleokchher-Regular",
   },
   subtitle: {
