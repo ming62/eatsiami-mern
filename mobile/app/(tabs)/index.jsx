@@ -5,9 +5,10 @@ import {
   FlatList,
   ActivityIndicator,
   RefreshControl,
+  TextInput,
 } from "react-native";
 import { useAuthStore } from "../../store/authStore";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import styles from "../../assets/styles/home.styles";
 import { API_URL } from "../../constants/api";
 import { Image } from "expo-image";
@@ -25,6 +26,22 @@ export default function Home() {
   const [refreshing, setRefreshing] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");  
+
+
+  const filteredFoodcards = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return foodcards;
+    }
+    return foodcards.filter((item) =>
+      item.title.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [foodcards, searchQuery]);
+
+  const handleSearch = useCallback((text) => {
+    setSearchQuery(text);
+  }, []);
+
 
   const fetchFoodcards = async (pagenum = 1, refresh = false) => {
     try {
@@ -60,6 +77,7 @@ export default function Home() {
             );
 
       setFoodcards(uniqueFoodcards);
+
 
       setHasMore(pagenum < data.totalPages);
       setPage(pagenum);
@@ -138,7 +156,7 @@ export default function Home() {
   return (
     <View style={styles.container}>
       <FlatList
-        data={foodcards}
+        data={filteredFoodcards}
         renderItem={renderItem}
         keyExtractor={(item) => item._id}
         contentContainerStyle={styles.listContent}
@@ -162,8 +180,18 @@ export default function Home() {
             </View>
 
             <View style={styles.searchContainer}>
-              <Ionicons name="search" size={21} color={COLORS.textSecondary} />
-              <Text style={styles.searchText}>search for anything</Text>
+              <Ionicons name="search" size={30} color={COLORS.textSecondary} style={{ marginLeft: 5}} />
+              <TextInput
+                style={styles.searchText}
+                placeholder="search for anything"
+                value={searchQuery}
+                onChangeText={handleSearch}
+                placeholderTextColor={COLORS.textSecondary}
+                maxLength={50}
+                multiline={false}
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
             </View>
           </View>
         }
@@ -175,7 +203,7 @@ export default function Home() {
           </View>
         }
         ListFooterComponent={
-          hasMore && foodcards.length > 0 ? (
+          hasMore && filteredFoodcards.length > 0 ? (
             <ActivityIndicator
               style={styles.footerLoader}
               size="small"

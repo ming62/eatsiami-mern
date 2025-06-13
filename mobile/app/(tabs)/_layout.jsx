@@ -1,8 +1,9 @@
-import { View, Text } from "react-native";
+import { View, Text, TouchableOpacity} from "react-native";
 import { Tabs } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import React from "react";
 import COLORS from "../../constants/colors";
+import { Ionicons } from "@expo/vector-icons";
 
 import homeIcon from "../../assets/images/home.png";
 import friendsIcon from "../../assets/images/friends.png";
@@ -10,6 +11,7 @@ import notifIcon from "../../assets/images/notification.png";
 import profileIcon from "../../assets/images/profile.png";
 
 import { Image } from "react-native";
+import { Colors } from "react-native/Libraries/NewAppScreen";
 
 export default function TabLayout() {
   const insets = useSafeAreaInsets();
@@ -19,35 +21,41 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: COLORS.cardBackground,
-          borderTopWidth: 1,
-          borderTopColor: COLORS.border,
+          backgroundColor: COLORS.white,
+          borderTopWidth: 2,
+
           height: 65 + insets.bottom,
           paddingBottom: insets.bottom,
         },
         tabBarLabelStyle: {
-          fontSize: 9,
+          fontSize: 10,
           fontWeight: "600",
           fontFamily: "Konkhmer_Sleokchher-Regular",
         },
         tabBarActiveTintColor: COLORS.primary,
         tabBarInactiveTintColor: COLORS.textSecondary,
+        tabBarButton: (props) => (
+          <TouchableOpacity
+            {...props}
+            activeOpacity={0.8} 
+            style={[props.style, { flex: 1 }]}
+          />)
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
           title: "Home",
+          tabBarIconStyle: {
+            marginTop: 3,
+          },
           tabBarIcon: ({ focused }) => (
-            <Image
-              source={homeIcon}
-              style={{
-                width: 30,
-                height: 30,
-                tintColor: focused ? COLORS.primary : COLORS.textSecondary,
-              }}
-              resizeMode="contain"
-            />
+              <Ionicons
+                name="home-outline"
+                size={30}
+                color={focused ? COLORS.primary : COLORS.textSecondary}
+                resizeMode="contain"
+              />
           ),
         }}
       />
@@ -56,14 +64,14 @@ export default function TabLayout() {
         name="friends"
         options={{
           title: "Friends",
+          tabBarIconStyle: {
+            marginTop: 3,
+          },
           tabBarIcon: ({ focused }) => (
-            <Image
-              source={friendsIcon}
-              style={{
-                width: 30,
-                height: 30,
-                tintColor: focused ? COLORS.primary : COLORS.textSecondary,
-              }}
+            <Ionicons
+              name="people-outline"
+              size={30}
+              color={focused ? COLORS.primary : COLORS.textSecondary}
               resizeMode="contain"
             />
           ),
@@ -86,16 +94,12 @@ export default function TabLayout() {
                 marginBottom: 0,
               }}
             >
-              <Text
-                style={{
-                  color: "white",
-                  fontSize: 36,
-                  fontWeight: "bold",
-                  lineHeight: 36,
-                }}
-              >
-                +
-              </Text>
+            <Ionicons
+              name="add"
+              size={30}
+              color={COLORS.white}
+              resizeMode="contain"
+            />
             </View>
           ),
         }}
@@ -106,14 +110,14 @@ export default function TabLayout() {
         options={{
           title: "Notifications",
           tabBarLabel: "Notifications",
+          tabBarIconStyle: {
+            marginTop: 3,
+          },
           tabBarIcon: ({ focused }) => (
-            <Image
-              source={notifIcon}
-              style={{
-                width: 30,
-                height: 30,
-                tintColor: focused ? COLORS.primary : COLORS.textSecondary,
-              }}
+            <Ionicons
+              name="notifications-outline"
+              size={30}
+              color={focused ? COLORS.primary : COLORS.textSecondary}
               resizeMode="contain"
             />
           ),
@@ -124,14 +128,14 @@ export default function TabLayout() {
         name="profile"
         options={{
           title: "Profile",
+          tabBarIconStyle: {
+            marginTop: 3,
+          },
           tabBarIcon: ({ focused }) => (
-            <Image
-              source={profileIcon}
-              style={{
-                width: 30,
-                height: 30,
-                tintColor: focused ? COLORS.primary : COLORS.textSecondary,
-              }}
+            <Ionicons
+              name="person-outline"
+              size={30}
+              color={focused ? COLORS.primary : COLORS.textSecondary}
               resizeMode="contain"
             />
           ),
