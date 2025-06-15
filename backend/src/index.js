@@ -3,6 +3,7 @@ import "dotenv/config";
 import cors from 'cors';
 import authRoutes from './routes/authRoutes.js';
 import foodcardsRoutes from './routes/foodcardsRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 import { connectDB } from './lib/db.js';
 import job  from './lib/cron.js';
 
@@ -17,6 +18,7 @@ app.use(cors());
 //ROUTER
 app.use("/api/auth", authRoutes); // login, register
 app.use("/api/foodcards", foodcardsRoutes);
+app.use("/api/users", userRoutes); 
 
 app.listen(PORT, () => {
     console.log(`Server is running on port http://localhost:${PORT}`);
