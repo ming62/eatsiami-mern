@@ -23,7 +23,6 @@ export default function Friends() {
   // State Management
   const { token } = useAuthStore();
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [friends, setFriends] = useState([]);
   const router = useRouter();
@@ -58,86 +57,6 @@ export default function Friends() {
   useEffect(() => {
     fetchFriends();
   }, []);
-
-  // Search Users
-  const handleSearch = async (text) => {
-    setSearchTerm(text);
-
-    //check is not emtpy string
-    if (text.trim()) {
-      try {
-        setIsLoading(true);
-        const response = await fetch(
-          `${API_URL}/users/search?username=${text}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || "Search failed");
-        }
-
-        const data = await response.json();
-        setSearchResults(data);
-      } catch (error) {
-        console.error("Error searching users:", error);
-        Alert.alert("Error", error.message || "Failed to search users");
-      } finally {
-        setIsLoading(false);
-      }
-    } else {
-      setSearchResults([]);
-    }
-  };
-
-  // Send Friend Request
-  const handleSendFriendRequest = async (userId) => {
-    try {
-      const response = await fetch(
-        `${API_URL}/users/friend-request/${userId}`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to send friend request");
-      }
-
-      Alert.alert("Success", "Friend request sent successfully!");
-    } catch (error) {
-      console.error("Error sending friend request:", error);
-      Alert.alert("Error", error.message || "Failed to send friend request");
-    }
-  };
-
-  //friends card for search page
-  const renderSearchFriends = ({ item }) => (
-    <View style={styles.friendCard}>
-      <View style={styles.userInfo}>
-        <Image
-          source={{ uri: item.profileImage }}
-          style={styles.profileImage}
-        />
-        <Text style={styles.username}>{item.username}</Text>
-      </View>
-      <TouchableOpacity
-        style={styles.addButton}
-        onPress={() => handleSendFriendRequest(item._id)}
-      >
-        <Ionicons name="person-add" size={20} color="white" />
-        <Text style={styles.buttonText}>Add</Text>
-      </TouchableOpacity>
-    </View>
-  );
 
   //friends card for added friends
   const renderFriend = ({ item }) => (
@@ -174,30 +93,14 @@ export default function Friends() {
             style={styles.searchInput}
             placeholder="Search by username..."
             value={searchTerm}
-            onChangeText={setSearchTerm}
-            onSubmitEditing={() => handleSearch(searchTerm)} //trigger search when press search key
-            returnKeyType="search" //show search on keyboard
+            onFocus={() => router.push("otherpage/search")}
             placeholderTextColor="#666"
           />
         </View>
-
-        {/* Search Results */}
-        {searchResults.length > 0 && (
-          <View style={styles.resultsSection}>
-            <Text style={styles.sectionTitle}>Search Results</Text>
-            <FlatList
-              data={searchResults}
-              renderItem={renderSearchFriends}
-              keyExtractor={(item) => item._id}
-              showsVerticalScrollIndicator={false}
-            />
-          </View>
-        )}
       </View>
 
       {/* Friends List Section */}
       <View style={styles.friendsSection}>
-        <Text style={styles.sectionTitle}>My Friends</Text>
         {isLoading ? (
           <ActivityIndicator size="large" color="#0000ff" />
         ) : friends.length > 0 ? (
