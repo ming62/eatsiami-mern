@@ -2,13 +2,17 @@ import express from "express";
 import protectRoute from '../middleware/auth.middleware.js';
 import {
   acceptFriendRequest,
-  getFriendRequests,
+  getNotification,
   getMyFriends,
   getOutgoingFriendReqs,
   sendFriendRequest,
   searchFriends,
   deleteFriendRequest,
   deleteFriend,
+  sendJioRequest,
+getOutgoingJioReqs,
+  acceptJioRequest, 
+  rejectJioRequest,
 } from "../controllers/user.controller.js";
 const router = express.Router();
 
@@ -22,9 +26,15 @@ router.post("/friend-request/:id", sendFriendRequest);
 router.put("/friend-request/:id/accept", acceptFriendRequest);
 router.delete("/friend-request/:id/delete", deleteFriendRequest);
 
-router.get("/friend-requests", getFriendRequests);
+router.get("/notification", getNotification);
 router.get("/outgoing-friend-requests", getOutgoingFriendReqs);
+router.get("/outgoing-jio-requests", getOutgoingJioReqs);
+
 
 router.get("/search", searchFriends);
+
+router.post("/jio-request/:id", sendJioRequest);
+router.put("/jio-request/:id/accept", acceptJioRequest);
+router.put("/jio-request/:id/reject", rejectJioRequest);
 
 export default router;
