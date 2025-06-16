@@ -3,19 +3,19 @@ import {
   Text,
   TextInput,
   FlatList,
-  Image,
   TouchableOpacity,
   SafeAreaView,
   ActivityIndicator,
   Alert,
 } from "react-native";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuthStore } from "../../store/authStore";
 import { API_URL } from "../../constants/api";
 import styles from "../../assets/styles/friends.styles";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import COLORS from "../../constants/colors";
+import { Image } from "expo-image";
 
 export default function SearchScreen() {
   const { token } = useAuthStore();
@@ -140,7 +140,7 @@ export default function SearchScreen() {
         <TouchableOpacity
           style={[
             styles.addButton,
-            hasRequestBeenSent && { backgroundColor: "#d3d3d3" },
+            requestAlreadySent && { backgroundColor: "#d3d3d3" },
           ]}
           onPress={() => handleSendFriendRequest(item._id)}
           disabled={requestAlreadySent}

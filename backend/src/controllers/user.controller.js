@@ -155,3 +155,60 @@ const skip = (page - 1) * limit;
     res.status(500).json({ message: "Internal Server Error" });
   }
 }
+
+export async function deleteFriend(req, res) {
+   try {
+    const myId = req.user.id;
+    const { id: friendId } = req.params;
+
+    // prevent delete yourselfs
+    if (myId === friendId) {
+      return res.status(400).json({ message: "You can't delete yourself" });
+    }
+
+    const currentUser = await User.findById(myId);
+    if (!currentUser.friends.includes(friendId)) {
+      return res.status(400).json({ message: "This user is not your friend." });
+    }
+
+
+    await User.findByIdAndUpdate(myId, {
+      $pull: { friends: friendId },
+    });
+
+    await User.findByIdAndUpdate(friendId, {
+      $pull: { friends: myId },
+    });
+
+    res.status(200).json({ message: "Friend removed successfully." });
+  } catch (error) {
+    console.error("Error in deleting friend", error.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
+export async function deleteFriendRequest(req, res) {
+  try {
+    const { id: requestId } = req.params;
+    
+
+    const friendRequest = await FriendRequest.findById(requestId);
+
+    if (!friendRequest) {
+      return res.status(404).json({ message: "Friend request not found" });
+    }
+
+    // Verify the current user is the recipient
+    if (friendRequest.recipient.toString() !== req.user.id) {
+      return res.status(403).json({ message: "You are not authorized to delete this request" });
+    }
+
+  
+    await FriendRequest.findByIdAndDelete(requestId);
+
+    res.status(200).json({ message: "Friend request deleted" });
+  } catch (error) {
+    console.log("Error in deletetFriendRequest controller", error.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+}
