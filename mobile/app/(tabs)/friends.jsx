@@ -3,10 +3,10 @@ import {
   Text,
   TextInput,
   FlatList,
-  Image,
   TouchableOpacity,
   ActivityIndicator,
   SafeAreaView,
+  RefreshControl,
   Alert,
 } from "react-native";
 import { useAuthStore } from "../../store/authStore";
@@ -18,6 +18,7 @@ import styles from "../../assets/styles/friends.styles";
 import COLORS from "../../constants/colors";
 import { formatPublishDate } from "../../lib/utils";
 import Loader from "../../components/Loader";
+import { Image } from "expo-image";
 
 export default function Friends() {
   // State Management
@@ -25,12 +26,20 @@ export default function Friends() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [friends, setFriends] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
   const router = useRouter();
 
-  const fetchFriends = async () => {
-    try {
-      setIsLoading(true);
+  const onRefresh = useCallback(() => {
+    fetchFriends(true);
+  }, []);
 
+  const fetchFriends = async (refresh = false) => {
+    try {
+      if (refresh) {
+        setRefreshing(true);
+      } else {
+        setIsLoading(true);
+      }
       const response = await fetch(`${API_URL}/users/friends`, {
         method: "GET",
         headers: {
@@ -49,7 +58,34 @@ export default function Friends() {
       console.error("Error fetching friends:", error);
       Alert.alert("Error", error.message || "Failed to fetch friends");
     } finally {
-      setIsLoading(false);
+      if (refresh) {
+        setRefreshing(false);
+      } else {
+        setIsLoading(false);
+      }
+    }
+  };
+
+  const handleDeleteFriend = async (requestId) => {
+    try {
+      const response = await fetch(
+        `${API_URL}/users/deleteFriend/${requestId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || `Failed to delete friend request`);
+      }
+
+      setFriends((prev) => prev.filter((friend) => friend._id !== requestId));
+    } catch (error) {
+      console.error(`Error ${action}ing friend request:`, error);
     }
   };
 
@@ -60,18 +96,40 @@ export default function Friends() {
 
   //friends card for added friends
   const renderFriend = ({ item }) => (
-    <TouchableOpacity
-      style={styles.friendCard}
-      onPress={() => router.push(`/profile/${item._id}`)}
-    >
-      <View style={styles.userInfo}>
+    <View style={styles.friendCard}>
+      <TouchableOpacity
+        style={styles.userInfo}
+        onPress={() => router.push(`/otherpage/${item._id}`)}
+      >
         <Image
           source={{ uri: item.profileImage }}
           style={styles.profileImage}
         />
         <Text style={styles.username}>{item.username}</Text>
-      </View>
-    </TouchableOpacity>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.actionButton, styles.deleteButton]}
+        onPress={() => {
+          Alert.alert(
+            "Confirm Delete",
+            "Are you sure you want to delete this friend?",
+            [
+              {
+                text: "Cancel",
+                style: "cancel",
+              },
+              {
+                text: "Delete",
+                style: "destructive",
+                onPress: () => handleDeleteFriend(item._id),
+              },
+            ]
+          );
+        }}
+      >
+        <Ionicons name="trash-outline" size={20} color="#fff" />
+      </TouchableOpacity>
+    </View>
   );
 
   return (
@@ -98,7 +156,6 @@ export default function Friends() {
           />
         </View>
       </View>
-
       {/* Friends List Section */}
       <View style={styles.friendsSection}>
         {isLoading ? (
@@ -109,6 +166,13 @@ export default function Friends() {
             renderItem={renderFriend}
             keyExtractor={(item) => item._id}
             showsVerticalScrollIndicator={false}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                colors={[COLORS.primary]}
+              />
+            }
           />
         ) : (
           <Text style={styles.emptyText}>

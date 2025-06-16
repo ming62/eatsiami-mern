@@ -82,6 +82,8 @@ userInfo: {
   elevation: 3,
 },
 profileImage: {
+  borderWidth:1,
+  borderColor: COLORS.gray,
   width: 80,
   height: 80,
   borderRadius: 40,

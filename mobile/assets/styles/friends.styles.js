@@ -53,41 +53,46 @@ const styles = StyleSheet.create({
   },
   friendCard: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: COLORS.white,
     flexDirection: 'row',
     padding: 5,
   },
   userInfo: {
     flex: 6,
-    backgroundColor: '#000000',
+    backgroundColor: COLORS.white,
     flexDirection: 'row',
+    alignItems: "center",
+    justifyContent: 'flex-start',
   },
-    profileImage: {
+  profileImage: {
+    borderWidth:1,
+    borderColor:COLORS.gray,
     width: 45,
     height: 45,
     borderRadius: 22.5,
-    marginRight: 12,
-    backgroundColor: "#ddd",
+    marginRight: 15,
+    backgroundColor: "#d3d3d3",
   },
   username: {
     fontSize: 16,
     fontWeight: "500",
     color: "#333",
+    
   },
   addButton: {
+    margin:3,
     flex: 1,
-    flexDirection: "row",
     alignItems: "center",
-    backgroundColor: COLORS.primary || "#4CAF50",
+    backgroundColor: COLORS.primary ,
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 8,
+    borderRadius: 10,
+    justifyContent:'center',
   },
   buttonText: {
     color: "#fff",
     fontSize: 14,
-    marginLeft: 6,
-    fontWeight: "500",
+    fontWeight: 'bold',
   },
  friendsSection: {
   flex: 11,
@@ -103,6 +108,24 @@ backButton: {
   width: 35,
   padding: 4,
   borderRadius: 20,
+},
+actionButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    marginVertical: 2,
+  },
+  acceptButton: {
+    backgroundColor: COLORS.success,
+  },
+deleteButton: {
+  backgroundColor: COLORS.danger,
+  paddingVertical: 8,
+  paddingHorizontal: 12,
+  borderRadius: 8,
+  alignItems: "center",
+  justifyContent: "center",
+  marginLeft: 8, 
 },
 });
 
