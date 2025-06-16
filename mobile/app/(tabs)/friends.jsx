@@ -27,6 +27,7 @@ export default function Friends() {
   const [isLoading, setIsLoading] = useState(false);
   const [friends, setFriends] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [outgoingJioRequestIds, setOutgoingJioRequestIds] = useState(new Set());
   const router = useRouter();
 
   const onRefresh = useCallback(() => {
@@ -66,6 +67,53 @@ export default function Friends() {
     }
   };
 
+  const fetchOutgoingJioRequests = async () => {
+    try {
+      const response = await fetch(`${API_URL}/users/outgoing-jio-requests`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.message || "Failed to fetch outgoing requests"
+        );
+      }
+
+      const data = await response.json();
+
+      const ids = new Set(data.map((req) => req.recipient._id));
+      setOutgoingJioRequestIds(ids);
+    } catch (error) {
+      console.error("Error fetching outgoing requests:", error);
+    }
+  };
+
+  const handleSendJioRequest = async (userId) => {
+    try {
+      const response = await fetch(`${API_URL}/users/jio-request/${userId}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to send jio request");
+      }
+
+      setOutgoingJioRequestIds((prev) => new Set(prev).add(userId));
+
+      Alert.alert("Success", "Jio request sent successfully!");
+    } catch (error) {
+      console.error("Error sending jio request:", error);
+      Alert.alert("Error", error.message || "Failed to send jio request");
+    }
+  };
+
   const handleDeleteFriend = async (requestId) => {
     try {
       const response = await fetch(
@@ -92,45 +140,61 @@ export default function Friends() {
   // Fetch Friends List
   useEffect(() => {
     fetchFriends();
+    fetchOutgoingJioRequests();
   }, []);
 
   //friends card for added friends
-  const renderFriend = ({ item }) => (
-    <View style={styles.friendCard}>
-      <TouchableOpacity
-        style={styles.userInfo}
-        onPress={() => router.push(`/otherpage/${item._id}`)}
-      >
-        <Image
-          source={{ uri: item.profileImage }}
-          style={styles.profileImage}
-        />
-        <Text style={styles.username}>{item.username}</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={[styles.actionButton, styles.deleteButton]}
-        onPress={() => {
-          Alert.alert(
-            "Confirm Delete",
-            "Are you sure you want to delete this friend?",
-            [
-              {
-                text: "Cancel",
-                style: "cancel",
-              },
-              {
-                text: "Delete",
-                style: "destructive",
-                onPress: () => handleDeleteFriend(item._id),
-              },
-            ]
-          );
-        }}
-      >
-        <Ionicons name="trash-outline" size={20} color="#fff" />
-      </TouchableOpacity>
-    </View>
-  );
+  const renderFriend = ({ item }) => {
+    const requestAlreadySent = outgoingJioRequestIds.has(item._id);
+    return (
+      <View style={styles.friendCard}>
+        <TouchableOpacity
+          style={styles.userInfo}
+          onPress={() => router.push(`/otherpage/${item._id}`)}
+        >
+          <Image
+            source={{ uri: item.profileImage }}
+            style={styles.profileImage}
+          />
+          <Text style={styles.username}>{item.username}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.addButton,
+            requestAlreadySent && { backgroundColor: "#d3d3d3" },
+          ]}
+          onPress={() => handleSendJioRequest(item._id)}
+          disabled={requestAlreadySent}
+        >
+          <Text style={styles.buttonText}>
+            {requestAlreadySent ? "Requested" : "Add"}
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.actionButton, styles.deleteButton]}
+          onPress={() => {
+            Alert.alert(
+              "Confirm Delete",
+              "Are you sure you want to delete this friend?",
+              [
+                {
+                  text: "Cancel",
+                  style: "cancel",
+                },
+                {
+                  text: "Delete",
+                  style: "destructive",
+                  onPress: () => handleDeleteFriend(item._id),
+                },
+              ]
+            );
+          }}
+        >
+          <Ionicons name="trash-outline" size={20} color="#fff" />
+        </TouchableOpacity>
+      </View>
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container}>

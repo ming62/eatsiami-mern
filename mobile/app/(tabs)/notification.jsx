@@ -23,16 +23,20 @@ export default function Notification() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [friendRequests, setFriendRequests] = useState({
-    incomingReqs: [],
-    acceptedReqs: [],
+  const [Notification, setNotification] = useState({
+    pendingFriendReqs: [],
+    pendingJioReqs: [],
+    acceptedFriendReqs: [],
+    acceptedJioRequest: [],
+    rejectedJioRequest: [],
   });
-  const fetchFriendRequests = async (refresh = false) => {
+
+  const fetchNotification = async (refresh = false) => {
     try {
       if (refresh) {
         setRefreshing(true);
       }
-      const response = await fetch(`${API_URL}/users/friend-requests`, {
+      const response = await fetch(`${API_URL}/users/notification`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -43,9 +47,12 @@ export default function Notification() {
         throw new Error(data.message || "Failed to fetch friend requests");
       }
 
-      setFriendRequests({
-        incomingReqs: data.incomingReqs || [],
-        acceptedReqs: data.acceptedReqs || [],
+      setNotification({
+        pendingFriendReqs: data.pendingFriendReqs || [],
+        pendingJioReqs: data.pendingJioReqs || [],
+        acceptedFriendReqs: data.acceptedFriendReqs || [],
+        acceptedJioRequest: data.acceptedJioRequest || [],
+        rejectedJioRequest: data.rejectedJioRequest || [],
       });
     } catch (error) {
       console.error("Error fetching friend requests:", error);
@@ -75,9 +82,9 @@ export default function Notification() {
         throw new Error(data.message || `Failed to ${action} friend request`);
       }
 
-      setFriendRequests((prev) => ({
+      setNotification((prev) => ({
         ...prev,
-        incomingReqs: prev.incomingReqs.filter(
+        pendingFriendReqs: prev.pendingFriendReqs.filter(
           (request) => request._id !== requestId
         ),
       }));
@@ -86,18 +93,60 @@ export default function Notification() {
     }
   };
 
+  const handleJioRequest = async (requestId, action) => {
+    try {
+      const response = await fetch(
+        `${API_URL}/users/jio-request/${requestId}/${action}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || `Failed to ${action} friend request`);
+      }
+
+      setNotification((prev) => ({
+        ...prev,
+        pendingJioReqs: prev.pendingJioReqs.filter(
+          (request) => request._id !== requestId
+        ),
+      }));
+    } catch (error) {
+      console.error(`Error ${action}ing jio request:`, error);
+    }
+  };
+
   const onRefresh = useCallback(() => {
-    fetchFriendRequests(true);
+    fetchNotification(true);
   }, []);
 
   useEffect(() => {
-    fetchFriendRequests();
+    fetchNotification();
   }, []);
 
-  const incomingRequests = friendRequests?.incomingReqs || [];
-  const acceptedRequests = friendRequests?.acceptedReqs || [];
+  const pendingFriendReqs = Notification?.pendingFriendReqs || [];
+  const pendingJioReqs = Notification?.pendingJioReqs || [];
+  const otherNotification = [
+    ...Notification.acceptedFriendReqs.map((item) => ({
+      ...item,
+      type: "acceptedFriend",
+    })),
+    ...Notification.acceptedJioRequest.map((item) => ({
+      ...item,
+      type: "acceptedJio",
+    })),
+    ...Notification.rejectedJioRequest.map((item) => ({
+      ...item,
+      type: "rejectedJio",
+    })),
+  ].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
 
-  const renderIncomingRequest = ({ item }) => {
+  const renderFriendRequest = ({ item }) => {
     return (
       <View style={styles.requestCard}>
         <Image
@@ -147,17 +196,77 @@ export default function Notification() {
     );
   };
 
-  const renderAcceptedRequest = ({ item }) => {
+  const renderJioRequest = ({ item }) => {
     return (
       <View style={styles.requestCard}>
         <Image
-          source={{ uri: item.recipient.profileImage }}
+          source={{ uri: item.sender.profileImage }}
+          style={styles.avatar}
+        />
+        <View style={styles.userInfo}>
+          <Text style={styles.notificationName}>{item.sender.username}</Text>
+          <Text style={styles.notificationText}>ask you for a meal!</Text>
+          <Text style={styles.notificationTime}>
+            {formatPublishDate(item.createdAt)}
+          </Text>
+        </View>
+
+        <View style={styles.buttons}>
+          <TouchableOpacity
+            style={[styles.actionButton, styles.acceptButton]}
+            onPress={() => handleJioRequest(item._id, "accept")}
+          >
+            <Text style={styles.buttonText}>Accept</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.actionButton, styles.deleteButton]}
+            onPress={() => {
+              Alert.alert(
+                "Confirm Delete",
+                "Are you sure you don't want to jia beng?",
+                [
+                  {
+                    text: "Cancel",
+                    style: "cancel",
+                  },
+                  {
+                    text: "Delete",
+                    style: "destructive",
+                    onPress: () => handleJioRequest(item._id, "reject"),
+                  },
+                ]
+              );
+            }}
+          >
+            <Ionicons name="trash-outline" size={20} color="#fff" />
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  };
+
+  const renderOtherNotification = ({ item }) => {
+    const isFriendRequest = item.type === "acceptedFriend";
+    const isJioAccepted = item.type === "acceptedJio";
+    const isJioRejected = item.type === "rejectedJio";
+
+    return (
+      <View style={styles.requestCard}>
+        <Image
+          source={{ uri: item.sender.profileImage }}
           style={styles.avatar}
         />
         <View style={styles.userInfo}>
           <Text style={styles.notificationName}>{item.recipient.username}</Text>
           <Text style={styles.notificationText}>
-            has accepted your friends request
+            {isFriendRequest
+              ? "accepted your friend request"
+              : isJioAccepted
+                ? "accepted your jio request!"
+                : isJioRejected
+                  ? "don't want jia beng"
+                  : null}
           </Text>
           <Text style={styles.notificationTime}>
             {formatPublishDate(item.createdAt)}
@@ -181,23 +290,28 @@ export default function Notification() {
         />
       ) : (
         <FlatList
-          data={[...incomingRequests, ...acceptedRequests]}
+          data={[...pendingFriendReqs, ...pendingJioReqs, ...otherNotification]}
           keyExtractor={(item) => item._id}
           renderItem={({ item }) => {
-            const isIncoming = incomingRequests.some(
-              (req) => req._id === item._id
-            );
-            return isIncoming
-              ? renderIncomingRequest({ item })
-              : renderAcceptedRequest({ item });
+            if (pendingFriendReqs.some((req) => req._id === item._id)) {
+              return renderFriendRequest({ item });
+            }
+            if (pendingJioReqs.some((req) => req._id === item._id)) {
+              return renderJioRequest({ item });
+            }
+            if (otherNotification.some((req) => req._id === item._id)) {
+              return renderOtherNotification({ item });
+            }
+            return null;
           }}
           ListHeaderComponent={
             <>
-              {incomingRequests.length > 0 && (
+              {pendingFriendReqs.length > 0 && (
                 <Text style={styles.requestTitle}>Friend Requests</Text>
               )}
-              {incomingRequests.length === 0 &&
-                acceptedRequests.length === 0 && (
+              {pendingFriendReqs.length === 0 &&
+                pendingJioReqs.length === 0 &&
+                otherNotification.length === 0 && (
                   <View style={styles.emptyContainer}>
                     <Text style={styles.emptyText}>No notifications</Text>
                   </View>
