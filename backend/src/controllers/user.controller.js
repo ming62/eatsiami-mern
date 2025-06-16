@@ -180,6 +180,14 @@ export async function deleteFriend(req, res) {
       $pull: { friends: myId },
     });
 
+    //delete friend request between them so that they can add each other in the future
+        await FriendRequest.deleteMany({
+      $or: [
+        { sender: myId, recipient: friendId },
+        { sender: friendId, recipient: myId },
+      ],
+    });
+
     res.status(200).json({ message: "Friend removed successfully." });
   } catch (error) {
     console.error("Error in deleting friend", error.message);
