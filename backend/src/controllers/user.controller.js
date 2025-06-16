@@ -188,13 +188,6 @@ export async function deleteFriend(req, res) {
       ],
     });
 
-await FriendRequest.deleteMany({
-  $or: [
-    { sender: "683c2566b4abcad8e6d7a55d", recipient: "683b17d3d5447b374d4d6381" },
-    { sender: "683b17d3d5447b374d4d6381", recipient: "683c2566b4abcad8e6d7a55d" },
-  ],
-});
-
 
     res.status(200).json({ message: "Friend removed successfully." });
   } catch (error) {
