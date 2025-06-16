@@ -216,7 +216,7 @@ export default function Notification() {
             style={[styles.actionButton, styles.acceptButton]}
             onPress={() => handleJioRequest(item._id, "accept")}
           >
-            <Text style={styles.buttonText}>Accept</Text>
+            <Text style={styles.buttonText}>gogogo</Text>
           </TouchableOpacity>
 
           <TouchableOpacity

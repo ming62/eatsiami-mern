@@ -167,7 +167,7 @@ export default function Friends() {
           disabled={requestAlreadySent}
         >
           <Text style={styles.buttonText}>
-            {requestAlreadySent ? "Requested" : "Add"}
+            {requestAlreadySent ? "Requested" : "Jio"}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
