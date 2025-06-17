@@ -166,12 +166,14 @@ export default function SearchScreen() {
       {/* Search Section */}
       <View style={styles.searchSection}>
         <View style={styles.searchContainer}>
-          <Ionicons
-            name="search"
-            size={20}
-            color="#666"
-            style={styles.searchIcon}
-          />
+          <TouchableOpacity onPress={() => handleSearch(searchTerm)}>
+            <Ionicons
+              name="search"
+              size={20}
+              color="#666"
+              style={styles.searchIcon}
+            />
+          </TouchableOpacity>
           <TextInput
             style={styles.searchInput}
             placeholder="Search by username..."

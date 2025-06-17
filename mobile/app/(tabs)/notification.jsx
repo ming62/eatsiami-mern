@@ -154,23 +154,25 @@ export default function Notification() {
           style={styles.avatar}
         />
         <View style={styles.userInfo}>
-          <Text style={styles.notificationName}>{item.sender.username}</Text>
+          <View style={styles.time}>
+            <Text style={styles.notificationName}>{item.sender.username}</Text>
+            <Text style={styles.notificationTime}>
+              {formatPublishDate(item.createdAt)}
+            </Text>
+          </View>
           <Text style={styles.notificationText}>sent you a friend request</Text>
-          <Text style={styles.notificationTime}>
-            {formatPublishDate(item.createdAt)}
-          </Text>
         </View>
 
         <View style={styles.buttons}>
           <TouchableOpacity
-            style={[styles.actionButton, styles.acceptButton]}
+            style={styles.acceptButton}
             onPress={() => handleFriendRequest(item._id, "accept")}
           >
             <Text style={styles.buttonText}>Accept</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.actionButton, styles.deleteButton]}
+            style={styles.deleteButton}
             onPress={() => {
               Alert.alert(
                 "Confirm Delete",
@@ -189,7 +191,7 @@ export default function Notification() {
               );
             }}
           >
-            <Ionicons name="trash-outline" size={20} color="#fff" />
+            <Ionicons name="trash-outline" size={24} color="#6A6968" />
           </TouchableOpacity>
         </View>
       </View>
@@ -204,23 +206,25 @@ export default function Notification() {
           style={styles.avatar}
         />
         <View style={styles.userInfo}>
-          <Text style={styles.notificationName}>{item.sender.username}</Text>
-          <Text style={styles.notificationText}>ask you for a meal!</Text>
-          <Text style={styles.notificationTime}>
-            {formatPublishDate(item.createdAt)}
-          </Text>
+          <View style={styles.time}>
+            <Text style={styles.notificationName}>{item.sender.username}</Text>
+            <Text style={styles.notificationTime}>
+              {formatPublishDate(item.createdAt)}
+            </Text>
+          </View>
+          <Text style={styles.notificationText}>jio you for a meal!</Text>
         </View>
 
         <View style={styles.buttons}>
           <TouchableOpacity
-            style={[styles.actionButton, styles.acceptButton]}
+            style={styles.acceptButton}
             onPress={() => handleJioRequest(item._id, "accept")}
           >
             <Text style={styles.buttonText}>gogogo</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.actionButton, styles.deleteButton]}
+            style={styles.deleteButton}
             onPress={() => {
               Alert.alert(
                 "Confirm Delete",
@@ -239,7 +243,7 @@ export default function Notification() {
               );
             }}
           >
-            <Ionicons name="trash-outline" size={20} color="#fff" />
+            <Ionicons name="trash-outline" size={24} color="#6A6968" />
           </TouchableOpacity>
         </View>
       </View>
@@ -254,11 +258,18 @@ export default function Notification() {
     return (
       <View style={styles.requestCard}>
         <Image
-          source={{ uri: item.sender.profileImage }}
+          source={{ uri: item.recipient.profileImage }}
           style={styles.avatar}
         />
         <View style={styles.userInfo}>
-          <Text style={styles.notificationName}>{item.recipient.username}</Text>
+          <View style={styles.time}>
+            <Text style={styles.notificationName}>
+              {item.recipient.username}
+            </Text>
+            <Text style={styles.notificationTime}>
+              {formatPublishDate(item.createdAt)}
+            </Text>
+          </View>
           <Text style={styles.notificationText}>
             {isFriendRequest
               ? "accepted your friend request"
@@ -267,9 +278,6 @@ export default function Notification() {
                 : isJioRejected
                   ? "don't want jia beng"
                   : null}
-          </Text>
-          <Text style={styles.notificationTime}>
-            {formatPublishDate(item.createdAt)}
           </Text>
         </View>
       </View>
@@ -280,6 +288,7 @@ export default function Notification() {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Notification</Text>
+        <View style={styles.grayBlock} />
       </View>
 
       {loading ? (

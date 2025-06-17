@@ -16,7 +16,6 @@ import { useRouter } from "expo-router";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import styles from "../../assets/styles/friends.styles";
 import COLORS from "../../constants/colors";
-import { formatPublishDate } from "../../lib/utils";
 import Loader from "../../components/Loader";
 import { Image } from "expo-image";
 
@@ -170,28 +169,30 @@ export default function Friends() {
             {requestAlreadySent ? "Requested" : "Jio"}
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.actionButton, styles.deleteButton]}
-          onPress={() => {
-            Alert.alert(
-              "Confirm Delete",
-              "Are you sure you want to delete this friend?",
-              [
-                {
-                  text: "Cancel",
-                  style: "cancel",
-                },
-                {
-                  text: "Delete",
-                  style: "destructive",
-                  onPress: () => handleDeleteFriend(item._id),
-                },
-              ]
-            );
-          }}
-        >
-          <Ionicons name="trash-outline" size={20} color="#fff" />
-        </TouchableOpacity>
+        <View style={styles.buttons}>
+          <TouchableOpacity
+            style={styles.deleteButton}
+            onPress={() => {
+              Alert.alert(
+                "Confirm Delete",
+                "Are you sure you want to delete this friend?",
+                [
+                  {
+                    text: "Cancel",
+                    style: "cancel",
+                  },
+                  {
+                    text: "Delete",
+                    style: "destructive",
+                    onPress: () => handleDeleteFriend(item._id),
+                  },
+                ]
+              );
+            }}
+          >
+            <Ionicons name="trash-outline" size={24} color="#6a6968" />
+          </TouchableOpacity>
+        </View>
       </View>
     );
   };

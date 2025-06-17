@@ -52,13 +52,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   friendCard: {
-    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: COLORS.white,
-    flexDirection: 'row',
-    padding: 5,
+    padding: 10,
+    marginVertical: 6,
+    marginHorizontal: 0,
   },
   userInfo: {
-    flex: 6,
+    flex: 1,
     backgroundColor: COLORS.white,
     flexDirection: 'row',
     alignItems: "center",
@@ -80,19 +82,17 @@ const styles = StyleSheet.create({
     
   },
   addButton: {
-    margin:3,
-    flex: 1,
-    alignItems: "center",
-    backgroundColor: COLORS.primary ,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 10,
-    justifyContent:'center',
+    paddingVertical: 8,
+    paddingHorizontal: 25,
+    borderRadius: 15,
+    backgroundColor: COLORS.primary,
+    alignItems: "center",       
+    justifyContent: "center",
   },
   buttonText: {
-    color: "#fff",
+    color: COLORS.white,
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: "600",
   },
  friendsSection: {
   flex: 11,
@@ -109,24 +109,17 @@ backButton: {
   padding: 4,
   borderRadius: 20,
 },
-actionButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-    marginVertical: 2,
-  },
-  acceptButton: {
-    backgroundColor: COLORS.success,
-  },
 deleteButton: {
-  backgroundColor: COLORS.danger,
   paddingVertical: 8,
-  paddingHorizontal: 12,
-  borderRadius: 8,
+  paddingHorizontal: 5,
   alignItems: "center",
   justifyContent: "center",
-  marginLeft: 8, 
 },
+  buttons: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    marginLeft: 5,
+  },
 });
 
 export default styles;

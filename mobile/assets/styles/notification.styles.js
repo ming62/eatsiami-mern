@@ -7,16 +7,18 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
   },
   header: {  
-    flexDirection:'row',
+    flexDirection:'column',
     alignItems: 'center',
     justifyContent: 'center',
     padding: 15,
-    backgroundColor: COLORS.white,
   },
   title: {
     fontSize: 24,
     textAlign: 'center',
     fontWeight: 'bold',
+  },
+  time: {
+    flexDirection: 'row',
   },
   request: {
     backgroundColor: COLORS.background,
@@ -26,8 +28,9 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
     padding: 10,
   },
-  scrollContainer: {
-  padding: 10,
+  scrollContainer: {    
+  paddingHorizontal: 10,
+  paddingBottom: 10,
 },
 requestTitle: {
    fontSize: 20,
@@ -43,10 +46,9 @@ requestCard: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: COLORS.white,
-    padding: 12,
+    padding: 10,
     marginVertical: 6,
-    marginHorizontal: 12,
-    borderRadius: 12,
+    marginHorizontal: 0,
   },
   avatar: {
     borderWidth:1,
@@ -63,22 +65,23 @@ requestCard: {
   notificationName: {
     fontSize: 16,
     fontWeight: "bold",
-    color: COLORS.primary,
+    color: COLORS.black,
   },
   notificationText: {
     fontSize: 14,
-    color: COLORS.grayDark,
-    marginTop: 2,
+    color: "#99704C",
+    marginTop: 0,
   },
   notificationTime: {
     fontSize: 12,
-    color: COLORS.gray,
-    marginTop: 4,
+    color: "#99704C",
+    marginTop: 5,
+    marginLeft: 5,
   },
   buttons: {
-    flexDirection: "column",
+    flexDirection: "row",
     alignItems: "flex-end",
-    marginLeft: 8,
+    marginLeft: 5,
   },
   actionButton: {
     paddingVertical: 6,
@@ -87,16 +90,18 @@ requestCard: {
     marginVertical: 2,
   },
   acceptButton: {
-    backgroundColor: COLORS.success,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 15,
+    backgroundColor: COLORS.primary,
+    alignItems: "center",       
+  justifyContent: "center",
   },
 deleteButton: {
-  backgroundColor: COLORS.danger,
   paddingVertical: 8,
-  paddingHorizontal: 12,
-  borderRadius: 8,
+  paddingHorizontal: 5,
   alignItems: "center",
   justifyContent: "center",
-  marginLeft: 8, 
 },
 
   buttonText: {
@@ -104,6 +109,12 @@ deleteButton: {
     fontSize: 14,
     fontWeight: "600",
   },
+grayBlock: {
+  height: 35,              
+  backgroundColor: "#d9d9d9", 
+  borderRadius: 10,
+  width: "100%",  
+},        
   // loadingContainer: {
   //   flex: 1,
   //   justifyContent: 'center',
