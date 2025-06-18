@@ -25,9 +25,11 @@ import Loader from "../../components/Loader";
 
 export default function Profile() {
   const [foodcards, setFoodcards] = useState([]);
+  const [savedFoodcards, setSavedFoodcards] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [deleteBookId, setDeleteBookId] = useState(null);
+  const [unsaveFoodcardId, setUnsaveFoodcardId] = useState(null);
   const [index, setIndex] = useState(0);
   const [routes] = useState([
     { key: "foodcards", title: "Foodcards" },
@@ -68,8 +70,35 @@ export default function Profile() {
     }
   };
 
+  const fetchSavedFoodcards = async () => {
+    try {
+      const response = await fetch(`${API_URL}/foodcards/saved-foodcards`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to fetch saved foodcards");
+      }
+      setSavedFoodcards(data);
+    } catch (error) {
+      console.error("Error fetching saved foodcards:", error);
+      setSavedFoodcards([]);
+      Alert.alert(
+        "Error",
+        error.message ||
+          "An error occurred while fetching saved foodcards. Pull down to refresh."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchData();
+    fetchSavedFoodcards();
   }, []);
 
   const deleteFoodcard = async (id) => {
@@ -97,6 +126,39 @@ export default function Profile() {
       );
     } finally {
       setDeleteBookId(null);
+    }
+  };
+
+  const unsaveFoodcard = async (id) => {
+    try {
+      setUnsaveFoodcardId(id);
+      const response = await fetch(
+        `${API_URL}/foodcards/unsave-foodcard/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to unsave foodcard");
+      }
+
+      setSavedFoodcards(
+        savedFoodcards.filter((foodcard) => foodcard._id !== id)
+      );
+      Alert.alert("Success", "Foodcard unsaved successfully.");
+    } catch (error) {
+      console.error("Error unsaving foodcard:", error);
+      Alert.alert(
+        "Error",
+        "An error occurred while unsaving the foodcard. Please try again."
+      );
+    } finally {
+      setUnsaveFoodcardId(null);
     }
   };
 
@@ -171,10 +233,48 @@ export default function Profile() {
     </View>
   );
 
+  const renderSavedFoodcard = ({ item }) => (
+    <View style={styles.bookCard}>
+      <View style={styles.bookImageContainer}>
+        <Image source={{ uri: item.image }} style={styles.bookImage} />
+
+        <View style={styles.overlayContent}>
+          <View style={styles.infoBackground} />
+          <View style={styles.bookDetails}>
+            <TouchableOpacity
+              onPress={() => confirmUnsave(item._id)}
+              style={styles.deleteButton}
+            >
+              {unsaveFoodcardId === item._id ? (
+                <ActivityIndicator size="small" color={COLORS.primary} />
+              ) : (
+                <Ionicons
+                  name="trash-outline"
+                  size={25}
+                  color={COLORS.primary}
+                />
+              )}
+            </TouchableOpacity>
+
+            <View style={styles.ratingContainer}>
+              <Text style={styles.bookTitle}>{item.title}</Text>
+              {renderRatingStars(item.rating)}
+            </View>
+            <Text style={styles.caption}>{item.caption}</Text>
+            <Text style={styles.date}>
+              {new Date(item.createdAt).toLocaleDateString()}
+            </Text>
+          </View>
+        </View>
+      </View>
+    </View>
+  );
+
   const handleRefresh = async () => {
     setRefreshing(true);
     await sleep(500);
     await fetchData();
+    await fetchSavedFoodcards();
     setRefreshing(false);
   };
 
@@ -220,11 +320,40 @@ export default function Profile() {
   );
 
   const SavedRoute = () => (
-    <View>
-      <Text>This is the Saved tab</Text>
-    </View>
+    <FlatList
+      key={"saved-2-columns"}
+      data={savedFoodcards}
+      renderItem={renderSavedFoodcard}
+      keyExtractor={(item) => item._id}
+      numColumns={2}
+      columnWrapperStyle={styles.columnWrapper}
+      contentContainerStyle={styles.gridContainer}
+      showsVerticalScrollIndicator={false}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={handleRefresh}
+          colors={[COLORS.primary]}
+          tintColor={COLORS.primary}
+        />
+      }
+      ListEmptyComponent={
+        <View style={styles.emptyListContainer}>
+          <Ionicons
+            name="heart-outline"
+            size={50}
+            color={COLORS.textSecondary}
+          />
+          <Text style={styles.emptyListText}>No saved foodcards yet.</Text>
+          <Text style={styles.emptyListSubtext}>
+            Swipe right on foodcards to save them!
+          </Text>
+        </View>
+      }
+    />
   );
 
+  
   const renderScene = SceneMap({
     foodcards: FoodcardsRoute,
     saved: SavedRoute,

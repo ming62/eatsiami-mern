@@ -1,8 +1,9 @@
+import "react-native-gesture-handler";
 import {
   View,
   Text,
   TouchableOpacity,
-  FlatList,
+  ScrollView,
   ActivityIndicator,
   RefreshControl,
   TextInput,
@@ -16,32 +17,55 @@ import { Ionicons } from "@expo/vector-icons";
 import COLORS from "../../constants/colors";
 import { formatPublishDate } from "../../lib/utils";
 import Loader from "../../components/Loader";
+import SwipeableCard from "../../components/SwipeableCard";
+import { useSharedValue } from "react-native-reanimated";
+import filter from "lodash.filter";
 
 export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export default function Home() {
   const { token } = useAuthStore();
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const animatedValue = useSharedValue(0);
+  const [activityIndex, setActivityIndex] = useState(0);
+
   const [foodcards, setFoodcards] = useState([]);
+  const [fullFoodcards, setFullFoodcards] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");  
+  const [searchQuery, setSearchQuery] = useState("");
 
+  const handleSearch = useCallback(
+    (query) => {
+      setSearchQuery(query);
+      const formattedQuery = query.trim().toLowerCase();
+      const filteredFoodcards = filter(fullFoodcards, (item) => {
+        return contains(item, formattedQuery);
+      });
+      setFoodcards(filteredFoodcards);
+      setCurrentIndex(0);
+    },
+    [fullFoodcards]
+  );
 
-  const filteredFoodcards = useMemo(() => {
-    if (!searchQuery.trim()) {
-      return foodcards;
-    }
-    return foodcards.filter((item) =>
-      item.title.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [foodcards, searchQuery]);
-
-  const handleSearch = useCallback((text) => {
-    setSearchQuery(text);
+  const handleRefresh = useCallback(() => {
+    setCurrentIndex(0);
+    setSearchQuery("");
+    setPage(1);
+    setHasMore(true);
+    fetchFoodcards(1, true);
   }, []);
 
+  const contains = (item, query) => {
+    if (!query) return true;
+    const lowerCaseQuery = query.toLowerCase();
+    return (
+      item.title.toLowerCase().includes(lowerCaseQuery) ||
+      item.caption.toLowerCase().includes(lowerCaseQuery)
+    );
+  };
 
   const fetchFoodcards = async (pagenum = 1, refresh = false) => {
     try {
@@ -52,7 +76,7 @@ export default function Home() {
       }
 
       const response = await fetch(
-        `${API_URL}/foodcards?page=${pagenum}&limit=5`,
+        `${API_URL}/foodcards?page=${pagenum}&limit=10`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -71,13 +95,26 @@ export default function Home() {
         refresh || pagenum === 1
           ? data.foodcards
           : Array.from(
-              new Set([...foodcards, ...data.foodcards].map((item) => item._id))
+              new Set(
+                [...fullFoodcards, ...data.foodcards].map((item) => item._id)
+              )
             ).map((id) =>
-              [...foodcards, ...data.foodcards].find((item) => item._id === id)
+              [...fullFoodcards, ...data.foodcards].find(
+                (item) => item._id === id
+              )
             );
 
-      setFoodcards(uniqueFoodcards);
+      setFullFoodcards(uniqueFoodcards);
 
+      if (!searchQuery.trim()) {
+        setFoodcards(uniqueFoodcards);
+      } else {
+        // If there's a search, filter the new data
+        const filteredData = filter(uniqueFoodcards, (item) => {
+          return contains(item, searchQuery.trim().toLowerCase());
+        });
+        setFoodcards(filteredData);
+      }
 
       setHasMore(pagenum < data.totalPages);
       setPage(pagenum);
@@ -97,11 +134,66 @@ export default function Home() {
     fetchFoodcards();
   }, []);
 
-  const handleLoadMore = async () => {
-    if (hasMore && !loading && !refreshing) {
-      await fetchFoodcards(page + 1);
+  useEffect(() => {
+    const FETCH_THRESHOLD = 3;
+    const remainingCards = foodcards.length - currentIndex;
+
+    if (
+      remainingCards <= FETCH_THRESHOLD &&
+      hasMore &&
+      !loading &&
+      !refreshing
+    ) {
+      console.log("Auto-fetching more cards...");
+      fetchFoodcards(page + 1);
+    }
+  }, [currentIndex, foodcards.length, hasMore, loading, refreshing, page]);
+
+  useEffect(() => {
+    animatedValue.value = currentIndex;
+  }, [foodcards, currentIndex]);
+
+  // useEffect(() => {
+  //   if (currentIndex >= foodcards.length && foodcards.length > 0) {
+  //     if (!hasMore) {
+  //       setCurrentIndex(0);
+  //     }
+  //   }
+  // }, [currentIndex, foodcards.length, hasMore]);
+
+  const saveFoodcard = async (foodcardId) => {
+    try {
+      const response = await fetch(`${API_URL}/foodcards/save-foodcard/${foodcardId}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to save foodcard");
+      }
+      
+      console.log("Foodcard saved successfully:", data);
+
+    } catch (error) {
+      console.error("Error saving foodcard:", error);
     }
   };
+
+  const handleSwipeLeft = useCallback(async (item, index) => {
+    console.log(`Swiped LEFT on card ${index}:`, item.title);
+    setCurrentIndex((prev) => prev + 1);
+  }, []);
+
+  const handleSwipeRight = useCallback(async (item, index) => {
+    console.log(`Swiped RIGHT on card ${index}:`, item.title);
+    setCurrentIndex((prev) => prev + 1);
+
+    await saveFoodcard(item._id);
+  }, []);
 
   const renderRatingStars = (rating) => {
     const stars = [];
@@ -119,99 +211,175 @@ export default function Home() {
     return <View style={{ flexDirection: "row" }}>{stars}</View>;
   };
 
-  const renderItem = ({ item }) => {
-    return (
-      <View style={styles.bookCard}>
-        <View style={styles.bookImageContainer}>
-          <Image source={{ uri: item.image }} style={styles.bookImage} />
+  // const renderItem = ({ item }) => {
+  //   return (
+  //     <View style={styles.bookCard}>
+  //       <View style={styles.bookImageContainer}>
+  //         <Image source={{ uri: item.image }} style={styles.bookImage} />
 
-          <View style={styles.overlayContent}>
-            <View style={styles.infoBackground} />
-            <View style={styles.bookDetails}>
-              <View style={styles.userInfo}>
-                <Image
-                  source={{ uri: item.user.profileImage }}
-                  style={styles.avatar}
-                />
-              </View>
+  //         <View style={styles.overlayContent}>
+  //           <View style={styles.infoBackground} />
+  //           <View style={styles.bookDetails}>
+  //             <View style={styles.userInfo}>
+  //               <Image
+  //                 source={{ uri: item.user.profileImage }}
+  //                 style={styles.avatar}
+  //               />
+  //             </View>
 
-              <View style={styles.ratingContainer}>
-                <Text style={styles.bookTitle}>{item.title}</Text>
-                {renderRatingStars(item.rating)}
-              </View>
-              <Text style={styles.caption}>{item.caption}</Text>
-              <Text style={styles.date}>
-                Shared on {formatPublishDate(item.createdAt)}
-              </Text>
-            </View>
-          </View>
-        </View>
-      </View>
-    );
-  };
+  //             <View style={styles.ratingContainer}>
+  //               <Text style={styles.bookTitle}>{item.title}</Text>
+  //               {renderRatingStars(item.rating)}
+  //             </View>
+  //             <Text style={styles.caption}>{item.caption}</Text>
+  //             <Text style={styles.date}>
+  //               Shared on {formatPublishDate(item.createdAt)}
+  //             </Text>
+  //           </View>
+  //         </View>
+  //       </View>
+  //     </View>
+  //   );
+  // };
 
   if (loading) {
     return <Loader size="large" />;
   }
+
+  const MAX = 3;
   return (
     <View style={styles.container}>
-      <FlatList
-        data={filteredFoodcards}
-        renderItem={renderItem}
-        keyExtractor={(item) => item._id}
-        contentContainerStyle={styles.listContent}
-        showsVerticalScrollIndicator={false}
-        onEndReached={handleLoadMore}
-        onEndReachedThreshold={0.1}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={() => {
-              fetchFoodcards(1, true);
-            }}
-            colors={[COLORS.primary]}
-            tintColor={COLORS.primary}
-          />
-        }
-        ListHeaderComponent={
-          <View>
-            <View style={styles.header}>
-              <Text style={styles.headerTitle}>EatSiaMi</Text>
-            </View>
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>EatSiaMi</Text>
+      </View>
 
-            <View style={styles.searchContainer}>
-              <Ionicons name="search" size={30} color={COLORS.textSecondary} style={{ marginLeft: 5}} />
-              <TextInput
-                style={styles.searchText}
-                placeholder="search for anything"
-                value={searchQuery}
-                onChangeText={handleSearch}
-                placeholderTextColor={COLORS.textSecondary}
-                maxLength={50}
-                multiline={false}
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
-            </View>
-          </View>
-        }
-        ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Ionicons name="fast-food-outline" size={60} color={"#8e8e8e"} />
-            <Text style={styles.emptyText}>No foodcards available</Text>
-            <Text style={styles.emptySubtext}>Share your first foodcard!</Text>
-          </View>
-        }
-        ListFooterComponent={
-          hasMore && filteredFoodcards.length > 0 ? (
-            <ActivityIndicator
-              style={styles.footerLoader}
-              size="small"
-              color={COLORS.primary}
+      {/* SearchBar */}
+      <View style={styles.searchContainer}>
+        <Ionicons
+          name="search"
+          size={30}
+          color={COLORS.textSecondary}
+          style={{ marginLeft: 5 }}
+        />
+        <TextInput
+          style={styles.searchText}
+          placeholder="search for anything"
+          value={searchQuery}
+          onChangeText={(query) => {
+            handleSearch(query);
+          }}
+          placeholderTextColor={COLORS.textSecondary}
+          maxLength={50}
+          multiline={false}
+          autoCapitalize="none"
+          autoCorrect={false}
+        />
+      </View>
+
+      <View style={styles.CardContainer}>
+        {foodcards.map((item, index) => {
+          if (index > currentIndex + MAX || index < currentIndex) return null;
+          return (
+            <SwipeableCard
+              item={item}
+              key={item._id}
+              index={index}
+              datalength={foodcards.length}
+              maxVisibleItem={MAX}
+              currentIndex={currentIndex}
+              setCurrentIndex={setCurrentIndex}
+              animatedValue={animatedValue}
+              foodcards={foodcards}
+              setFoodcards={setFoodcards}
+              onSwipeLeft={handleSwipeLeft}
+              onSwipeRight={handleSwipeRight}
             />
-          ) : null
-        }
-      />
+          );
+        })}
+      </View>
+
+      {/* Loading indicator for background fetching */}
+      {loading && foodcards.length > 0 && (
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator size="small" color={COLORS.primary} />
+          <Text style={styles.loadingText}>Loading more cards...</Text>
+        </View>
+      )}
+
+      <TouchableOpacity
+        style={styles.refreshButton}
+        onPress={handleRefresh}
+        disabled={refreshing}
+      >
+        {refreshing ? (
+          <ActivityIndicator size="small" color="white" />
+        ) : (
+          <Ionicons name="refresh" size={20} color="white" />
+        )}
+      </TouchableOpacity>
+
+      {/* Empty State */}
     </View>
+
+    // <View style={styles.container}>
+    //   <FlatList
+    //     data={filteredFoodcards}
+    //     renderItem={renderItem}
+    //     keyExtractor={(item) => item._id}
+    //     contentContainerStyle={styles.listContent}
+    //     showsVerticalScrollIndicator={false}
+    //     onEndReached={handleLoadMore}
+    //     onEndReachedThreshold={0.1}
+    //     refreshControl={
+    //       <RefreshControl
+    //         refreshing={refreshing}
+    //         onRefresh={() => {
+    //           fetchFoodcards(1, true);
+    //         }}
+    //         colors={[COLORS.primary]}
+    //         tintColor={COLORS.primary}
+    //       />
+    //     }
+    //     ListHeaderComponent={
+    //       <View>
+    //         <View style={styles.header}>
+    //           <Text style={styles.headerTitle}>EatSiaMi</Text>
+    //         </View>
+
+    //         <View style={styles.searchContainer}>
+    //           <Ionicons name="search" size={30} color={COLORS.textSecondary} style={{ marginLeft: 5}} />
+    //           <TextInput
+    //             style={styles.searchText}
+    //             placeholder="search for anything"
+    //             value={searchQuery}
+    //             onChangeText={handleSearch}
+    //             placeholderTextColor={COLORS.textSecondary}
+    //             maxLength={50}
+    //             multiline={false}
+    //             autoCapitalize="none"
+    //             autoCorrect={false}
+    //           />
+    //         </View>
+    //       </View>
+    //     }
+    //     ListEmptyComponent={
+    //       <View style={styles.emptyContainer}>
+    //         <Ionicons name="fast-food-outline" size={60} color={"#8e8e8e"} />
+    //         <Text style={styles.emptyText}>No foodcards available</Text>
+    //         <Text style={styles.emptySubtext}>Share your first foodcard!</Text>
+    //       </View>
+    //     }
+    //     ListFooterComponent={
+    //       hasMore && filteredFoodcards.length > 0 ? (
+    //         <ActivityIndicator
+    //           style={styles.footerLoader}
+    //           size="small"
+    //           color={COLORS.primary}
+    //         />
+    //       ) : null
+    //     }
+    //   />
+    // </View>
   );
 }

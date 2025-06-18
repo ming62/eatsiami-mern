@@ -5,6 +5,7 @@ import { StatusBar } from "expo-status-bar";
 import { use, useEffect, useState } from "react";
 import { useAuthStore } from "../store/authStore";
 import { useFonts } from "expo-font";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -15,7 +16,6 @@ export default function RootLayout() {
 
   const { checkAuth, user, token } = useAuthStore();
   SplashScreen.preventAutoHideAsync();
-
 
   const [fontsLoaded] = useFonts({
     "Konkhmer_Sleokchher-Regular": require("../assets/fonts/KonkhmerSleokchher-Regular.ttf"),
@@ -54,14 +54,16 @@ export default function RootLayout() {
   }
 
   return (
-    <SafeAreaProvider>
-      <SafeScreen>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="(auth)" />
-        </Stack>
-      </SafeScreen>
-      <StatusBar style="dark" />
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <SafeScreen>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="(auth)" />
+          </Stack>
+        </SafeScreen>
+        <StatusBar style="dark" />
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }
