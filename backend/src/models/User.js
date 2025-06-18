@@ -28,6 +28,12 @@ const userSchema = new mongoose.Schema({
         ref: "User",
       },
     ],
+    savedFoodcards: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Foodcard",
+        },
+    ],
 }, 
     {    timestamps: true, }
 );
