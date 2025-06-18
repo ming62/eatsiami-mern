@@ -151,6 +151,7 @@ const SwipeableCard = ({
                 {renderRatingStars(item.rating)}
               </View>
               <Text style={styles.caption}>{item.caption}</Text>
+              <Text style={styles.location}>📍 {item.location}</Text>
               <Text style={styles.date}>
                 Shared on {formatPublishDate(item.createdAt)}
               </Text>
@@ -288,5 +289,11 @@ const styles = StyleSheet.create({
   },
   footerLoader: {
     marginVertical: 20,
+  },
+  location: {
+    fontSize: 12,
+    color: COLORS.white,
+    marginBottom: 4,
+    fontStyle: "italic",
   },
 });

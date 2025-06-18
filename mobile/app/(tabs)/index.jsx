@@ -63,7 +63,8 @@ export default function Home() {
     const lowerCaseQuery = query.toLowerCase();
     return (
       item.title.toLowerCase().includes(lowerCaseQuery) ||
-      item.caption.toLowerCase().includes(lowerCaseQuery)
+      item.caption.toLowerCase().includes(lowerCaseQuery) ||
+      item.location.toLowerCase().includes(lowerCaseQuery) 
     );
   };
 

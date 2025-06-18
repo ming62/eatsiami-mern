@@ -242,7 +242,7 @@ export default function Profile() {
           <View style={styles.infoBackground} />
           <View style={styles.bookDetails}>
             <TouchableOpacity
-              onPress={() => confirmUnsave(item._id)}
+              onPress={() => unsaveFoodcard(item._id)}
               style={styles.deleteButton}
             >
               {unsaveFoodcardId === item._id ? (

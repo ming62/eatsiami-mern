@@ -17,6 +17,11 @@ const foodcardSchema = new mongoose.Schema({
         required: true,
     },
 
+    location: {
+        type: String,
+        required: true,
+    },
+
     rating: {
         type: Number,
         required: true,
