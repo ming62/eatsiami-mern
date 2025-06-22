@@ -155,40 +155,40 @@ export default function SearchScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* header */}
-      <View style={styles.searchheader}>
+      {/* Header - Similar to Friends page */}
+      <View style={styles.header}>
         <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color={COLORS.black} />
+          <Ionicons name="arrow-back" size={24} color={COLORS.white} />
         </TouchableOpacity>
-        <Text style={styles.title}>Discover</Text>
-        <View style={styles.backButton} />
+        <Text style={styles.headerTitle}>Discover</Text>
+
       </View>
-      {/* Search Section */}
-      <View style={styles.searchSection}>
-        <View style={styles.searchContainer}>
-          <TouchableOpacity onPress={() => handleSearch(searchTerm)}>
-            <Ionicons
-              name="search"
-              size={20}
-              color="#666"
-              style={styles.searchIcon}
-            />
-          </TouchableOpacity>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search by username..."
-            value={searchTerm}
-            onChangeText={setSearchTerm}
-            onSubmitEditing={() => handleSearch(searchTerm)} //trigger search when press search key
-            returnKeyType="search" //show search on keyboard
-            placeholderTextColor="#666"
-            autoFocus={true}
-          />
-        </View>
+
+      {/* Search Section - Similar to Friends page */}
+      <View style={styles.searchContainer}>
+        <Ionicons
+          name="search"
+          size={30}
+          color={COLORS.textSecondary}
+          style={{ marginLeft: 5 }}
+        />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search by username..."
+          value={searchTerm}
+          onChangeText={handleSearch}
+          onSubmitEditing={() => handleSearch(searchTerm)}
+          returnKeyType="search"
+          placeholderTextColor={COLORS.textSecondary}
+          autoFocus={true}
+        />
       </View>
+
       {/* Search Results */}
       <View style={styles.friendsSection}>
-        {searchResults.length > 0 ? (
+        {isLoading ? (
+          <ActivityIndicator size="large" color={COLORS.primary} />
+        ) : searchResults.length > 0 ? (
           <FlatList
             data={searchResults}
             renderItem={renderSearchFriends}
@@ -196,9 +196,60 @@ export default function SearchScreen() {
             showsVerticalScrollIndicator={false}
           />
         ) : (
-          <Text style={styles.emptyText}> no friends found</Text>
+          <Text style={styles.emptyText}>
+            {searchTerm.trim()
+              ? "No users found"
+              : "Start searching for friends"}
+          </Text>
         )}
       </View>
     </SafeAreaView>
+
+    // <SafeAreaView style={styles.container}>
+    //   {/* header */}
+    //   <View style={styles.searchheader}>
+    //     <TouchableOpacity onPress={handleBack} style={styles.backButton}>
+    //       <Ionicons name="arrow-back" size={24} color={COLORS.black} />
+    //     </TouchableOpacity>
+    //     <Text style={styles.title}>Discover</Text>
+    //     <View style={styles.backButton} />
+    //   </View>
+    //   {/* Search Section */}
+    //   <View style={styles.searchSection}>
+    //     <View style={styles.searchContainer}>
+    //       <TouchableOpacity onPress={() => handleSearch(searchTerm)}>
+    //         <Ionicons
+    //           name="search"
+    //           size={20}
+    //           color="#666"
+    //           style={styles.searchIcon}
+    //         />
+    //       </TouchableOpacity>
+    //       <TextInput
+    //         style={styles.searchInput}
+    //         placeholder="Search by username..."
+    //         value={searchTerm}
+    //         onChangeText={setSearchTerm}
+    //         onSubmitEditing={() => handleSearch(searchTerm)} //trigger search when press search key
+    //         returnKeyType="search" //show search on keyboard
+    //         placeholderTextColor="#666"
+    //         autoFocus={true}
+    //       />
+    //     </View>
+    //   </View>
+    //   {/* Search Results */}
+    //   <View style={styles.friendsSection}>
+    //     {searchResults.length > 0 ? (
+    //       <FlatList
+    //         data={searchResults}
+    //         renderItem={renderSearchFriends}
+    //         keyExtractor={(item) => item._id}
+    //         showsVerticalScrollIndicator={false}
+    //       />
+    //     ) : (
+    //       <Text style={styles.emptyText}> no friends found</Text>
+    //     )}
+    //   </View>
+    // </SafeAreaView>
   );
 }

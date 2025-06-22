@@ -1,11 +1,11 @@
 import { SplashScreen, Stack, useRouter, useSegments } from "expo-router";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import SafeScreen from "../components/SafeScreen";
-import { StatusBar } from "expo-status-bar";
 import { use, useEffect, useState } from "react";
 import { useAuthStore } from "../store/authStore";
 import { useFonts } from "expo-font";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import COLORS from "../constants/colors";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -20,6 +20,10 @@ export default function RootLayout() {
   const [fontsLoaded] = useFonts({
     "Konkhmer_Sleokchher-Regular": require("../assets/fonts/KonkhmerSleokchher-Regular.ttf"),
     "YoungSerif-Regular": require("../assets/fonts/YoungSerif-Regular.ttf"),
+    Bagnard: require("../assets/fonts/Bagnard.otf"),
+    Transicty: require("../assets/fonts/Transcity DEMO.otf"),
+    Manbow: require("../assets/fonts/Manbow Lines.otf"),
+    Milkyway: require("../assets/fonts/Milkyway DEMO.ttf"),
   });
 
   useEffect(() => {
@@ -55,14 +59,14 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaProvider>
+      <SafeAreaProvider style={{ flex: 1 }}>
         <SafeScreen>
+
           <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen name="(tabs)" />
             <Stack.Screen name="(auth)" />
           </Stack>
         </SafeScreen>
-        <StatusBar style="dark" />
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

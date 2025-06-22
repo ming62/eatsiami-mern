@@ -190,7 +190,7 @@ export default function Friends() {
               );
             }}
           >
-            <Ionicons name="trash-outline" size={24} color="#6a6968" />
+            <Ionicons name="trash-outline" size={20} color="#6a6968" />
           </TouchableOpacity>
         </View>
       </View>
@@ -199,28 +199,28 @@ export default function Friends() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* header */}
+      {/* Header - Similar to Home page */}
       <View style={styles.header}>
-        <Text style={styles.title}>Friends</Text>
+        <Text style={styles.headerTitle}>Friends</Text>
       </View>
-      {/* Search Section */}
-      <View style={styles.searchSection}>
-        <View style={styles.searchContainer}>
-          <Ionicons
-            name="search"
-            size={20}
-            color="#666"
-            style={styles.searchIcon}
-          />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search by username..."
-            value={searchTerm}
-            onFocus={() => router.push("otherpage/search")}
-            placeholderTextColor="#666"
-          />
-        </View>
+
+      {/* Search Section - Similar to Home page */}
+      <View style={styles.searchContainer}>
+        <Ionicons
+          name="search"
+          size={30}
+          color={COLORS.textSecondary}
+          style={{ marginLeft: 5 }}
+        />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="search by username..."
+          value={searchTerm}
+          onFocus={() => router.push("otherpage/search")}
+          placeholderTextColor={COLORS.textSecondary}
+        />
       </View>
+
       {/* Friends List Section */}
       <View style={styles.friendsSection}>
         {isLoading ? (
@@ -246,5 +246,55 @@ export default function Friends() {
         )}
       </View>
     </SafeAreaView>
+    // <SafeAreaView style={styles.container}>
+
+    //   {/* header */}
+    //   <View style={styles.header}>
+    //     <Text style={styles.title}>Friends</Text>
+    //   </View>
+
+    //   {/* Search Section */}
+    //   <View style={styles.searchSection}>
+    //     <View style={styles.searchContainer}>
+    //       <Ionicons
+    //         name="search"
+    //         size={20}
+    //         color="#666"
+    //         style={styles.searchIcon}
+    //       />
+    //       <TextInput
+    //         style={styles.searchInput}
+    //         placeholder="Search by username..."
+    //         value={searchTerm}
+    //         onFocus={() => router.push("otherpage/search")}
+    //         placeholderTextColor="#666"
+    //       />
+    //     </View>
+    //   </View>
+    //   {/* Friends List Section */}
+    //   <View style={styles.friendsSection}>
+    //     {isLoading ? (
+    //       <ActivityIndicator size="large" color="#0000ff" />
+    //     ) : friends.length > 0 ? (
+    //       <FlatList
+    //         data={friends}
+    //         renderItem={renderFriend}
+    //         keyExtractor={(item) => item._id}
+    //         showsVerticalScrollIndicator={false}
+    //         refreshControl={
+    //           <RefreshControl
+    //             refreshing={refreshing}
+    //             onRefresh={onRefresh}
+    //             colors={[COLORS.primary]}
+    //           />
+    //         }
+    //       />
+    //     ) : (
+    //       <Text style={styles.emptyText}>
+    //         No friends yet. Start adding some!
+    //       </Text>
+    //     )}
+    //   </View>
+    // </SafeAreaView>
   );
 }

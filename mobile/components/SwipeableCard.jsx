@@ -5,6 +5,8 @@ import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
 import { formatPublishDate } from "../lib/utils";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { LinearGradient } from "expo-linear-gradient";
+import { useRouter } from "expo-router";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -14,20 +16,33 @@ import Animated, {
   runOnJS,
 } from "react-native-reanimated";
 
+const CARD_WIDTH = 303;
+const CARD_HEIGHT = 517;
+const CARD_ASPECT_RATIO = 9 / 16;
+
 const renderRatingStars = (rating) => {
   const stars = [];
-  for (let i = 1; i <= 5; i++) {
+  for (let i = 1; i <= rating; i++) {
     stars.push(
       <Ionicons
         key={i}
-        name={i <= rating ? "star" : "star-outline"}
-        size={20}
+        name="star"
+        size={CARD_WIDTH * 0.066}
         color={i <= rating ? "#F4B400" : COLORS.textSecondary}
-        style={{ marginRight: 2 }}
+        style={{ marginRight: CARD_WIDTH * 0.0066 }}
       />
     );
   }
-  return <View style={{ flexDirection: "row" }}>{stars}</View>;
+  return (
+    <View
+      style={{
+        flexDirection: "row",
+        marginBottom: -CARD_HEIGHT * 0.015,
+      }}
+    >
+      {stars}
+    </View>
+  );
 };
 
 const SwipeableCard = ({
@@ -41,8 +56,14 @@ const SwipeableCard = ({
   onSwipeRight,
 }) => {
   const { width } = useWindowDimensions();
+  const router = useRouter();
   const translateX = useSharedValue(0);
   const direction = useSharedValue(0);
+
+  const navigateToCardDetail = () => {
+    router.push(`/otherpage/cardDetail?cardId=${item._id}`);
+  };
+
   const pan = Gesture.Pan()
     .onUpdate((e) => {
       const isSwipeRight = e.translationX > 0;
@@ -59,7 +80,20 @@ const SwipeableCard = ({
     })
     .onEnd((e) => {
       if (currentIndex == index) {
-        if (Math.abs(e.translationX) > 150 || Math.abs(e.velocityX) > 1000) {
+        const isTap =
+          Math.abs(e.translationX) < 15 && 
+          Math.abs(e.translationY) < 15 && 
+          Math.abs(e.velocityX) < 500;  
+
+        if (isTap) {
+          runOnJS(navigateToCardDetail)();
+          return;
+        }
+
+        if (
+          Math.abs(e.translationX) > CARD_WIDTH * 0.5 ||
+          Math.abs(e.velocityX) > 1000
+        ) {
           translateX.value = withTiming(width * direction.value, {}, () => {
             if (e.translationX > 0) {
               if (onSwipeRight) {
@@ -78,6 +112,14 @@ const SwipeableCard = ({
       }
     });
 
+  const tap = Gesture.Tap().onEnd(() => {
+    if (currentIndex === index) {
+      runOnJS(navigateToCardDetail)();
+    }
+  });
+
+  const combinedGesture = Gesture.Exclusive(pan, tap);
+
   const animatedStyle = useAnimatedStyle(() => {
     const currentItem = index === currentIndex;
 
@@ -90,7 +132,7 @@ const SwipeableCard = ({
     const translateY = interpolate(
       animatedValue.value,
       [index - 1, index],
-      [-45, 0]
+      [-CARD_HEIGHT * 0.087, 0]
     );
 
     const scale = interpolate(
@@ -122,8 +164,38 @@ const SwipeableCard = ({
     };
   });
 
+  const rightOverlayStyle = useAnimatedStyle(() => {
+    const currentItem = index === currentIndex;
+    if (!currentItem || translateX.value <= 0) return { opacity: 0 };
+
+    const overlayOpacity = interpolate(
+      translateX.value,
+      [0, CARD_WIDTH * 0.33, CARD_WIDTH * 0.66],
+      [0, 0.6, 0.9]
+    );
+
+    return {
+      opacity: overlayOpacity,
+    };
+  });
+
+  const leftOverlayStyle = useAnimatedStyle(() => {
+    const currentItem = index === currentIndex;
+    if (!currentItem || translateX.value >= 0) return { opacity: 0 };
+
+    const overlayOpacity = interpolate(
+      Math.abs(translateX.value),
+      [0, CARD_WIDTH * 0.33, CARD_WIDTH * 0.66],
+      [0, 0.6, 0.9]
+    );
+
+    return {
+      opacity: overlayOpacity,
+    };
+  });
+
   return (
-    <GestureDetector gesture={pan}>
+    <GestureDetector gesture={combinedGesture}>
       <Animated.View
         style={[
           styles.cardContainer,
@@ -136,27 +208,62 @@ const SwipeableCard = ({
         <View style={styles.imageContainer}>
           <Image source={{ uri: item.image }} style={styles.cardImage} />
 
-          <View style={styles.overlayContent}>
-            <View style={styles.infoBackground} />
-            <View style={styles.bookDetails}>
-              <View style={styles.userInfo}>
-                <Image
-                  source={{ uri: item.user.profileImage }}
-                  style={styles.avatar}
-                />
-              </View>
+          <Animated.View
+            style={[
+              styles.swipeOverlay,
+              styles.rightSwipeOverlay,
+              rightOverlayStyle,
+            ]}
+          >
+            <View style={styles.swipeIconContainer}>
+              <Ionicons name="heart" size={CARD_WIDTH * 0.264} color="white" />
+              <Text style={styles.swipeText}>SAVE</Text>
+            </View>
+          </Animated.View>
 
+          <Animated.View
+            style={[
+              styles.swipeOverlay,
+              styles.leftSwipeOverlay,
+              leftOverlayStyle,
+            ]}
+          >
+            <View style={styles.swipeIconContainer}>
+              <Ionicons name="close" size={CARD_WIDTH * 0.264} color="white" />
+              <Text style={styles.swipeText}>NOPE</Text>
+            </View>
+          </Animated.View>
+
+          <LinearGradient
+            colors={[
+              "transparent",
+              "transparent",
+              "transparent",
+              "rgba(0,0,0,0.2)",
+              "rgba(0,0,0,0.6)",
+              "rgba(0,0,0,0.8)",
+            ]}
+            locations={[0, 0.5, 0.7, 0.8, 0.9, 1]}
+            style={styles.gradientOverlay}
+          >
+            <View style={styles.userInfo}>
+              <Image
+                source={{ uri: item.user.profileImage }}
+                style={styles.avatar}
+              />
+            </View>
+
+            <View style={styles.foodcardDetails}>
               <View style={styles.ratingContainer}>
-                <Text style={styles.bookTitle}>{item.title}</Text>
+                <Text style={styles.foodcardTitle}>{item.title}</Text>
                 {renderRatingStars(item.rating)}
               </View>
               <Text style={styles.caption}>{item.caption}</Text>
-              <Text style={styles.location}>📍 {item.location}</Text>
-              <Text style={styles.date}>
-                Shared on {formatPublishDate(item.createdAt)}
-              </Text>
+              <View style={styles.locationContainer}>
+                <Text style={styles.location}>@ {item.location}</Text>
+              </View>
             </View>
-          </View>
+          </LinearGradient>
         </View>
       </Animated.View>
     </GestureDetector>
@@ -168,132 +275,153 @@ export default SwipeableCard;
 const styles = StyleSheet.create({
   cardContainer: {
     position: "absolute",
-    height: 517,
-    width: 303,
+    height: CARD_HEIGHT,
+    width: CARD_WIDTH,
     backgroundColor: COLORS.cardBackground,
-    borderRadius: 16,
-    shadowColor: COLORS.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-
-    aspectRatio: 9 / 16,
+    borderRadius: CARD_WIDTH * 0.053,
+    aspectRatio: CARD_ASPECT_RATIO,
     overflow: "hidden",
     alignSelf: "center",
-  },
-  infoBackground: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: "21%",
-    backgroundColor: "rgba(0, 0, 0, 0.33)",
-    borderBottomLeftRadius: 10,
-    borderBottomRightRadius: 10,
-    zIndex: 0,
-  },
-  bookHeader: {
-    paddingHorizontal: 16,
-    paddingTop: 8,
-  },
-  userInfo: {
-    position: "absolute",
-    alignItems: "center",
-  },
 
-  avatar: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    marginHorizontal: "85%",
-    marginVertical: "3%",
-  },
-  username: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: COLORS.textPrimary,
+    // Responsive shadow
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: CARD_HEIGHT * 0.015,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: CARD_WIDTH * 0.04,
+    elevation: CARD_WIDTH * 0.066,
   },
 
   imageContainer: {
     ...StyleSheet.absoluteFillObject,
-    borderRadius: 16,
+    borderRadius: CARD_WIDTH * 0.053,
     backgroundColor: COLORS.border,
   },
 
   cardImage: {
     width: "100%",
     height: "100%",
-    borderRadius: 16,
+    borderRadius: CARD_WIDTH * 0.053,
     contentFit: "cover",
   },
-  overlayContent: {
+
+  gradientOverlay: {
     ...StyleSheet.absoluteFillObject,
     justifyContent: "flex-end",
-    zIndex: 1,
+    borderRadius: CARD_WIDTH * 0.053,
   },
-  bookDetails: {
-    paddingHorizontal: 16,
-    paddingBottom: 16,
+
+  userInfo: {
+    position: "absolute",
+    alignItems: "center",
+    bottom: CARD_HEIGHT * 0.031,
+    right: CARD_WIDTH * 0.053,
+  },
+
+  avatar: {
+    width: CARD_WIDTH * 0.198,
+    height: CARD_WIDTH * 0.198,
+    borderRadius: CARD_WIDTH * 0.099,
+  },
+
+  foodcardDetails: {
+    paddingHorizontal: CARD_WIDTH * 0.053,
+    paddingBottom: CARD_HEIGHT * 0.031,
     marginTop: 0,
     zIndex: 1,
   },
 
-  bookTitle: {
-    fontSize: 20,
+  foodcardTitle: {
+    fontSize: CARD_WIDTH * 0.099,
     fontWeight: "700",
     color: COLORS.white,
     fontFamily: "Konkhmer_Sleokchher-Regular",
-    marginRight: 8,
-    marginVertical: "-3%",
+    marginRight: CARD_WIDTH * 0.026,
+    marginVertical: CARD_HEIGHT * -0.006,
   },
 
   ratingContainer: {
-    marginTop: -10,
     flexDirection: "row",
-    marginVertical: "5%",
+    marginVertical: CARD_HEIGHT * 0.015,
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 12,
   },
+
   caption: {
-    fontSize: 14,
+    fontSize: CARD_WIDTH * 0.046,
     color: COLORS.white,
-    marginBottom: 8,
-    lineHeight: 20,
+    marginTop: CARD_HEIGHT * 0.008,
+    marginBottom: CARD_HEIGHT * 0.015,
+    lineHeight: CARD_WIDTH * 0.066,
+    top: -CARD_HEIGHT * 0.023,
   },
+
+  locationContainer: {
+    backgroundColor: COLORS.primary,
+    borderRadius: CARD_WIDTH * 0.04,
+    paddingHorizontal: CARD_WIDTH * 0.026,
+    paddingVertical: CARD_HEIGHT * 0.008,
+    alignSelf: "flex-start",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
   location: {
-    fontSize: 14,
-    color: COLORS.textDark,
-  },
-  date: {
-    fontSize: 12,
+    fontSize: CARD_WIDTH * 0.04,
     color: COLORS.white,
+    marginBottom: CARD_HEIGHT * 0.004,
   },
+
+  swipeOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: CARD_WIDTH * 0.053,
+  },
+
+  rightSwipeOverlay: {
+    backgroundColor: COLORS.primary,
+  },
+
+  leftSwipeOverlay: {
+    backgroundColor: "#2c2c2c",
+  },
+
+  swipeIconContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  swipeText: {
+    color: "white",
+    fontSize: CARD_WIDTH * 0.079,
+    fontWeight: "bold",
+    marginTop: CARD_HEIGHT * 0.019,
+    letterSpacing: CARD_WIDTH * 0.0066,
+    fontFamily: "Konkhmer_Sleokchher-Regular",
+  },
+
   emptyContainer: {
     alignItems: "center",
     justifyContent: "center",
-    padding: 40,
-    marginTop: 40,
+    padding: CARD_WIDTH * 0.132,
+    marginTop: CARD_WIDTH * 0.132,
   },
+
   emptyText: {
-    fontSize: 18,
+    fontSize: CARD_WIDTH * 0.059,
     fontWeight: "600",
     color: COLORS.textPrimary,
-    marginTop: 16,
-    marginBottom: 8,
+    marginTop: CARD_WIDTH * 0.053,
+    marginBottom: CARD_WIDTH * 0.026,
   },
+
   emptySubtext: {
-    fontSize: 14,
+    fontSize: CARD_WIDTH * 0.046,
     color: COLORS.textSecondary,
     textAlign: "center",
-  },
-  footerLoader: {
-    marginVertical: 20,
-  },
-  location: {
-    fontSize: 12,
-    color: COLORS.white,
-    marginBottom: 4,
-    fontStyle: "italic",
   },
 });

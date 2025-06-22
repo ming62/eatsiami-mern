@@ -6,7 +6,10 @@ import { ImageBackground } from "expo-image";
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    //backgroundColor: "#2c2c2c",
+    backgroundColor: COLORS.primary,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
   },
   cardContainer: {
     flex: 1,
@@ -25,17 +28,21 @@ const styles = StyleSheet.create({
     paddingBottom: 80,
   },
   header: {
-    marginTop: 20,
-    marginBottom: -10,
     alignItems: "center",
+    backgroundColor: COLORS.primary,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+    height: 70,
+    justifyContent: "center",
   },
+
   headerTitle: {
-    fontSize: 30,
-    fontWeight: "bold",
-    color: COLORS.black,
-    marginBottom: 10,
-    fontFamily: "YoungSerif-Regular",
+    fontSize: 50,
+    color: COLORS.white,
+    fontFamily: "Transicty",
+    textAlign: "center",
   },
+
   headerSubtitle: {
     fontSize: 14,
     color: COLORS.textSecondary,
@@ -45,7 +52,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 12,
-    paddingVertical: 1,
     borderWidth: 1,
     borderColor: "#ddd",
     borderRadius: 20,
@@ -53,7 +59,7 @@ const styles = StyleSheet.create({
     marginBottom: 40,
     marginLeft: 30,
     marginRight: 30,
-    marginTop: 8,
+    marginTop: 20,
   },
   searchText: {
     marginLeft: 10,
@@ -252,7 +258,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     position: "relative",
-
   },
 });
 

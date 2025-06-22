@@ -16,7 +16,7 @@
 // RETRO
 
 const COLORS = {
-  primary: "#ff6c36",
+  primary: "#FF7601",
   textPrimary: "#784e2d",
   textSecondary: "#b3b3b3",
   textDark: "#50372a",

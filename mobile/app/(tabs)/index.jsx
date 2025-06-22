@@ -64,7 +64,7 @@ export default function Home() {
     return (
       item.title.toLowerCase().includes(lowerCaseQuery) ||
       item.caption.toLowerCase().includes(lowerCaseQuery) ||
-      item.location.toLowerCase().includes(lowerCaseQuery) 
+      item.location.toLowerCase().includes(lowerCaseQuery)
     );
   };
 
@@ -164,21 +164,23 @@ export default function Home() {
 
   const saveFoodcard = async (foodcardId) => {
     try {
-      const response = await fetch(`${API_URL}/foodcards/save-foodcard/${foodcardId}`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `${API_URL}/foodcards/save-foodcard/${foodcardId}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.message || "Failed to save foodcard");
       }
-      
-      console.log("Foodcard saved successfully:", data);
 
+      console.log("Foodcard saved successfully:", data);
     } catch (error) {
       console.error("Error saving foodcard:", error);
     }
@@ -249,12 +251,24 @@ export default function Home() {
 
   const MAX = 3;
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>EatSiaMi</Text>
+    <ScrollView
+      style={{ backgroundColor: COLORS.background }}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={handleRefresh}
+          colors={[COLORS.primary]}
+          tintColor={COLORS.primary}
+        />
+      }
+    >
+      <View style={styles.container}>
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>eatsiami</Text>
+        </View>
       </View>
-
+      
       {/* SearchBar */}
       <View style={styles.searchContainer}>
         <Ionicons
@@ -277,51 +291,40 @@ export default function Home() {
           autoCorrect={false}
         />
       </View>
-
-      <View style={styles.CardContainer}>
-        {foodcards.map((item, index) => {
-          if (index > currentIndex + MAX || index < currentIndex) return null;
-          return (
-            <SwipeableCard
-              item={item}
-              key={item._id}
-              index={index}
-              datalength={foodcards.length}
-              maxVisibleItem={MAX}
-              currentIndex={currentIndex}
-              setCurrentIndex={setCurrentIndex}
-              animatedValue={animatedValue}
-              foodcards={foodcards}
-              setFoodcards={setFoodcards}
-              onSwipeLeft={handleSwipeLeft}
-              onSwipeRight={handleSwipeRight}
-            />
-          );
-        })}
-      </View>
-
-      {/* Loading indicator for background fetching */}
-      {loading && foodcards.length > 0 && (
-        <View style={styles.loadingOverlay}>
-          <ActivityIndicator size="small" color={COLORS.primary} />
-          <Text style={styles.loadingText}>Loading more cards...</Text>
+      <View>
+        <View style={styles.CardContainer}>
+          {foodcards.map((item, index) => {
+            if (index > currentIndex + MAX || index < currentIndex) return null;
+            return (
+              <SwipeableCard
+                item={item}
+                key={item._id}
+                index={index}
+                datalength={foodcards.length}
+                maxVisibleItem={MAX}
+                currentIndex={currentIndex}
+                setCurrentIndex={setCurrentIndex}
+                animatedValue={animatedValue}
+                foodcards={foodcards}
+                setFoodcards={setFoodcards}
+                onSwipeLeft={handleSwipeLeft}
+                onSwipeRight={handleSwipeRight}
+              />
+            );
+          })}
         </View>
-      )}
 
-      <TouchableOpacity
-        style={styles.refreshButton}
-        onPress={handleRefresh}
-        disabled={refreshing}
-      >
-        {refreshing ? (
-          <ActivityIndicator size="small" color="white" />
-        ) : (
-          <Ionicons name="refresh" size={20} color="white" />
+        {/* Loading indicator for background fetching */}
+        {loading && foodcards.length > 0 && (
+          <View style={styles.loadingOverlay}>
+            <ActivityIndicator size="small" color={COLORS.primary} />
+            <Text style={styles.loadingText}>Loading more cards...</Text>
+          </View>
         )}
-      </TouchableOpacity>
 
-      {/* Empty State */}
-    </View>
+        {/* Empty State */}
+      </View>
+    </ScrollView>
 
     // <View style={styles.container}>
     //   <FlatList

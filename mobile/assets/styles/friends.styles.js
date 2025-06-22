@@ -4,121 +4,135 @@ import COLORS from "../../constants/colors";
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.white,
-    flexDirection:'column',
+    backgroundColor: COLORS.background,
+    flexDirection: "column",
   },
-  header: {  
-    flexDirection:'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 0.8,
-    padding: 15,
-    backgroundColor: COLORS.white,
+
+  header: {
+    alignItems: "center",
+    backgroundColor: COLORS.primary,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+    height: 70,
+    justifyContent: "center",
   },
-  searchheader: {  
-  flexDirection: 'row',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  flex: 0.8,
-  padding: 15,
-  backgroundColor: COLORS.white,
-},
-  searchSection: {
-    padding:15,
-    flex:1,
-    justifyContent: 'center',
+
+  headerTitle: {
+    fontSize: 30,
+    color: COLORS.white,
+    fontFamily: "Konkhmer_Sleokchher_Regular",
+    fontWeight: "bold",
+    textAlign: "center",
   },
+
   searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginHorizontal: 5,
-    flex:1,
-    padding:5,
-    borderRadius:15,
-    backgroundColor:'#d3d3d3',
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 20,
+    backgroundColor: "#d9d9d9",
+    marginBottom: 20,
+    marginLeft: 30,
+    marginRight: 30,
+    marginTop: 20,
   },
- searchIcon: {
-  marginRight: 8,
-  marginLeft: 4,
-},
+
   searchInput: {
+    marginLeft: 10,
+    marginTop: 2,
+    color: "#2c2c2c",
+    fontSize: 15,
+    fontFamily: "Konkhmer_Sleokchher-Regular",
     flex: 1,
-    fontSize: 16,
-    color: "#000",
   },
-  title: {
-    fontSize: 24,
-    textAlign: 'center',
-    fontWeight: 'bold',
+
+  friendsSection: {
+    flex: 1,
+    paddingHorizontal: 15,
   },
+
   friendCard: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: COLORS.white,
-    padding: 10,
+    paddingLeft: 10,
+    paddingRight: 10,
+    paddingTop: 5,
+    paddingBottom: 5,
     marginVertical: 6,
-    marginHorizontal: 0,
   },
+
   userInfo: {
     flex: 1,
     backgroundColor: COLORS.white,
-    flexDirection: 'row',
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: 'flex-start',
+    justifyContent: "flex-start",
   },
+
   profileImage: {
-    borderWidth:1,
-    borderColor:COLORS.gray,
-    width: 45,
-    height: 45,
-    borderRadius: 22.5,
+    borderWidth: 1,
+    borderColor: COLORS.gray,
+    width: 50, // CHANGED: Slightly bigger
+    height: 50, // CHANGED: Slightly bigger
+    borderRadius: 25, // CHANGED: Adjust border radius
     marginRight: 15,
     backgroundColor: "#d3d3d3",
   },
+
   username: {
-    fontSize: 16,
-    fontWeight: "500",
+    fontSize: 18, // CHANGED: Slightly bigger font
+    fontWeight: "600", // CHANGED: Increase font weight
     color: "#333",
-    
   },
+
   addButton: {
-    paddingVertical: 8,
+    paddingVertical: 10, // CHANGED: Increase padding
     paddingHorizontal: 25,
     borderRadius: 15,
     backgroundColor: COLORS.primary,
-    alignItems: "center",       
+    alignItems: "center",
     justifyContent: "center",
   },
+
   buttonText: {
     color: COLORS.white,
     fontSize: 14,
     fontWeight: "600",
   },
- friendsSection: {
-  flex: 11,
-  justifyContent: 'center', 
-},
 
-emptyText: {
-  fontSize: 16,
-  color: '#666',
-  textAlign: 'center',
-},
-backButton: {
-  width: 35,
-  padding: 4,
-  borderRadius: 20,
-},
-deleteButton: {
-  paddingVertical: 8,
-  paddingHorizontal: 5,
-  alignItems: "center",
-  justifyContent: "center",
-},
+  emptyText: {
+    fontSize: 16,
+    color: "#666",
+    textAlign: "center",
+    marginTop: 50, // CHANGED: Add top margin
+  },
+
+  deleteButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 5,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
   buttons: {
     flexDirection: "row",
     alignItems: "flex-end",
     marginLeft: 5,
+  },
+
+  backButton: {
+    width: 40,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+    position: "absolute",
+    left: 20,
+    top: "50%",
+    marginTop: -20,
+    zIndex: 1,
   },
 });
 
