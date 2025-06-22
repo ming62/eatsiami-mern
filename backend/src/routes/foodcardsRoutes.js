@@ -63,30 +63,6 @@ router.get("/", protectRoute, async (req, res) => {
   }
 });
 
-router.get("/:id", protectRoute, async (req, res) => {
-  try {
-    const foodcardId = req.params.id;
-    const userId = req.user._id;
-
-    const foodcard = await Foodcard.findById(foodcardId).populate("user", "username profileImage");
-
-    if (!foodcard) {
-      return res.status(404).json({ message: "Foodcard not found" });
-    }
-
-    const currentUser = await User.findById(userId)
-    const isSaved = currentUser.savedFoodcards.includes(foodcardId);
-
-    return res.status(200).json({
-      ...foodcard.toObject(),
-      isSaved,
-    });
-
-  } catch (error) {
-    console.log("Error fetching food card by ID", error);
-    return res.status(500).json({ message: "Internal server error" });
-  }
-});
 
 
 // deleting a food card by ID
@@ -213,6 +189,32 @@ router.delete("/unsave-foodcard/:id", protectRoute, async (req, res) => {
   } catch (error) {
     console.log("Error unsaving food card", error);
     res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// fetching a food card by ID
+router.get("/:id", protectRoute, async (req, res) => {
+  try {
+    const foodcardId = req.params.id;
+    const userId = req.user._id;
+
+    const foodcard = await Foodcard.findById(foodcardId).populate("user", "username profileImage");
+
+    if (!foodcard) {
+      return res.status(404).json({ message: "Foodcard not found" });
+    }
+
+    const currentUser = await User.findById(userId)
+    const isSaved = currentUser.savedFoodcards.includes(foodcardId);
+
+    return res.status(200).json({
+      ...foodcard.toObject(),
+      isSaved,
+    });
+
+  } catch (error) {
+    console.log("Error fetching food card by ID", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 });
 

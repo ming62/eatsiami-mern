@@ -80,16 +80,6 @@ const SwipeableCard = ({
     })
     .onEnd((e) => {
       if (currentIndex == index) {
-        const isTap =
-          Math.abs(e.translationX) < 15 && 
-          Math.abs(e.translationY) < 15 && 
-          Math.abs(e.velocityX) < 500;  
-
-        if (isTap) {
-          runOnJS(navigateToCardDetail)();
-          return;
-        }
-
         if (
           Math.abs(e.translationX) > CARD_WIDTH * 0.5 ||
           Math.abs(e.velocityX) > 1000
@@ -112,11 +102,13 @@ const SwipeableCard = ({
       }
     });
 
-  const tap = Gesture.Tap().onEnd(() => {
-    if (currentIndex === index) {
-      runOnJS(navigateToCardDetail)();
-    }
-  });
+  const tap = Gesture.Tap()
+    .numberOfTaps(2)
+    .onEnd(() => {
+      if (currentIndex === index) {
+        runOnJS(navigateToCardDetail)();
+      }
+    });
 
   const combinedGesture = Gesture.Exclusive(pan, tap);
 
