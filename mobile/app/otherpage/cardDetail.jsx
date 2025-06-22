@@ -17,6 +17,11 @@ import { useAuthStore } from "../../store/authStore";
 import { API_URL } from "../../constants/api";
 import COLORS from "../../constants/colors";
 import { formatPublishDate } from "../../lib/utils";
+import { Colors } from "react-native/Libraries/NewAppScreen";
+
+const CARD_WIDTH = 303;
+const CARD_HEIGHT = 517;
+const CARD_ASPECT_RATIO = 9 / 16;
 
 export default function CardDetail() {
   const router = useRouter();
@@ -123,21 +128,26 @@ export default function CardDetail() {
     }
   };
 
-  const renderRatingStars = (rating) => {
-    const stars = [];
-    for (let i = 1; i <= 5; i++) {
-      stars.push(
-        <Ionicons
-          key={i}
-          name="star"
-          size={24}
-          color={i <= rating ? "#F4B400" : COLORS.textSecondary}
-          style={{ marginRight: 4 }}
-        />
-      );
-    }
-    return <View style={{ flexDirection: "row" }}>{stars}</View>;
-  };
+const renderRatingStars = (rating) => {
+  const stars = [];
+  for (let i = 1; i <= 5; i++) {
+    stars.push(
+      <Ionicons
+        key={i}
+        name={i <= rating ? "star" : "star-outline"} 
+        size={26} 
+        color={i <= rating ? "#FFD700" : "rgba(255, 255, 255, 0.3)"} 
+        style={{ 
+          marginRight: 3,
+          textShadowColor: "rgba(0, 0, 0, 0.3)", 
+          textShadowOffset: { width: 0, height: 1 },
+          textShadowRadius: 2,
+        }}
+      />
+    );
+  }
+  return <View style={{ flexDirection: "row", alignItems: "center" }}>{stars}</View>;
+};
 
   useEffect(() => {
     if (cardId) {
@@ -147,7 +157,10 @@ export default function CardDetail() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView
+        style={styles.container}
+        edges={["left", "right", "bottom"]}
+      >
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={COLORS.primary} />
           <Text style={styles.loadingText}>Loading foodcard...</Text>
@@ -172,36 +185,21 @@ export default function CardDetail() {
     );
   }
 
-  const isAuthor = user && foodcard.user._id === user._id;
+  const isAuthor = user && foodcard?.user?._id && user.id === foodcard.user._id;
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Header */}
+    <SafeAreaView style={styles.container} edges={["left", "right", "bottom"]}>
+      {/* Header - Matching Friends page */}
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => router.back()}
-          style={styles.headerButton}
+          style={styles.backButton}
         >
-          <Ionicons name="arrow-back" size={24} color={COLORS.black} />
+          <Ionicons name="arrow-back" size={24} color={COLORS.white} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Foodcard</Text>
-        <TouchableOpacity
-          onPress={isAuthor ? handleDelete : handleSave}
-          style={styles.headerButton}
-          disabled={actionLoading}
-        >
-          {actionLoading ? (
-            <ActivityIndicator size="small" color={COLORS.primary} />
-          ) : (
-            <Ionicons
-              name={
-                isAuthor ? "trash-outline" : saved ? "heart" : "heart-outline"
-              }
-              size={24}
-              color={isAuthor ? "#FF3B30" : COLORS.primary}
-            />
-          )}
-        </TouchableOpacity>
+        <Text style={styles.headerTitle}>
+          {foodcard.user.username}'s {foodcard.title}
+        </Text>
       </View>
 
       <ScrollView
@@ -209,88 +207,56 @@ export default function CardDetail() {
         showsVerticalScrollIndicator={false}
       >
         {/* Card Image */}
-        <View style={styles.imageContainer}>
-          <Image source={{ uri: foodcard.image }} style={styles.cardImage} />
-
-          {/* Gradient Overlay */}
-          <LinearGradient
-            colors={[
-              "transparent",
-              "transparent",
-              "rgba(0,0,0,0.3)",
-              "rgba(0,0,0,0.7)",
-            ]}
-            style={styles.gradientOverlay}
-          >
-            <View style={styles.userInfo}>
-              <Image
-                source={{ uri: foodcard.user.profileImage }}
-                style={styles.avatar}
-              />
-              <Text style={styles.username}>@{foodcard.user.username}</Text>
-            </View>
-          </LinearGradient>
+        <View style={styles.cardContainer}>
+          <View style={styles.imageContainer}>
+            <Image source={{ uri: foodcard.image }} style={styles.cardImage} />
+          </View>
         </View>
 
-        {/* Card Details */}
-        <View style={styles.detailsContainer}>
+        {/*Card Details */}
+        <View style={styles.detailsCard}>
           <View style={styles.titleSection}>
             <Text style={styles.title}>{foodcard.title}</Text>
-            <View style={styles.ratingContainer}>
-              {renderRatingStars(foodcard.rating)}
-              <Text style={styles.ratingText}>({foodcard.rating}/5)</Text>
-            </View>
-          </View>
 
-          <View style={styles.locationSection}>
-            <Ionicons
-              name="location-outline"
-              size={20}
-              color={COLORS.primary}
-            />
-            <Text style={styles.locationText}>{foodcard.location}</Text>
+            <View style={styles.ratingLocationRow}>
+              <View style={styles.ratingContainer}>
+                {renderRatingStars(foodcard.rating)}
+                <Text style={styles.ratingText}>({foodcard.rating}/5)</Text>
+              </View>
+
+              <View style={styles.locationSection}>
+                <Text style={styles.locationText}>@ {foodcard.location}</Text>
+              </View>
+            </View>
           </View>
 
           <View style={styles.captionSection}>
-            <Text style={styles.captionLabel}>About this dish:</Text>
             <Text style={styles.captionText}>{foodcard.caption}</Text>
-          </View>
-
-          <View style={styles.dateSection}>
-            <Text style={styles.dateText}>
-              Shared on {formatPublishDate(foodcard.createdAt)}
-            </Text>
           </View>
 
           {/* Action Button */}
           <TouchableOpacity
             style={[
-              styles.actionButton,
-              isAuthor ? styles.deleteButton : styles.saveButton,
+              styles.floatingActionButton,
+              isAuthor
+                ? styles.deleteFloatingButton
+                : styles.saveFloatingButton,
             ]}
             onPress={isAuthor ? handleDelete : handleSave}
             disabled={actionLoading}
           >
             {actionLoading ? (
-              <ActivityIndicator size="small" color={COLORS.white} />
+              <ActivityIndicator size="small" color="#2c2c2c" />
             ) : (
-              <>
-                <Ionicons
-                  name={
-                    isAuthor
-                      ? "trash-outline"
-                      : saved
-                        ? "heart"
-                        : "heart-outline"
-                  }
-                  size={20}
-                  color={COLORS.white}
-                  style={{ marginRight: 8 }}
-                />
-                <Text style={styles.actionButtonText}>
-                  {isAuthor ? "Delete Foodcard" : saved ? "Unsave" : "Save"}
-                </Text>
-              </>
+              <Ionicons
+                name={
+                  isAuthor ? "trash-outline" : saved ? "heart" : "heart-outline"
+                }
+                size={24}
+                color={
+                    isAuthor ? COLORS.black : "#2c2c2c"
+                }
+              />
             )}
           </TouchableOpacity>
         </View>
@@ -303,56 +269,80 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
+    flexDirection: "column",
   },
+
   header: {
-    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    backgroundColor: COLORS.white,
-    borderBottomWidth: 1,
-    borderBottomColor: "#E0E0E0",
+    backgroundColor: COLORS.primary,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+    height: 70,
+    justifyContent: "center",
+    position: "relative",
   },
-  headerButton: {
+  headerTitle: {
+    fontSize: 26,
+    color: COLORS.white,
+    fontFamily: "Konkhmer_Sleokchher_Regular",
+    fontWeight: "bold",
+    textAlign: "center",
+    paddingHorizontal: 60,
+  },
+  backButton: {
     width: 40,
     height: 40,
     justifyContent: "center",
     alignItems: "center",
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: COLORS.black,
-    fontFamily: "Konkhmer_Sleokchher-Regular",
+    position: "absolute",
+    left: 20,
+    top: "50%",
+    marginTop: -20,
+    zIndex: 1,
   },
   scrollView: {
     flex: 1,
   },
+  cardContainer: {
+    alignSelf: "center",
+    marginTop: 20,
+    marginBottom: 15,
+    width: CARD_WIDTH,
+    height: CARD_HEIGHT,
+    elevation: CARD_WIDTH * 0.066,
+  },
   imageContainer: {
-    height: 400,
+    width: CARD_WIDTH,
+    height: CARD_HEIGHT,
+    borderRadius: CARD_WIDTH * 0.053,
+    overflow: "hidden",
     position: "relative",
+    backgroundColor: COLORS.border,
   },
   cardImage: {
     width: "100%",
     height: "100%",
+    borderRadius: CARD_WIDTH * 0.053,
     contentFit: "cover",
   },
   gradientOverlay: {
     ...StyleSheet.absoluteFillObject,
     justifyContent: "flex-end",
-    padding: 20,
+    padding: 15,
+    borderRadius: CARD_WIDTH * 0.053,
   },
   userInfo: {
     flexDirection: "row",
     alignItems: "center",
   },
   avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginRight: 12,
+    width: CARD_WIDTH * 0.198,
+    height: CARD_WIDTH * 0.198,
+    borderRadius: CARD_WIDTH * 0.099,
+    marginRight: 10,
     backgroundColor: "#d3d3d3",
+    borderWidth: 2,
+    borderColor: COLORS.white,
   },
   username: {
     color: COLORS.white,
@@ -360,18 +350,50 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontFamily: "Konkhmer_Sleokchher-Regular",
   },
-  detailsContainer: {
-    padding: 20,
+
+  detailsCard: {
+    backgroundColor: "#2c2c2c",
+    marginHorizontal: 30,
+    marginBottom: 20,
+    borderRadius: 16,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+    paddingTop: 10,
+    elevation: 10,
+    position: "relative",
+    minHeight: 120,
+  },
+  headerActionButton: {
+    position: "absolute",
+    top: 15,
+    right: 15,
+    width: 40,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: COLORS.white,
+    borderRadius: 20,
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   titleSection: {
-    marginBottom: 20,
+    marginBottom: 15,
   },
   title: {
-    fontSize: 28,
+    fontSize: 30,
     fontWeight: "bold",
-    color: COLORS.black,
-    marginBottom: 8,
+    color: COLORS.white,
+    marginBottom: 12,
     fontFamily: "Konkhmer_Sleokchher-Regular",
+  },
+  ratingLocationRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "100%",
   },
   ratingContainer: {
     flexDirection: "row",
@@ -383,23 +405,22 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
   },
   locationSection: {
-    flexDirection: "row",
+    backgroundColor: COLORS.white,
+    borderRadius: CARD_WIDTH * 0.04,
+    paddingHorizontal: CARD_WIDTH * 0.026,
+    paddingVertical: CARD_HEIGHT * 0.008,
     alignItems: "center",
-    marginBottom: 20,
-    backgroundColor: "#FFE4D6",
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 12,
-    alignSelf: "flex-start",
+    justifyContent: "center",
+    marginLeft: 10,
   },
   locationText: {
-    marginLeft: 8,
     fontSize: 16,
-    color: COLORS.primary,
+    color: "#2c2c2c",
     fontWeight: "600",
+    marginBottom: CARD_HEIGHT * 0.004,
   },
   captionSection: {
-    marginBottom: 20,
+    marginBottom: 15,
   },
   captionLabel: {
     fontSize: 18,
@@ -411,35 +432,47 @@ const styles = StyleSheet.create({
   captionText: {
     fontSize: 16,
     lineHeight: 24,
-    color: COLORS.textPrimary,
+    color: COLORS.white,
     fontFamily: "Konkhmer_Sleokchher-Regular",
   },
   dateSection: {
-    borderTopWidth: 1,
-    borderTopColor: "#E0E0E0",
-    paddingTop: 15,
-    marginBottom: 30,
+    paddingTop: 5,
+    marginBottom: 20,
   },
   dateText: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.white,
     textAlign: "center",
   },
-  actionButton: {
-    flexDirection: "row",
-    alignItems: "center",
+  floatingActionButton: {
+    position: "absolute",
+    bottom: 15,
+    right: 15,
+    width: 45,
+    height: 45,
+    borderRadius: 22.5,
     justifyContent: "center",
-    paddingVertical: 15,
-    paddingHorizontal: 30,
-    borderRadius: 12,
-    marginBottom: 20,
+    alignItems: "center",
+    elevation: 4,
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
   },
-  saveButton: {
-    backgroundColor: COLORS.primary,
+
+  saveFloatingButton: {
+    backgroundColor: COLORS.white,
   },
-  deleteButton: {
-    backgroundColor: "#FF3B30",
+
+  deleteFloatingButton: {
+    backgroundColor: COLORS.white,
   },
+
+  captionSection: {
+    marginBottom: 15,
+    paddingBottom: 60,
+  },
+
   actionButtonText: {
     color: COLORS.white,
     fontSize: 16,
@@ -466,14 +499,8 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     marginBottom: 20,
   },
-  backButton: {
-    backgroundColor: COLORS.primary,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 8,
-  },
   backButtonText: {
-    color: COLORS.white,
+    color: COLORS.primary,
     fontSize: 16,
     fontWeight: "600",
   },
