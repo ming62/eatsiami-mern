@@ -103,7 +103,7 @@ const SwipeableCard = ({
     });
 
   const tap = Gesture.Tap()
-    .numberOfTaps(2)
+    .numberOfTaps(1)
     .onEnd(() => {
       if (currentIndex === index) {
         runOnJS(navigateToCardDetail)();
@@ -252,7 +252,7 @@ const SwipeableCard = ({
               </View>
               <Text style={styles.caption}>{item.caption}</Text>
               <View style={styles.locationContainer}>
-                <Text style={styles.location}>@ {item.location}</Text>
+                <Text style={styles.location}>{item.location}</Text>
               </View>
             </View>
           </LinearGradient>
@@ -327,7 +327,7 @@ const styles = StyleSheet.create({
 
   foodcardTitle: {
     fontSize: CARD_WIDTH * 0.099,
-    fontWeight: "700",
+    fontWeight: "600",
     color: COLORS.white,
     fontFamily: "Konkhmer_Sleokchher-Regular",
     marginRight: CARD_WIDTH * 0.026,
@@ -343,6 +343,7 @@ const styles = StyleSheet.create({
   },
 
   caption: {
+    fontFamily: "Konkhmer_Sleokchher-Regular",
     fontSize: CARD_WIDTH * 0.046,
     color: COLORS.white,
     marginTop: CARD_HEIGHT * 0.008,
@@ -362,9 +363,11 @@ const styles = StyleSheet.create({
   },
 
   location: {
+    fontFamily: "Konkhmer_Sleokchher-Regular",
     fontSize: CARD_WIDTH * 0.04,
     color: COLORS.white,
-    marginBottom: CARD_HEIGHT * 0.004,
+    textAlign: "center",
+    textAlignVertical: "center",
   },
 
   swipeOverlay: {

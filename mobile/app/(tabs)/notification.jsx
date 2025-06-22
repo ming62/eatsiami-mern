@@ -7,6 +7,7 @@ import {
   SafeAreaView,
   RefreshControl,
   Alert,
+  TextInput,
 } from "react-native";
 import { useAuthStore } from "../../store/authStore";
 import { Ionicons } from "@expo/vector-icons";
@@ -191,7 +192,7 @@ export default function Notification() {
               );
             }}
           >
-            <Ionicons name="trash-outline" size={24} color="#6A6968" />
+            <Ionicons name="trash-outline" size={20} color="#6A6968" />
           </TouchableOpacity>
         </View>
       </View>
@@ -220,7 +221,7 @@ export default function Notification() {
             style={styles.acceptButton}
             onPress={() => handleJioRequest(item._id, "accept")}
           >
-            <Text style={styles.buttonText}>gogogo</Text>
+            <Text style={styles.buttonText}>Onz</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -243,7 +244,7 @@ export default function Notification() {
               );
             }}
           >
-            <Ionicons name="trash-outline" size={24} color="#6A6968" />
+            <Ionicons name="trash-outline" size={20} color="#6A6968"  />
           </TouchableOpacity>
         </View>
       </View>
@@ -287,8 +288,16 @@ export default function Notification() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Notification</Text>
-        <View style={styles.grayBlock} />
+        <Text style={styles.headerTitle}>Notification</Text>
+      </View>
+
+      <View style={styles.searchContainer}>
+        <Ionicons name="search" size={30} color={COLORS.textSecondary} style= {{ marginLeft: 5}}/>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="search notifications..."
+          placeholderTextColor={COLORS.textSecondary}
+        />
       </View>
 
       {loading ? (

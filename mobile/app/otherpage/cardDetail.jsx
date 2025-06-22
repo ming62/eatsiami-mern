@@ -128,26 +128,30 @@ export default function CardDetail() {
     }
   };
 
-const renderRatingStars = (rating) => {
-  const stars = [];
-  for (let i = 1; i <= 5; i++) {
-    stars.push(
-      <Ionicons
-        key={i}
-        name={i <= rating ? "star" : "star-outline"} 
-        size={26} 
-        color={i <= rating ? "#FFD700" : "rgba(255, 255, 255, 0.3)"} 
-        style={{ 
-          marginRight: 3,
-          textShadowColor: "rgba(0, 0, 0, 0.3)", 
-          textShadowOffset: { width: 0, height: 1 },
-          textShadowRadius: 2,
-        }}
-      />
+  const renderRatingStars = (rating) => {
+    const stars = [];
+    for (let i = 1; i <= 5; i++) {
+      stars.push(
+        <Ionicons
+          key={i}
+          name={i <= rating ? "star" : "star-outline"}
+          size={26}
+          color={i <= rating ? "#FFD700" : "rgba(255, 255, 255, 0.3)"}
+          style={{
+            marginRight: 3,
+            textShadowColor: "rgba(0, 0, 0, 0.3)",
+            textShadowOffset: { width: 0, height: 1 },
+            textShadowRadius: 2,
+          }}
+        />
+      );
+    }
+    return (
+      <View style={{ flexDirection: "row", alignItems: "center" }}>
+        {stars}
+      </View>
     );
-  }
-  return <View style={{ flexDirection: "row", alignItems: "center" }}>{stars}</View>;
-};
+  };
 
   useEffect(() => {
     if (cardId) {
@@ -225,7 +229,7 @@ const renderRatingStars = (rating) => {
               </View>
 
               <View style={styles.locationSection}>
-                <Text style={styles.locationText}>@ {foodcard.location}</Text>
+                <Text style={styles.locationText}>{foodcard.location}</Text>
               </View>
             </View>
           </View>
@@ -253,9 +257,7 @@ const renderRatingStars = (rating) => {
                   isAuthor ? "trash-outline" : saved ? "heart" : "heart-outline"
                 }
                 size={24}
-                color={
-                    isAuthor ? COLORS.black : "#2c2c2c"
-                }
+                color={isAuthor ? COLORS.black : "#2c2c2c"}
               />
             )}
           </TouchableOpacity>
@@ -279,13 +281,14 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 30,
     height: 70,
     justifyContent: "center",
+    paddingTop: 10,
     position: "relative",
   },
   headerTitle: {
     fontSize: 26,
     color: COLORS.white,
-    fontFamily: "Konkhmer_Sleokchher_Regular",
-    fontWeight: "bold",
+    fontFamily: "Konkhmer_Sleokchher-Regular",
+    fontWeight: 600,
     textAlign: "center",
     paddingHorizontal: 60,
   },
@@ -297,7 +300,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 20,
     top: "50%",
-    marginTop: -20,
+    marginTop: -10,
     zIndex: 1,
   },
   scrollView: {
@@ -384,7 +387,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 30,
-    fontWeight: "bold",
+    fontWeight: 600,
     color: COLORS.white,
     marginBottom: 12,
     fontFamily: "Konkhmer_Sleokchher-Regular",
@@ -414,10 +417,12 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   locationText: {
+    fontFamily: "Konkhmer_Sleokchher-Regular",
     fontSize: 16,
     color: "#2c2c2c",
     fontWeight: "600",
-    marginBottom: CARD_HEIGHT * 0.004,
+    textAlign: "center",
+    textAlignVertical: "center",
   },
   captionSection: {
     marginBottom: 15,

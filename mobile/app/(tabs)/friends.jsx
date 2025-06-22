@@ -199,12 +199,12 @@ export default function Friends() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header - Similar to Home page */}
+      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Friends</Text>
       </View>
 
-      {/* Search Section - Similar to Home page */}
+      {/* Search Section */}
       <View style={styles.searchContainer}>
         <Ionicons
           name="search"

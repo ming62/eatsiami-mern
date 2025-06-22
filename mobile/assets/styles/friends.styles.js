@@ -14,15 +14,16 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
     height: 70,
-    justifyContent: "center",
+    justifyContent: "flex-end",
+    paddingTop: 10,
   },
 
   headerTitle: {
     fontSize: 30,
     color: COLORS.white,
-    fontFamily: "Konkhmer_Sleokchher_Regular",
-    fontWeight: "bold",
+    fontFamily: "Konkhmer_Sleokchher-Regular",
     textAlign: "center",
+    fontWeight: 1000,
   },
 
   searchContainer: {
@@ -75,21 +76,22 @@ const styles = StyleSheet.create({
   profileImage: {
     borderWidth: 1,
     borderColor: COLORS.gray,
-    width: 50, // CHANGED: Slightly bigger
-    height: 50, // CHANGED: Slightly bigger
-    borderRadius: 25, // CHANGED: Adjust border radius
+    width: 50, 
+    height: 50, 
+    borderRadius: 25,
     marginRight: 15,
     backgroundColor: "#d3d3d3",
   },
 
   username: {
-    fontSize: 18, // CHANGED: Slightly bigger font
-    fontWeight: "600", // CHANGED: Increase font weight
+    fontSize: 18,
+    fontFamily: "Konkhmer_Sleokchher-Regular",
+    fontWeight: "600", 
     color: "#333",
   },
 
   addButton: {
-    paddingVertical: 10, // CHANGED: Increase padding
+    paddingVertical: 10, 
     paddingHorizontal: 25,
     borderRadius: 15,
     backgroundColor: COLORS.primary,
@@ -107,7 +109,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#666",
     textAlign: "center",
-    marginTop: 50, // CHANGED: Add top margin
+    marginTop: 50, 
   },
 
   deleteButton: {
@@ -131,7 +133,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 20,
     top: "50%",
-    marginTop: -20,
+    marginTop: -10,
     zIndex: 1,
   },
 });

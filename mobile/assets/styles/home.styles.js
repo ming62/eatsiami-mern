@@ -252,7 +252,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    minHeight: "100%", // Ensure content fills the screen for pull-to-refresh
+    minHeight: "100%", 
   },
   CardContainer: {
     flex: 1,
