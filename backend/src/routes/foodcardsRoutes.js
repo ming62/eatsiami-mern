@@ -103,7 +103,27 @@ router.delete("/:id", protectRoute, async (req, res) => {
   }
 });
 
-// fetching food card by userID
+router.get("/user/:userId", protectRoute, async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    const userExist = await User.findById(userId);
+    if (!userExist) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const foodcards = await Foodcard.find({ user: userId }).sort({
+      createdAt: -1,
+    }).populate("user", "username profileImage");
+
+    res.json(foodcards);
+  } catch (error) {
+    console.log("Error fetching food cards by user", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// fetching food card for current user
 router.get("/user", protectRoute, async (req, res) => {
   try {
     const foodcards = await Foodcard.find({ user: req.user._id }).sort({

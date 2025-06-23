@@ -6,8 +6,9 @@ import { Image } from "expo-image";
 import { formatMemberSince } from "../lib/utils";
 import LogoutButton from "../components/LogoutButton";
 
-export default function ProfileHeader() {
-  const { user } = useAuthStore();
+export default function ProfileHeader({ userData, showLogout}) {
+  const { user: currentUser } = useAuthStore();
+  const user = userData || currentUser;
 
   if (!user) {
     return null;

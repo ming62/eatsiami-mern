@@ -13,12 +13,14 @@ import {
 getOutgoingJioReqs,
   acceptJioRequest, 
   rejectJioRequest,
+  getUserById
 } from "../controllers/user.controller.js";
 const router = express.Router();
 
 //apply to all routes
 router.use(protectRoute)
 
+router.get("/:id", getUserById)
 router.get("/friends", getMyFriends)
 router.delete("/deleteFriend/:id", deleteFriend);
 

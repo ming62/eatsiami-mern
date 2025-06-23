@@ -197,27 +197,31 @@ export default function Profile() {
   };
 
   const renderFoodcard = ({ item }) => (
-    <View style={styles.bookCard}>
+    <TouchableOpacity
+      onPress={() => router.push(`/otherpage/cardDetail?cardId=${item._id}`)}
+      activeOpacity={0.8}
+      style={styles.bookCard}
+    >
       <View style={styles.bookImageContainer}>
         <Image source={{ uri: item.image }} style={styles.bookImage} />
 
         <View style={styles.overlayContent}>
           <View style={styles.infoBackground} />
           <View style={styles.bookDetails}>
-            <TouchableOpacity
-              onPress={() => confirmDelete(item._id)}
-              style={styles.deleteButton}
-            >
-              {deleteBookId === item._id ? (
-                <ActivityIndicator size="small" color={COLORS.primary} />
-              ) : (
-                <Ionicons
-                  name="trash-outline"
-                  size={25}
-                  color={COLORS.primary}
-                />
-              )}
-            </TouchableOpacity>
+            {/* <TouchableOpacity
+                onPress={() => confirmDelete(item._id)}
+                style={styles.deleteButton}
+              >
+                {deleteBookId === item._id ? (
+                  <ActivityIndicator size="small" color={COLORS.primary} />
+                ) : (
+                  <Ionicons
+                    name="trash-outline"
+                    size={25}
+                    color={COLORS.primary}
+                  />
+                )}
+              </TouchableOpacity> */}
 
             <View style={styles.ratingContainer}>
               <Text style={styles.bookTitle}>{item.title}</Text>
@@ -230,18 +234,22 @@ export default function Profile() {
           </View>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   const renderSavedFoodcard = ({ item }) => (
-    <View style={styles.bookCard}>
+    <TouchableOpacity
+      onPress={() => router.push(`/otherpage/cardDetail?cardId=${item._id}`)}
+      activeOpacity={0.8}
+      style={styles.bookCard}
+    >
       <View style={styles.bookImageContainer}>
         <Image source={{ uri: item.image }} style={styles.bookImage} />
 
         <View style={styles.overlayContent}>
           <View style={styles.infoBackground} />
           <View style={styles.bookDetails}>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               onPress={() => unsaveFoodcard(item._id)}
               style={styles.deleteButton}
             >
@@ -254,7 +262,7 @@ export default function Profile() {
                   color={COLORS.primary}
                 />
               )}
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
             <View style={styles.ratingContainer}>
               <Text style={styles.bookTitle}>{item.title}</Text>
@@ -267,7 +275,7 @@ export default function Profile() {
           </View>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   const handleRefresh = async () => {
@@ -353,7 +361,6 @@ export default function Profile() {
     />
   );
 
-  
   const renderScene = SceneMap({
     foodcards: FoodcardsRoute,
     saved: SavedRoute,
@@ -364,7 +371,7 @@ export default function Profile() {
       {/* Orange header background */}
       <View style={styles.headerBackground} />
 
-      <ProfileHeader />
+      <ProfileHeader userData={null} showLogout={true} />
 
       <TabView
         navigationState={{ index, routes }}

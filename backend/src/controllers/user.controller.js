@@ -2,6 +2,49 @@ import User from "../models/User.js";
 import FriendRequest from "../models/FriendRequest.js";
 import JioRequest from "../models/JioRequest.js";
 
+export async function getUserById(req, res) {
+  try {
+    const { id: userId } = req.params;
+    const currentUserId = req.user.id;
+
+    const user = await User.findById(userId)
+      .select("username profileImage friends createdAt")
+      .populate("friends", "username profileImage");
+
+    if(!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const isFriend = user.friends.some(f => f._id.toString() === currentUserId || userId === currentUserId);
+
+    if(!isFriend) {
+          return res.status(200).json({
+        _id: user._id,
+        username: user.username,
+        profileImage: user.profileImage,
+        createdAt: user.createdAt,
+      });
+    }
+
+    res.status(200).json({
+      _id: user._id,
+      username: user.username,
+      profileImage: user.profileImage,
+      createdAt: user.createdAt,
+      friends: user.friends.map(friend => ({
+        _id: friend._id,
+        username: friend.username,
+        profileImage: friend.profileImage
+      }))
+    });
+  
+  } catch (error) {
+    console.error("Error in getUserById controller", error.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
+
 export async function getMyFriends(req, res) {
   try {
     const user = await User.findById(req.user.id)

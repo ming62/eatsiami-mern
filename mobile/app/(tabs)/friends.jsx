@@ -149,7 +149,7 @@ export default function Friends() {
       <View style={styles.friendCard}>
         <TouchableOpacity
           style={styles.userInfo}
-          onPress={() => router.push(`/otherpage/${item._id}`)}
+          onPress={() => router.push(`/otherpage/friendDetail?friendId=${item._id}`)}
         >
           <Image
             source={{ uri: item.profileImage }}

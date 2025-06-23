@@ -55,6 +55,7 @@ const styles = StyleSheet.create({
 
   scrollContainer: {
     paddingHorizontal: 10,
+    paddingTop: 10,
     paddingBottom: 10,
   },
 

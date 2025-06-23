@@ -291,14 +291,14 @@ export default function Notification() {
         <Text style={styles.headerTitle}>Notification</Text>
       </View>
 
-      <View style={styles.searchContainer}>
+      {/* <View style={styles.searchContainer}>
         <Ionicons name="search" size={30} color={COLORS.textSecondary} style= {{ marginLeft: 5}}/>
         <TextInput
           style={styles.searchInput}
           placeholder="search notifications..."
           placeholderTextColor={COLORS.textSecondary}
         />
-      </View>
+      </View> */}
 
       {loading ? (
         <ActivityIndicator
