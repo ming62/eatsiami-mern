@@ -5,12 +5,21 @@ import {
   ActivityIndicator,
   SafeAreaView,
   TouchableOpacity,
+  Dimensions,
+  TextInput,
+  StyleSheet,
+  Image,
+  FlatList,
+  RefreshControl,
 } from "react-native";
 import React, { useEffect } from "react";
 import { useLocalSearchParams } from "expo-router";
 import { API_URL } from "../../constants/api";
 import { useAuthStore } from "../../store/authStore";
 import COLORS from "../../constants/colors";
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+
 
 export default function FriendDetail() {
   const { friendId } = useLocalSearchParams();

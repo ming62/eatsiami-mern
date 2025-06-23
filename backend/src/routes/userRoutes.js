@@ -20,7 +20,6 @@ const router = express.Router();
 //apply to all routes
 router.use(protectRoute)
 
-router.get("/:id", getUserById)
 router.get("/friends", getMyFriends)
 router.delete("/deleteFriend/:id", deleteFriend);
 
@@ -34,6 +33,8 @@ router.get("/outgoing-jio-requests", getOutgoingJioReqs);
 
 
 router.get("/search", searchFriends);
+router.get("/:id", getUserById)
+
 
 router.post("/jio-request/:id", sendJioRequest);
 router.put("/jio-request/:id/accept", acceptJioRequest);
