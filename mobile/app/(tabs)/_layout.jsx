@@ -30,6 +30,8 @@ export default function TabLayout() {
             paddingTop: 5,
             paddingLeft: 10,
             paddingRight: 10,
+            borderTopWidth: 0,
+            borderRadiusColor: "transparent",
           },
           tabBarLabelStyle: {
             fontSize: 10,

@@ -22,6 +22,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { sleep } from "./index";
 import Loader from "../../components/Loader";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function Profile() {
   const [foodcards, setFoodcards] = useState([]);
@@ -32,7 +34,7 @@ export default function Profile() {
   const [unsaveFoodcardId, setUnsaveFoodcardId] = useState(null);
   const [index, setIndex] = useState(0);
   const [routes] = useState([
-    { key: "foodcards", title: "Foodcards" },
+    { key: "foodcards", title: "Mine" },
     { key: "saved", title: "Saved" },
   ]);
 
@@ -200,39 +202,29 @@ export default function Profile() {
     <TouchableOpacity
       onPress={() => router.push(`/otherpage/cardDetail?cardId=${item._id}`)}
       activeOpacity={0.8}
-      style={styles.bookCard}
+      style={styles.foodcard}
     >
-      <View style={styles.bookImageContainer}>
-        <Image source={{ uri: item.image }} style={styles.bookImage} />
+      <View style={styles.imageContainer}>
+        <Image source={{ uri: item.image }} style={styles.cardImage} />
 
-        <View style={styles.overlayContent}>
-          <View style={styles.infoBackground} />
-          <View style={styles.bookDetails}>
-            {/* <TouchableOpacity
-                onPress={() => confirmDelete(item._id)}
-                style={styles.deleteButton}
-              >
-                {deleteBookId === item._id ? (
-                  <ActivityIndicator size="small" color={COLORS.primary} />
-                ) : (
-                  <Ionicons
-                    name="trash-outline"
-                    size={25}
-                    color={COLORS.primary}
-                  />
-                )}
-              </TouchableOpacity> */}
+        <LinearGradient
+          colors={[
+            "transparent",
+            "transparent",
+            "transparent",
+            "rgba(0,0,0,0.2)",
+            "rgba(0,0,0,0.6)",
+            "rgba(0,0,0,0.8)",
+          ]}
+          locations={[0, 0.5, 0.7, 0.8, 0.9, 1]}
+          style={styles.gradientOverlay}
+        >
 
-            <View style={styles.ratingContainer}>
-              <Text style={styles.bookTitle}>{item.title}</Text>
-              {renderRatingStars(item.rating)}
-            </View>
-            <Text style={styles.caption}>{item.caption}</Text>
-            <Text style={styles.date}>
-              {new Date(item.createdAt).toLocaleDateString()}
-            </Text>
+
+          <View style={styles.foodcardDetails}>
+            <Text style={styles.foodcardTitle}>{item.title}</Text>
           </View>
-        </View>
+        </LinearGradient>
       </View>
     </TouchableOpacity>
   );
@@ -241,39 +233,29 @@ export default function Profile() {
     <TouchableOpacity
       onPress={() => router.push(`/otherpage/cardDetail?cardId=${item._id}`)}
       activeOpacity={0.8}
-      style={styles.bookCard}
+      style={styles.foodcard}
     >
-      <View style={styles.bookImageContainer}>
-        <Image source={{ uri: item.image }} style={styles.bookImage} />
+      <View style={styles.imageContainer}>
+        <Image source={{ uri: item.image }} style={styles.cardImage} />
 
-        <View style={styles.overlayContent}>
-          <View style={styles.infoBackground} />
-          <View style={styles.bookDetails}>
-            {/* <TouchableOpacity
-              onPress={() => unsaveFoodcard(item._id)}
-              style={styles.deleteButton}
-            >
-              {unsaveFoodcardId === item._id ? (
-                <ActivityIndicator size="small" color={COLORS.primary} />
-              ) : (
-                <Ionicons
-                  name="trash-outline"
-                  size={25}
-                  color={COLORS.primary}
-                />
-              )}
-            </TouchableOpacity> */}
+        <LinearGradient
+          colors={[
+            "transparent",
+            "transparent",
+            "transparent",
+            "rgba(0,0,0,0.2)",
+            "rgba(0,0,0,0.6)",
+            "rgba(0,0,0,0.8)",
+          ]}
+          locations={[0, 0.5, 0.7, 0.8, 0.9, 1]}
+          style={styles.gradientOverlay}
+        >
 
-            <View style={styles.ratingContainer}>
-              <Text style={styles.bookTitle}>{item.title}</Text>
-              {renderRatingStars(item.rating)}
-            </View>
-            <Text style={styles.caption}>{item.caption}</Text>
-            <Text style={styles.date}>
-              {new Date(item.createdAt).toLocaleDateString()}
-            </Text>
+
+          <View style={styles.foodcardDetails}>
+            <Text style={styles.foodcardTitle}>{item.title}</Text>
           </View>
-        </View>
+        </LinearGradient>
       </View>
     </TouchableOpacity>
   );
@@ -367,9 +349,11 @@ export default function Profile() {
   });
 
   return (
-    <View style={styles.container}>
-      {/* Orange header background */}
-      <View style={styles.headerBackground} />
+    <SafeAreaView style={styles.container} edges={["bottom", "left", "right"]}>
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}> Profile </Text>
+      </View>
 
       <ProfileHeader userData={null} showLogout={true} />
 
@@ -378,24 +362,40 @@ export default function Profile() {
         renderScene={renderScene}
         onIndexChange={setIndex}
         initialLayout={initialLayout}
-        renderTabBar={(props) => (
-          <TabBar
-            {...props}
-            //line under active tab
-            indicatorStyle={{
-              backgroundColor: "#ff6c36",
-              height: 5,
-            }}
-            //tabbar background
-            style={{ backgroundColor: "white" }}
-            activeColor="#ff6c36"
-            inactiveColor="#000000"
-            tabStyle={{
-              justifyContent: "center",
-            }}
-          />
+        style={styles.tabView}
+        renderTabBar={() => (
+          <View style={{ backgroundColor: "white", elevation: 5 }}>
+            <View style={{ flexDirection: "row" }}>
+              {routes.map((route, i) => {
+                const isActive = i === index;
+                return (
+                  <TouchableOpacity
+                    key={route.key}
+                    onPress={() => setIndex(i)}
+                    style={{
+                      flex: 1,
+                      alignItems: "center",
+                      justifyContent: "center",
+                      paddingVertical: 12,
+                      backgroundColor: isActive ? COLORS.primary : "white",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: isActive ? "white" : "#2c2c2c",
+                        fontWeight: "600",
+                        fontSize: 16,
+                      }}
+                    >
+                      {route.title}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </View>
         )}
       />
-    </View>
+    </SafeAreaView>
   );
 }
