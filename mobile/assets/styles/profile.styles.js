@@ -1,16 +1,46 @@
 import { StyleSheet } from "react-native";
 import COLORS from "../../constants/colors";
+import { TabView } from "react-native-tab-view";
 
 const styles = StyleSheet.create({
-  headerBackground: {
-    height: 120,
-    backgroundColor: "#FF6B3C",
-    right: 0,
-    left: 0,
-    position: "absolute",
-    top: 0,
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+    flexDirection: "column",
+    backgroundColor: "#2c2c2c",
+    paddingBottom: -24,
   },
-  bookCard: {
+
+  header: {
+    alignItems: "center",
+    backgroundColor: COLORS.primary,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+    height: 70,
+    justifyContent: "flex-end",
+    paddingTop: 10,
+  },
+
+  headerTitle: {
+    fontSize: 30,
+    color: COLORS.white,
+    fontFamily: "Konkhmer_Sleokchher-Regular",
+    textAlign: "center",
+    fontWeight: 1000,
+  },
+
+  tabView: {
+    flex: 1,
+    backgroundColor: COLORS.white,
+    height: "120%",
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    elevation: 5,
+    marginTop: -15,
+  },
+
+
+  foodcard: {
     borderRadius: 16,
     marginBottom: 50,
     padding: 16,
@@ -26,9 +56,45 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     alignSelf: "center",
   },
-  bookImageContainer: {
+
+  gradientOverlay: {
+  ...StyleSheet.absoluteFillObject,
+  justifyContent: "flex-end",
+  borderRadius: 16,
+
+},
+
+userInfo: {
+  position: "absolute",
+  alignItems: "center",
+  top: 12, 
+  right: 12,
+},
+
+avatar: {
+  width: 40, 
+  height: 40,
+  borderRadius: 20,
+  borderWidth: 2,
+  borderColor: COLORS.white,
+},
+
+foodcardDetails: {
+  paddingHorizontal: 12,
+  paddingBottom: 12,
+  marginTop: 0,
+  zIndex: 1,
+},
+
+foodcardTitle: {
+  fontSize: 16, 
+  fontWeight: "600",
+  color: COLORS.white,
+  fontFamily: "Konkhmer_Sleokchher-Regular",
+
+},
+  imageContainer: {
     ...StyleSheet.absoluteFillObject,
-    //overflow: "hidden",
     backgroundColor: COLORS.border,
   },
   overlayContent: {
@@ -58,13 +124,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     alignItems: "center",
     left: 0,
-  },
-  container: {
-    flex: 1,
-    width: "100%",
-    backgroundColor: COLORS.background,
-    padding: 16,
-    paddingBottom: 0,
   },
   loadingContainer: {
     flex: 1,
@@ -114,22 +173,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: COLORS.textSecondary,
   },
-  logoutButton: {
-    backgroundColor: COLORS.primary,
-    borderRadius: 999,
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    alignSelf: "flex-end",
-    marginTop: 8,
-    shadowColor: COLORS.black,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
+
   upperHeader: {
     flexDirection: "row",
     alignItems: "center",
@@ -176,7 +220,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.border,
   },
-  bookImage: {
+  cardImage: {
     width: "100%",
     height: "100%",
   },
@@ -277,6 +321,7 @@ const styles = StyleSheet.create({
   gridContainer: {
     paddingHorizontal: 12,
     paddingBottom: 30,
+    paddingTop: 20,
   },
   columnWrapper: {
     justifyContent: "space-between",
