@@ -149,13 +149,36 @@ export default function Friends() {
       <View style={styles.friendCard}>
         <TouchableOpacity
           style={styles.userInfo}
-          onPress={() => router.push(`/otherpage/friendDetail?friendId=${item._id}`)}
+          onPress={() =>
+            router.push(`/otherpage/friendDetail?friendId=${item._id}`)
+          }
         >
           <Image
             source={{ uri: item.profileImage }}
             style={styles.profileImage}
           />
           <Text style={styles.username}>{item.username}</Text>
+        </TouchableOpacity>
+
+        {/* Chat Button */}
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() =>
+            router.push({
+              pathname: "/otherpage/chatPage",
+              params: {
+                friendId: item._id,
+                friendName: item.username,
+                friendImage: item.profileImage,
+              },
+            })
+          }
+        >
+          <Ionicons
+            name="chatbubble-ellipses-outline"
+            size={20}
+            color="#ffffff"
+          />
         </TouchableOpacity>
         <TouchableOpacity
           style={[
