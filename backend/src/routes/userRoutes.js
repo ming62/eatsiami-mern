@@ -10,7 +10,7 @@ import {
   deleteFriendRequest,
   deleteFriend,
   sendJioRequest,
-getOutgoingJioReqs,
+  getOutgoingJioReqs,
   acceptJioRequest, 
   rejectJioRequest,
   getUserById
