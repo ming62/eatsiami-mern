@@ -1,14 +1,22 @@
 import { useEffect, useState } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { View, ActivityIndicator, StyleSheet } from "react-native";
+import {
+  View,
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+} from "react-native";
+import { Image } from "expo-image";
+import { Ionicons } from "@expo/vector-icons";
 import { API_URL } from "../../constants/api";
 import { StreamChat } from "stream-chat";
 import {
+  OverlayProvider,
   Chat,
   Channel,
   MessageList,
   MessageInput,
-  ChannelHeader,
 } from "stream-chat-react-native";
 import { useAuthStore } from "../../store/authStore";
 
@@ -27,45 +35,26 @@ export default function ChatPage() {
   const [channel, setChannel] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  console.log("📦 ENV | STREAM_API_KEY:", STREAM_API_KEY);
-  console.log("👤 AuthStore | user:", user);
-  console.log("🔐 AuthStore | token:", token);
-  console.log("📨 Params | targetUserId:", targetUserId);
-  console.log("📨 Params | friendName:", friendName);
-  console.log("📨 Params | friendImage:", friendImage);
-
   const fetchStreamToken = async () => {
     try {
-      console.log("📡 Fetching stream token from:", `${API_URL}/chat/token`);
       const res = await fetch(`${API_URL}/chat/token`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
-      if (!res.ok) {
-        const err = await res.text();
-        console.error("❌ Token fetch failed with response:", err);
-        throw new Error("Failed to get Stream token");
-      }
+      if (!res.ok) throw new Error("Failed to get Stream token");
 
       const data = await res.json();
-      console.log("✅ Got Stream token:", data.token);
       return data.token;
-    } catch (err) {
-      console.error("❌ Error fetching Stream token:", err);
+    } catch {
       return null;
     }
   };
 
   useEffect(() => {
     const initChat = async () => {
-      if (!user || !token || !targetUserId) {
-        console.warn("⚠️ Missing required data to init chat");
-        return;
-      }
-
-      console.log("⚙️ Initializing chat for user:", user.id);
+      if (!user || !token || !targetUserId) return;
 
       setLoading(true);
       const streamToken = await fetchStreamToken();
@@ -73,8 +62,6 @@ export default function ChatPage() {
 
       try {
         const client = StreamChat.getInstance(STREAM_API_KEY);
-        console.log("⚙️ Connecting user to Stream...");
-
         await client.connectUser(
           {
             id: user.id,
@@ -85,20 +72,16 @@ export default function ChatPage() {
         );
 
         const channelId = [user.id, targetUserId].sort().join("-");
-        console.log("💬 Using channelId:", channelId);
-
         const chatChannel = client.channel("messaging", channelId, {
           members: [user.id, targetUserId],
         });
 
-        console.log("👀 Watching channel...");
         await chatChannel.watch();
 
         setChatClient(client);
         setChannel(chatChannel);
-        console.log("✅ Chat initialized successfully");
-      } catch (err) {
-        console.error("❌ Failed to connect to Stream Chat:", err);
+      } catch {
+        // Silent fail
       } finally {
         setLoading(false);
       }
@@ -108,7 +91,6 @@ export default function ChatPage() {
 
     return () => {
       if (chatClient) {
-        console.log("🔌 Disconnecting Stream client...");
         chatClient.disconnectUser();
       }
     };
@@ -123,20 +105,26 @@ export default function ChatPage() {
   }
 
   return (
-    <Chat client={chatClient}>
-      <Channel channel={channel}>
-        <View style={styles.chatContainer}>
-          <ChannelHeader
-            title={friendName}
-            additionalProps={{
-              avatarImage: friendImage,
-            }}
-          />
-          <MessageList />
-          <MessageInput />
-        </View>
-      </Channel>
-    </Chat>
+    <OverlayProvider>
+      <Chat client={chatClient}>
+        <Channel channel={channel}>
+          <View style={styles.chatContainer}>
+            <View style={styles.customHeader}>
+              <TouchableOpacity
+                onPress={() => router.back()}
+                style={styles.backButton}
+              >
+                <Ionicons name="arrow-back" size={24} color="black" />
+              </TouchableOpacity>
+              <Image source={{ uri: friendImage }} style={styles.avatar} />
+              <Text style={styles.friendName}>{friendName}</Text>
+            </View>
+            <MessageList />
+            <MessageInput />
+          </View>
+        </Channel>
+      </Chat>
+    </OverlayProvider>
   );
 }
 
@@ -148,5 +136,28 @@ const styles = StyleSheet.create({
   },
   chatContainer: {
     flex: 1,
+  },
+  customHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+    backgroundColor: "#fff",
+  },
+  backButton: {
+    marginRight: 12,
+  },
+  avatar: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    marginRight: 12,
+  },
+  friendName: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#333",
   },
 });
