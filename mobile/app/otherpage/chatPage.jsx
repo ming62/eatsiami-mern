@@ -22,6 +22,8 @@ import { useAuthStore } from "../../store/authStore";
 
 const STREAM_API_KEY = process.env.EXPO_PUBLIC_STREAM_API_KEY;
 
+const chatClient = StreamChat.getInstance(STREAM_API_KEY);
+
 export default function ChatPage() {
   const router = useRouter();
   const {
@@ -31,7 +33,6 @@ export default function ChatPage() {
   } = useLocalSearchParams();
 
   const { token, user } = useAuthStore();
-  const [chatClient, setChatClient] = useState(null);
   const [channel, setChannel] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -61,27 +62,25 @@ export default function ChatPage() {
       if (!streamToken) return;
 
       try {
-        const client = StreamChat.getInstance(STREAM_API_KEY);
-        await client.connectUser(
-          {
-            id: user.id,
-            name: user.username,
-            image: user.profileImage,
-          },
-          streamToken
-        );
+        if (!chatClient.userID) {
+          await chatClient.connectUser(
+            {
+              id: user.id,
+              name: user.username,
+              image: user.profileImage,
+            },
+            streamToken
+          );
+        }
 
         const channelId = [user.id, targetUserId].sort().join("-");
-        const chatChannel = client.channel("messaging", channelId, {
+        const chatChannel = chatClient.channel("messaging", channelId, {
           members: [user.id, targetUserId],
         });
 
         await chatChannel.watch();
-
-        setChatClient(client);
         setChannel(chatChannel);
       } catch {
-        // Silent fail
       } finally {
         setLoading(false);
       }
@@ -90,13 +89,13 @@ export default function ChatPage() {
     initChat();
 
     return () => {
-      if (chatClient) {
+      if (chatClient.userID) {
         chatClient.disconnectUser();
       }
     };
-  }, [user]);
+  }, [user?.id, targetUserId]);
 
-  if (loading || !chatClient || !channel) {
+  if (loading || !channel) {
     return (
       <View style={styles.loaderContainer}>
         <ActivityIndicator size="large" />
