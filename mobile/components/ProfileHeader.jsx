@@ -32,6 +32,9 @@ export default function ProfileHeader({ userData, showMore }) {
 
       <View style={styles.profileInfo}>
         <Text style={styles.username}>{user.username}</Text>
+        {user.bio !== "Introduce yourself..." ? (
+          <Text style={styles.bio}>{user.bio}</Text>
+        ) : null}
 
         <Text style={styles.memberSince}>
           Joined {formatMemberSince(user.createdAt)}
@@ -57,6 +60,13 @@ const styles = StyleSheet.create({
     top: 4,
     right: 16,
     zIndex: 10,
+  },
+  bio: {
+    fontSize: 14,
+    color: "#ddd",
+    textAlign: "center",
+    marginBottom: 4,
+    fontStyle: "italic",
   },
   menuIconContainer: {
     position: "absolute",
