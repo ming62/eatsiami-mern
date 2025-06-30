@@ -13,7 +13,8 @@ import {
   getOutgoingJioReqs,
   acceptJioRequest, 
   rejectJioRequest,
-  getUserById
+  getUserById,
+  updateUserProfile
 } from "../controllers/user.controller.js";
 const router = express.Router();
 
@@ -39,5 +40,7 @@ router.get("/:id", getUserById)
 router.post("/jio-request/:id", sendJioRequest);
 router.put("/jio-request/:id/accept", acceptJioRequest);
 router.put("/jio-request/:id/reject", rejectJioRequest);
+
+router.put("/update/:id", updateUserProfile);
 
 export default router;

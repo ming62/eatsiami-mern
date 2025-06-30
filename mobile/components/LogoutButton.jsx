@@ -1,12 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import {
-  View,
-  Text,
-  Touchable,
-  TouchableOpacity,
-  Alert,
-  StyleSheet,
-} from "react-native";
+import { View, Text, TouchableOpacity, Alert, StyleSheet } from "react-native";
 import COLORS from "../constants/colors";
 import { useAuthStore } from "../store/authStore";
 
@@ -29,23 +22,32 @@ export default function LogoutButton() {
 
   return (
     <TouchableOpacity style={styles.logoutButton} onPress={confirmLogout}>
-      <Ionicons name="log-out" size={20} color="#2c2c2c" />
+      <Ionicons
+        name="log-out"
+        size={20}
+        color="#fff"
+        style={{ marginRight: 8 }}
+      />
+      <Text style={styles.logoutText}>Logout</Text>
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
   logoutButton: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.primary,
     borderRadius: 50,
-    paddingVertical: 8,
-    paddingHorizontal: 14,
+    paddingVertical: 12,
+    paddingHorizontal: 30,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    alignSelf: "flex-end",
-    marginTop: 8,
-    paddingRight: 8,
-    elevation: 2,
+    alignSelf: "center",
+    elevation: 3,
+  },
+  logoutText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
   },
 });

@@ -3,14 +3,17 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 import {
   View,
   ActivityIndicator,
-  StyleSheet,
   Text,
   TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
 } from "react-native";
 import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
 import { API_URL } from "../../constants/api";
 import { StreamChat } from "stream-chat";
+import styles from "../../assets/styles/chat.styles";
 import {
   OverlayProvider,
   Chat,
@@ -26,11 +29,7 @@ const chatClient = StreamChat.getInstance(STREAM_API_KEY);
 
 export default function ChatPage() {
   const router = useRouter();
-  const {
-    friendId: targetUserId,
-    friendName,
-    friendImage,
-  } = useLocalSearchParams();
+  const { friendId, friendName, friendImage } = useLocalSearchParams();
 
   const { token, user } = useAuthStore();
   const [channel, setChannel] = useState(null);
@@ -55,7 +54,7 @@ export default function ChatPage() {
 
   useEffect(() => {
     const initChat = async () => {
-      if (!user || !token || !targetUserId) return;
+      if (!user || !token || !friendId) return;
 
       setLoading(true);
       const streamToken = await fetchStreamToken();
@@ -73,9 +72,9 @@ export default function ChatPage() {
           );
         }
 
-        const channelId = [user.id, targetUserId].sort().join("-");
+        const channelId = [user.id, friendId].sort().join("-");
         const chatChannel = chatClient.channel("messaging", channelId, {
-          members: [user.id, targetUserId],
+          members: [user.id, friendId],
         });
 
         await chatChannel.watch();
@@ -93,7 +92,7 @@ export default function ChatPage() {
         chatClient.disconnectUser();
       }
     };
-  }, [user?.id, targetUserId]);
+  }, [user?.id, friendId]);
 
   if (loading || !channel) {
     return (
@@ -104,59 +103,47 @@ export default function ChatPage() {
   }
 
   return (
-    <OverlayProvider>
-      <Chat client={chatClient}>
-        <Channel channel={channel}>
-          <View style={styles.chatContainer}>
-            <View style={styles.customHeader}>
-              <TouchableOpacity
-                onPress={() => router.back()}
-                style={styles.backButton}
-              >
-                <Ionicons name="arrow-back" size={24} color="black" />
-              </TouchableOpacity>
-              <Image source={{ uri: friendImage }} style={styles.avatar} />
-              <Text style={styles.friendName}>{friendName}</Text>
-            </View>
-            <MessageList />
-            <MessageInput />
-          </View>
-        </Channel>
-      </Chat>
-    </OverlayProvider>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#ffffff" }}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 35}
+      >
+        <OverlayProvider>
+          <Chat client={chatClient}>
+            <Channel channel={channel}>
+              <View style={styles.chatContainer}>
+                <View style={styles.customHeader}>
+                  <TouchableOpacity
+                    onPress={() => router.back()}
+                    style={styles.backButton}
+                  >
+                    <Ionicons name="arrow-back" size={24} color="black" />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() =>
+                      router.push(
+                        `/otherpage/friendDetail?friendId=${friendId}`
+                      )
+                    }
+                    style={styles.centerContent}
+                  >
+                    <Image
+                      source={{ uri: friendImage }}
+                      style={styles.avatar}
+                    />
+                    <Text style={styles.friendName}>{friendName}</Text>
+                  </TouchableOpacity>
+
+                  <View style={styles.rightSpace} />
+                </View>
+                <MessageList />
+                <MessageInput />
+              </View>
+            </Channel>
+          </Chat>
+        </OverlayProvider>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  loaderContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  chatContainer: {
-    flex: 1,
-  },
-  customHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
-    backgroundColor: "#fff",
-  },
-  backButton: {
-    marginRight: 12,
-  },
-  avatar: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    marginRight: 12,
-  },
-  friendName: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#333",
-  },
-});

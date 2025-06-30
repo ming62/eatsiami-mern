@@ -1,13 +1,16 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { useAuthStore } from "../store/authStore";
 import COLORS from "../constants/colors";
 import { Image } from "expo-image";
 import { formatMemberSince } from "../lib/utils";
 import LogoutButton from "../components/LogoutButton";
+import { useRouter } from "expo-router";
 
-export default function ProfileHeader({ userData, showLogout }) {
+export default function ProfileHeader({ userData, showMore }) {
   const { user: currentUser } = useAuthStore();
   const user = userData || currentUser;
+  const router = useRouter();
 
   if (!user) {
     return null;
@@ -15,12 +18,16 @@ export default function ProfileHeader({ userData, showLogout }) {
 
   return (
     <View style={styles.profileHeader}>
-      {showLogout && (
-        <View style={styles.logoutButtonContainer}>
-          <LogoutButton />
+      {showMore && (
+        <View style={styles.menuIconContainer}>
+          <TouchableOpacity
+            onPress={() => router.push("/otherpage/more/morePage")}
+          >
+            <Ionicons name="menu-outline" size={30} color="#ffffff" />
+          </TouchableOpacity>
         </View>
       )}
-      
+
       <Image source={{ uri: user.profileImage }} style={styles.profileImage} />
 
       <View style={styles.profileInfo}>
@@ -41,7 +48,7 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     paddingHorizontal: 12,
     backgroundColor: "#2c2c2c",
-    position: "relative", 
+    position: "relative",
     marginBottom: 32,
   },
 
@@ -49,7 +56,13 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 4,
     right: 16,
-    zIndex: 10, 
+    zIndex: 10,
+  },
+  menuIconContainer: {
+    position: "absolute",
+    top: 4,
+    right: 16,
+    zIndex: 10,
   },
 
   profileImage: {
@@ -57,10 +70,10 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 50,
     borderWidth: 3,
-    borderColor: "black", 
+    borderColor: "black",
     marginBottom: 12,
     alignSelf: "center",
-    marginTop: 10, 
+    marginTop: 10,
   },
 
   profileInfo: {
@@ -70,7 +83,7 @@ const styles = StyleSheet.create({
 
   username: {
     fontSize: 24,
-    fontWeight: "600", 
+    fontWeight: "600",
     color: COLORS.white,
     textAlign: "center",
     fontFamily: "Konkhmer_Sleokchher-Regular",
@@ -83,6 +96,4 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: -10,
   },
-
-
 });
