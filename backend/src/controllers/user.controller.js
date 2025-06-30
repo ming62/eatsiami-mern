@@ -414,3 +414,37 @@ export async function rejectJioRequest(req, res) {
     res.status(500).json({ message: "Internal Server Error" });
   }
 }
+
+export async function updateUserProfile(req, res) {
+  const { username, bio, profileImage } = req.body;
+
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (user._id.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+
+    //check no repeat username, exclude user itself
+    if (username && username !== user.username) {
+      const existingUser = await User.findOne({ username });
+      if (existingUser) {
+        return res.status(400).json({ message: "Username already exist" });
+      }
+      user.username = username;
+    }
+
+    // Update other fields
+    if (bio !== undefined) user.bio = bio;
+    if (profileImage !== undefined) user.profileImage = profileImage;
+
+    const updatedUser = await user.save();
+    res.json({ message: "Profile updated successfully", user: updatedUser });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};

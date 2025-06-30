@@ -195,7 +195,7 @@ export default function FriendDetail() {
         </Text>
       </View>
 
-      <ProfileHeader userData={friendData} showLogout={false} />
+      <ProfileHeader userData={friendData} showMore={false} />
 
       <TabView
         navigationState={{ index, routes }}

@@ -219,8 +219,6 @@ export default function Profile() {
           locations={[0, 0.5, 0.7, 0.8, 0.9, 1]}
           style={styles.gradientOverlay}
         >
-
-
           <View style={styles.foodcardDetails}>
             <Text style={styles.foodcardTitle}>{item.title}</Text>
           </View>
@@ -250,8 +248,6 @@ export default function Profile() {
           locations={[0, 0.5, 0.7, 0.8, 0.9, 1]}
           style={styles.gradientOverlay}
         >
-
-
           <View style={styles.foodcardDetails}>
             <Text style={styles.foodcardTitle}>{item.title}</Text>
           </View>
@@ -355,7 +351,7 @@ export default function Profile() {
         <Text style={styles.headerTitle}> Profile </Text>
       </View>
 
-      <ProfileHeader userData={null} showLogout={true} />
+      <ProfileHeader userData={null} showMore={true} />
 
       <TabView
         navigationState={{ index, routes }}
