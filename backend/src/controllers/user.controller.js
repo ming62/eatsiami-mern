@@ -8,8 +8,8 @@ export async function getUserById(req, res) {
     const currentUserId = req.user.id;
 
     const user = await User.findById(userId)
-      .select("username profileImage friends createdAt")
-      .populate("friends", "username profileImage");
+      .select("username profileImage bio friends createdAt")
+      .populate("friends", "username profileImage bio");
 
     if(!user) {
       return res.status(404).json({ message: "User not found" });
@@ -22,6 +22,7 @@ export async function getUserById(req, res) {
         _id: user._id,
         username: user.username,
         profileImage: user.profileImage,
+        bio: user.bio,
         createdAt: user.createdAt,
       });
     }
@@ -30,11 +31,13 @@ export async function getUserById(req, res) {
       _id: user._id,
       username: user.username,
       profileImage: user.profileImage,
+      bio: user.bio,
       createdAt: user.createdAt,
       friends: user.friends.map(friend => ({
         _id: friend._id,
         username: friend.username,
-        profileImage: friend.profileImage
+        profileImage: friend.profileImage,
+        bio: friend.bio,
       }))
     });
   
