@@ -32,9 +32,8 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   backButton: {
-    width:32,
-    zIndex: 2,
-    padding: 8,
+    marginTop: 10,
+    alignSelf: "flex-start",
   },
   title: {
     flex: 1,

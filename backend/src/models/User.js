@@ -25,7 +25,7 @@ const userSchema = new mongoose.Schema(
     },
     bio: {
       type: String,
-      default: "",
+      default: "Introduce yourself...",
       maxLength: 200,
     },
     friends: [

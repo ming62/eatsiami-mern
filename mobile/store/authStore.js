@@ -10,6 +10,11 @@ export const useAuthStore = create((set) => ({
     isLoading: false,
     isCheckingAuth: true,
 
+    setUser: (newUser) => {
+    AsyncStorage.setItem("user", JSON.stringify(newUser));
+    set({ user: newUser });
+  },
+
     register: async (username, email, password) => {
         set({ isLoading: true});
         try {
