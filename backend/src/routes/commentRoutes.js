@@ -5,7 +5,7 @@ import { getComment, createComment, replyComment } from "../controllers/comment.
 
 const router = express.Router();
 
-router.get("/:foodCardId", protectRoute, getComment);
+router.get("/:postId", protectRoute, getComment);
 router.post("/", protectRoute, createComment);
 router.post("/:commentId/reply", protectRoute, replyComment);
 
