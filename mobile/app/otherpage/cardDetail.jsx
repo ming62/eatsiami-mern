@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   ScrollView,
   ActivityIndicator,
   StyleSheet,
+  TextInput,
 } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -14,9 +15,11 @@ import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useAuthStore } from "../../store/authStore";
+import { Keyboard, TouchableWithoutFeedback } from "react-native";
 import { API_URL } from "../../constants/api";
 import COLORS from "../../constants/colors";
 import { formatPublishDate } from "../../lib/utils";
+import { Loader } from "../../components/Loader";
 import { Colors } from "react-native/Libraries/NewAppScreen";
 
 const CARD_WIDTH = 303;
@@ -25,6 +28,7 @@ const CARD_ASPECT_RATIO = 9 / 16;
 
 export default function CardDetail() {
   const router = useRouter();
+  const inputRef = useRef(null);
   const { cardId } = useLocalSearchParams();
   const { token, user } = useAuthStore();
 
@@ -32,6 +36,98 @@ export default function CardDetail() {
   const [loading, setLoading] = useState(true);
   const [saved, setSaved] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState("");
+  const [posting, setPosting] = useState(false);
+  const [replyToCommentId, setReplyToCommentId] = useState(null);
+  const [replyToUsername, setReplyToUsername] = useState(null);
+
+  const fetchComments = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${API_URL}/comments/${cardId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to fetch comments");
+      }
+      setComments(data);
+    } catch (error) {
+      Alert.alert("Error", error.message || "Failed to fetch comments");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreateComment = async () => {
+    if (!newComment.trim()) return;
+
+    try {
+      setPosting(true);
+      const response = await fetch(`${API_URL}/comments`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          postId: cardId,
+          content: newComment.trim(),
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to post comment");
+      }
+
+      setNewComment("");
+      fetchComments();
+    } catch (error) {
+      Alert.alert("Error", error.message);
+    } finally {
+      setPosting(false);
+      setReplyToCommentId(null);
+      setReplyToUsername(null);
+    }
+  };
+
+  const handleReplyComment = async (commentId) => {
+    if (!newComment.trim()) return;
+
+    try {
+      setPosting(true);
+      const response = await fetch(`${API_URL}/comments/${commentId}/reply`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          postId: cardId,
+          content: newComment.trim(),
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to post reply");
+      }
+
+      setNewComment("");
+      fetchComments();
+    } catch (error) {
+      Alert.alert("Error", error.message);
+    } finally {
+      setPosting(false);
+      setReplyToCommentId(null);
+      setReplyToUsername(null);
+    }
+  };
 
   const fetchCardDetails = async () => {
     try {
@@ -153,9 +249,72 @@ export default function CardDetail() {
     );
   };
 
+  const CommentsItem = ({ comment }) => {
+    return (
+      <View style={styles.commentContainer}>
+        {/* Top-level comment */}
+        <TouchableOpacity
+          style={styles.commentHeader}
+          onPress={() =>
+            router.push(
+              `/otherpage/friendDetail?friendId=${comment.userId._id}`
+            )
+          }
+        >
+          <Image
+            source={{ uri: comment.userId.profileImage }}
+            style={styles.commentAvatar}
+          />
+          <Text style={styles.commentUsername}>{comment.userId.username}</Text>
+          <Text style={styles.commentTime}>
+            {formatPublishDate(comment.createdAt)}
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => {
+            setReplyToCommentId(comment._id);
+            setReplyToUsername(comment.userId.username);
+            setNewComment(`@${comment.userId.username} `);
+            inputRef.current?.focus();
+          }}
+        >
+          <Text style={styles.replyContent}>{comment.content}</Text>
+        </TouchableOpacity>
+
+        {/* Replies */}
+        {comment.replies.map((reply) => (
+          <View key={reply._id} style={styles.replyContainer}>
+            <View style={styles.replyHeader}>
+              <Image
+                source={{ uri: reply.userId.profileImage }}
+                style={styles.replyAvatar}
+              />
+              <Text style={styles.replyUsername}>{reply.userId.username}</Text>
+              <Text style={styles.commentTime}>
+                {formatPublishDate(reply.createdAt)}
+              </Text>
+            </View>
+            <TouchableOpacity
+              onPress={() => {
+                setReplyToCommentId(comment._id);
+                setReplyToUsername(reply.userId.username);
+                setNewComment(`@${reply.userId.username} `);
+                inputRef.current?.focus();
+              }}
+            >
+              <Text style={styles.replyContent}>{reply.content}</Text>
+            </TouchableOpacity>
+          </View>
+        ))}
+      </View>
+    );
+  };
+
   useEffect(() => {
     if (cardId) {
       fetchCardDetails();
+      fetchComments();
     }
   }, [cardId]);
 
@@ -261,6 +420,72 @@ export default function CardDetail() {
               />
             )}
           </TouchableOpacity>
+        </View>
+
+        {/* Comments part */}
+        <View style={styles.detailsCard}>
+          <View style={styles.titleSection}>
+            <Text style={styles.title}>
+              {" "}
+              Comments (
+              {comments.reduce(
+                (total, curr) => total + 1 + (curr.replies?.length || 0),
+                0
+              )}
+              )
+            </Text>
+
+            {/* create new comment */}
+            <View style={styles.commentForm}>
+              <TextInput
+                ref={inputRef}
+                style={styles.commentInput}
+                placeholder="Add a comment..."
+                placeholderTextColor="#aaa"
+                value={newComment}
+                onChangeText={(text) => {
+                  setNewComment(text);
+                  if (text.trim() === "") {
+                    setReplyToCommentId(null);
+                    setReplyToUsername(null);
+                    setNewComment("");
+                  }
+                }}
+                multiline
+              />
+              <TouchableOpacity
+                style={styles.commentButton}
+                onPress={
+                  replyToCommentId
+                    ? () => handleReplyComment(replyToCommentId)
+                    : handleCreateComment
+                }
+                disabled={posting || !newComment.trim()}
+              >
+                <View style={styles.commentButton}>
+                  {posting ? (
+                    <ActivityIndicator size="small" color="#fff" />
+                  ) : (
+                    <Ionicons
+                      name="send-outline"
+                      size={16}
+                      color={COLORS.white}
+                    />
+                  )}
+                </View>
+              </TouchableOpacity>
+            </View>
+
+            {comments.length === 0 && !loading ? (
+              <Text style={{ textAlign: "center", color: COLORS.white }}>
+                No comments yet.
+              </Text>
+            ) : (
+              comments.map((item) => (
+                <CommentsItem key={item._id} comment={item} />
+              ))
+            )}
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -508,5 +733,94 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
     fontSize: 16,
     fontWeight: "600",
+  },
+  commentContainer: {
+    marginBottom: 12,
+  },
+  commentHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  commentAvatar: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    marginRight: 8,
+  },
+  commentUsername: {
+    fontWeight: "bold",
+    color: COLORS.white,
+  },
+  commentTime: {
+    marginLeft: "auto",
+    fontSize: 11,
+    color: COLORS.gray,
+    marginLeft: 10,
+  },
+  commentContent: {
+    marginLeft: 38,
+    color: COLORS.grayLight,
+  },
+  replyContainer: {
+    marginLeft: 38,
+    marginTop: 10,
+    paddingLeft: 10,
+    borderLeftWidth: 1,
+    borderColor: "#ddd",
+  },
+  replyHeader: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+  },
+  replyAvatar: {
+    width: 25,
+    height: 25,
+    borderRadius: 12,
+    marginRight: 6,
+  },
+  replyUsername: {
+    fontWeight: "bold",
+    color: COLORS.white,
+  },
+  replyContent: {
+    marginLeft: 31,
+    color: COLORS.grayLight,
+  },
+  commentForm: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 10,
+    marginHorizontal: 20,
+    gap: 8,
+  },
+
+  commentInput: {
+    flex: 1,
+    color: "#fff",
+    borderBottomWidth: 1,
+    borderColor: "#fff",
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    fontSize: 14,
+    maxHeight: 100,
+    marginBottom: 15,
+  },
+  replyInput: {
+    flex: 1,
+    color: "#fff",
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    fontSize: 12,
+    maxHeight: 100,
+    marginBottom: 15,
+  },
+
+  commentButton: {
+    backgroundColor: COLORS.primary,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: 12,
   },
 });
