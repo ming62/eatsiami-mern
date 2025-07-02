@@ -1,42 +1,48 @@
 import mongoose from "mongoose";
 
-const foodcardSchema = new mongoose.Schema({
-
+const foodcardSchema = new mongoose.Schema(
+  {
     title: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
+    },
+
+    tag: {
+      type: String,
+      enum: ["breakfast", "lunch", "dinner", "supper", "snack", "others"],
+      required: true,
     },
 
     caption: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
     },
 
     image: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
     },
 
     location: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
     },
 
     rating: {
-        type: Number,
-        required: true,
-        min: 1,
-        max: 5,
+      type: Number,
+      required: true,
+      min: 1,
+      max: 5,
     },
 
-    user: { // Owner of the food card
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User", 
-        required: true,
-    }
-    
-}, 
-    {   timestamps: true    }
+    user: {
+      // Owner of the food card
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+  },
+  { timestamps: true }
 );
 
 const Foodcard = mongoose.model("Foodcard", foodcardSchema);

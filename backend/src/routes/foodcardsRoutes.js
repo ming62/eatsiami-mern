@@ -9,9 +9,9 @@ const router = express.Router();
 // POST route to create a new food card
 router.post("/", protectRoute, async (req, res) => {
   try {
-    const { title, caption, rating, image, location } = req.body;
+    const { title, tag, caption, rating, image, location } = req.body;
 
-    if (!image || !title || !caption || !rating || !location) {
+    if (!image || !title || !caption || !rating || !location ||!tag) {
       return res.status(400).json({ message: "Please provide all fields" });
     }
 
@@ -20,6 +20,7 @@ router.post("/", protectRoute, async (req, res) => {
 
     const newFoodcard = new Foodcard({
       title: title,
+      tag: tag,
       caption: caption,
       rating: rating,
       location: location,
