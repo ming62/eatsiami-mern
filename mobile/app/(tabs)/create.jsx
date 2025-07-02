@@ -20,17 +20,26 @@ import * as FileSystem from "expo-file-system";
 
 export default function Create() {
   const [title, setTitle] = useState("");
+  const [selectedTag, setSelectedTag] = useState("");
   const [location, setLocation] = useState("");
   const [caption, setCaption] = useState("");
   const [image, setImage] = useState(null);
   const [rating, setRating] = useState(3);
   const [imageBase64, setImageBase64] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const tagOptions = [
+    "breakfast",
+    "lunch",
+    "dinner",
+    "supper",
+    "snack",
+    "others",
+  ];
 
   const router = useRouter();
 
   const handleBack = () => {
-    if (title || location || caption || image || rating !== 3) {
+    if (title || selectedTag || location || caption || image || rating !== 3) {
       Alert.alert(
         "Discard Changes?",
         "Would you want to discard your changes?",
@@ -44,6 +53,7 @@ export default function Create() {
             style: "destructive",
             onPress: () => {
               setTitle("");
+              setSelectedTag("");
               setLocation("");
               setCaption("");
               setImage(null);
@@ -104,7 +114,14 @@ export default function Create() {
   };
 
   const handlePreview = async () => {
-    if (!title || !caption || !imageBase64 || !rating || !location) {
+    if (
+      !title ||
+      !caption ||
+      !imageBase64 ||
+      !rating ||
+      !location ||
+      !selectedTag
+    ) {
       Alert.alert("Error", "Please fill in all fields");
       return;
     }
@@ -112,6 +129,7 @@ export default function Create() {
       pathname: "otherpage/preview",
       params: {
         title,
+        tag: selectedTag,
         location,
         caption,
         image,
@@ -189,6 +207,37 @@ export default function Create() {
                   onChangeText={setTitle}
                   placeholderTextColor={COLORS.placeholderText}
                 />
+              </View>
+            </View>
+
+            {/* tag */}
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Location:</Text>
+              <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+                {tagOptions.map((tag) => (
+                  <TouchableOpacity
+                    key={tag}
+                    style={[
+                      styles.tagButton,
+                      {
+                        backgroundColor:
+                          selectedTag === tag
+                            ? COLORS.primary
+                            : COLORS.grayLight,
+                      },
+                    ]}
+                    onPress={() => setSelectedTag(tag)}
+                  >
+                    <Text
+                      style={[
+                        styles.tagInput,
+                        { color: selectedTag === tag ? "white" : "black" },
+                      ]}
+                    >
+                      {tag}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
               </View>
             </View>
 

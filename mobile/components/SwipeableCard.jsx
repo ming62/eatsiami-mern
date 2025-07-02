@@ -251,8 +251,13 @@ const SwipeableCard = ({
                 {renderRatingStars(item.rating)}
               </View>
               <Text style={styles.caption}>{item.caption}</Text>
-              <View style={styles.locationContainer}>
-                <Text style={styles.location}>{item.location}</Text>
+              <View style={styles.tagContainer}>
+                <View style={styles.locationContainer}>
+                  <Text style={styles.location}>{item.location}</Text>
+                </View>
+                <View style={styles.locationContainer}>
+                  <Text style={styles.location}>{item.tag}</Text>
+                </View>
               </View>
             </View>
           </LinearGradient>
@@ -352,6 +357,10 @@ const styles = StyleSheet.create({
     top: -CARD_HEIGHT * 0.023,
   },
 
+  tagContainer: {
+    flexDirection: "row",
+  },
+
   locationContainer: {
     backgroundColor: COLORS.primary,
     borderRadius: CARD_WIDTH * 0.04,
@@ -360,6 +369,7 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     alignItems: "center",
     justifyContent: "center",
+    marginEnd: 5,
   },
 
   location: {
