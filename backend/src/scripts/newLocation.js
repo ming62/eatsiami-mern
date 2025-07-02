@@ -1,37 +1,36 @@
-import mongoose from 'mongoose';
-import Foodcard from '../models/Foodcard.js';
-import 'dotenv/config';
+import mongoose from "mongoose";
+import Foodcard from "../models/Foodcard.js";
+import "dotenv/config";
 
-const migrateExistingFoodcards = async () => {
-    try {
-        await mongoose.connect(process.env.MONGO_URI);
-        console.log('Connected to MongoDB');
+const migrateTags = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log("Connected to MongoDB");
 
-        const foodcardsWithoutLocation = await Foodcard.find({
-            $or: [
-                { location: { $exists: false } },
-                { location: null },
-                { location: "" }
-            ]
-        });
+    const foodcardsWithoutTag = await Foodcard.find({
+      $or: [
+        { tag: { $exists: false } },
+        { tag: null },
+        { tag: "" }
+      ]
+    });
 
-        console.log(`Found ${foodcardsWithoutLocation.length} foodcards without location`);
+    console.log(`Found ${foodcardsWithoutTag.length} foodcards without tags.`);
 
-        for (const foodcard of foodcardsWithoutLocation) {
-            await Foodcard.findByIdAndUpdate(
-                foodcard._id,
-                { location: "PGP" }, // Default value
-                { new: true }
-            );
-        }
-
-        console.log('Migration completed successfully');
-        process.exit(0);
-
-    } catch (error) {
-        console.error('Migration failed:', error);
-        process.exit(1);
+    for (const foodcard of foodcardsWithoutTag) {
+      await Foodcard.findByIdAndUpdate(
+        foodcard._id,
+        { tag: "breakfast" },
+        { new: true }
+      );
     }
+
+    console.log('Migration completed: Default tag "breakfast" added.');
+    process.exit(0);
+  } catch (error) {
+    console.error("Migration failed:", error);
+    process.exit(1);
+  }
 };
 
-migrateExistingFoodcards();
+migrateTags();
