@@ -12,7 +12,7 @@ import {
 import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
 import { API_URL } from "../../constants/api";
-import { StreamChat } from "stream-chat";
+import { chatClient } from "../../lib/chatClient";
 import styles from "../../assets/styles/chat.styles";
 import {
   OverlayProvider,
@@ -22,10 +22,6 @@ import {
   MessageInput,
 } from "stream-chat-react-native";
 import { useAuthStore } from "../../store/authStore";
-
-const STREAM_API_KEY = process.env.EXPO_PUBLIC_STREAM_API_KEY;
-
-const chatClient = StreamChat.getInstance(STREAM_API_KEY);
 
 export default function ChatPage() {
   const router = useRouter();
