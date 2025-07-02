@@ -390,6 +390,9 @@ export default function CardDetail() {
               <View style={styles.locationSection}>
                 <Text style={styles.locationText}>{foodcard.location}</Text>
               </View>
+              <View style={styles.locationSection}>
+                <Text style={styles.locationText}>{foodcard.tag}</Text>
+              </View>
             </View>
           </View>
 

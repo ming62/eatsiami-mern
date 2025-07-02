@@ -64,7 +64,8 @@ export default function Home() {
     return (
       item.title.toLowerCase().includes(lowerCaseQuery) ||
       item.caption.toLowerCase().includes(lowerCaseQuery) ||
-      item.location.toLowerCase().includes(lowerCaseQuery)
+      item.location.toLowerCase().includes(lowerCaseQuery) ||
+      item.tag.toLowerCase().includes(lowerCaseQuery)
     );
   };
 
@@ -268,7 +269,7 @@ export default function Home() {
           <Text style={styles.headerTitle}>eatsiami</Text>
         </View>
       </View>
-      
+
       {/* SearchBar */}
       <View style={styles.searchContainer}>
         <Ionicons

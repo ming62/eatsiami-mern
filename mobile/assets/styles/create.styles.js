@@ -83,6 +83,24 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: "Konkhmer_Sleokchher-Regular",
   },
+  tagButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 16,
+    marginRight: 15,
+    marginBottom: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    backgroundColor:COLORS.grayLight,
+    borderColor: COLORS.gray,
+  },
+
+  tagInput: {
+    fontSize: 14,
+    fontWeight: "500",
+    textTransform: "capitalize",
+  },
   textArea: {
     backgroundColor: "#d9d9d9",
     borderRadius: 16,

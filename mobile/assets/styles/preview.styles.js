@@ -3,7 +3,114 @@ import { StyleSheet } from "react-native";
 import COLORS from "../../constants/colors";
 import { ImageBackground } from "expo-image";
 
+const CARD_WIDTH = 303;
+const CARD_HEIGHT = 517;
+const CARD_ASPECT_RATIO = 9 / 16;
+
 const styles = StyleSheet.create({
+    cardContainer: {
+    position: "absolute",
+    height: CARD_HEIGHT,
+    width: CARD_WIDTH,
+    backgroundColor: COLORS.cardBackground,
+    borderRadius: CARD_WIDTH * 0.053,
+    aspectRatio: CARD_ASPECT_RATIO,
+    overflow: "hidden",
+    alignSelf: "center",
+
+    // Responsive shadow
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: CARD_HEIGHT * 0.015,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: CARD_WIDTH * 0.04,
+    elevation: CARD_WIDTH * 0.066,
+  },
+    cardImage: {
+    width: "100%",
+    height: "100%",
+    borderRadius: CARD_WIDTH * 0.053,
+    contentFit: "cover",
+  },
+    imageContainer: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: CARD_WIDTH * 0.053,
+    backgroundColor: COLORS.border,
+  },
+  gradientOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "flex-end",
+    borderRadius: CARD_WIDTH * 0.053,
+  },
+    userInfo: {
+    position: "absolute",
+    alignItems: "center",
+    bottom: CARD_HEIGHT * 0.031,
+    right: CARD_WIDTH * 0.053,
+  },
+
+  avatar: {
+    width: CARD_WIDTH * 0.198,
+    height: CARD_WIDTH * 0.198,
+    borderRadius: CARD_WIDTH * 0.099,
+  },
+   foodcardDetails: {
+    paddingHorizontal: CARD_WIDTH * 0.053,
+    paddingBottom: CARD_HEIGHT * 0.031,
+    marginTop: 0,
+    zIndex: 1,
+  },
+
+  foodcardTitle: {
+    fontSize: CARD_WIDTH * 0.099,
+    fontWeight: "600",
+    color: COLORS.white,
+    fontFamily: "Konkhmer_Sleokchher-Regular",
+    marginRight: CARD_WIDTH * 0.026,
+    marginVertical: CARD_HEIGHT * -0.006,
+  },
+
+  ratingContainer: {
+    flexDirection: "row",
+    marginVertical: CARD_HEIGHT * 0.015,
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 12,
+  },
+   caption: {
+    fontFamily: "Konkhmer_Sleokchher-Regular",
+    fontSize: CARD_WIDTH * 0.046,
+    color: COLORS.white,
+    marginTop: CARD_HEIGHT * 0.008,
+    marginBottom: CARD_HEIGHT * 0.015,
+    lineHeight: CARD_WIDTH * 0.066,
+    top: -CARD_HEIGHT * 0.023,
+  },
+    tagContainer: {
+    flexDirection: "row",
+  },
+
+  locationContainer: {
+    backgroundColor: COLORS.primary,
+    borderRadius: CARD_WIDTH * 0.04,
+    paddingHorizontal: CARD_WIDTH * 0.026,
+    paddingVertical: CARD_HEIGHT * 0.008,
+    alignSelf: "flex-start",
+    alignItems: "center",
+    justifyContent: "center",
+    marginEnd: 5,
+  },
+
+  location: {
+    fontFamily: "Konkhmer_Sleokchher-Regular",
+    fontSize: CARD_WIDTH * 0.04,
+    color: COLORS.white,
+    textAlign: "center",
+    textAlignVertical: "center",
+  },
+
   bookCard: {
     backgroundColor: COLORS.cardBackground,
     borderRadius: 16,

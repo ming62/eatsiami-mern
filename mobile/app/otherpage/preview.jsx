@@ -18,12 +18,13 @@ import COLORS from "../../constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuthStore } from "../../store/authStore";
 import { API_URL } from "../../constants/api";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function Preview() {
   const router = useRouter();
   const { token } = useAuthStore();
 
-  const { title, location, caption, image, imageBase64, rating } =
+  const { title, tag, location, caption, image, imageBase64, rating } =
     useLocalSearchParams();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -48,6 +49,7 @@ export default function Preview() {
         },
         body: JSON.stringify({
           title,
+          tag,
           location,
           caption,
           rating: rating.toString(),
@@ -88,35 +90,47 @@ export default function Preview() {
 
   const renderItem = ({ item }) => {
     return (
-      <View style={styles.bookCard}>
-        <View style={styles.bookImageContainer}>
+      <View style={styles.cardContainer}>
+        <View style={styles.imageContainer}>
           <Image
             source={{
               uri: imageBase64
                 ? `data:image/jpeg;base64,${imageBase64}`
                 : image,
             }}
-            style={styles.previewImage}
+            style={styles.cardImage}
           />
 
-          <View style={styles.overlayContent}>
-            <View style={styles.infoBackground} />
-            <View style={styles.bookDetails}>
+          <LinearGradient
+            colors={[
+              "transparent",
+              "transparent",
+              "transparent",
+              "rgba(0,0,0,0.2)",
+              "rgba(0,0,0,0.6)",
+              "rgba(0,0,0,0.8)",
+            ]}
+            locations={[0, 0.5, 0.7, 0.8, 0.9, 1]}
+            style={styles.gradientOverlay}
+          >
+            <View style={styles.userInfo}></View>
+
+            <View style={styles.foodcardDetails}>
               <View style={styles.ratingContainer}>
-                <Text style={styles.bookTitle}>{title}</Text>
+                <Text style={styles.foodcardTitle}>{title}</Text>
                 {renderRatingStars(rating)}
               </View>
               <Text style={styles.caption}>{caption}</Text>
-              <Text style={styles.date}>
-                Shared on{" "}
-                {currentDate.toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </Text>
+              <View style={styles.tagContainer}>
+                <View style={styles.locationContainer}>
+                  <Text style={styles.location}>{location}</Text>
+                </View>
+                <View style={styles.locationContainer}>
+                  <Text style={styles.location}>{tag}</Text>
+                </View>
+              </View>
             </View>
-          </View>
+          </LinearGradient>
         </View>
       </View>
     );
@@ -139,7 +153,7 @@ export default function Preview() {
       {/* Preview content */}
       <View style={styles.contentFrame}>
         {renderItem({
-          item: { title, location, caption, rating, image, imageBase64 },
+          item: { title, tag, location, caption, rating, image, imageBase64 },
         })}
       </View>
 
