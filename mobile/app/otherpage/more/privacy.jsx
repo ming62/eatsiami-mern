@@ -165,9 +165,9 @@ export default function Privacy() {
           <TouchableOpacity
             style={[
               styles.option,
-              privacy === "friends-only" && styles.selectedOption,
+              privacy === "private" && styles.selectedOption,
             ]}
-            onPress={() => updatePrivacySettings("friends-only")}
+            onPress={() => updatePrivacySettings("private")}
             disabled={loading}
           >
             <View style={styles.optionLeft}>
@@ -178,7 +178,7 @@ export default function Privacy() {
                 Only your friends can see your foodcards and visit your profile
               </Text>
             </View>
-            {privacy === "friends-only" && (
+            {privacy === "private" && (
               <Ionicons name="checkmark-circle" size={24} color={COLORS.primary} />
             )}
           </TouchableOpacity>

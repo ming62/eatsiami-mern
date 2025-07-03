@@ -44,6 +44,6 @@ router.put("/jio-request/:id/reject", rejectJioRequest);
 
 router.put("/update/:id", updateUserProfile);
 
-router.get("/privacy", updateUserPrivacy);
+router.put("/privacy", updateUserPrivacy);
 
 export default router;
