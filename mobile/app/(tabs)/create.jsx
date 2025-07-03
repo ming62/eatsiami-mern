@@ -212,7 +212,7 @@ export default function Create() {
 
             {/* tag */}
             <View style={styles.formGroup}>
-              <Text style={styles.label}>Location:</Text>
+              <Text style={styles.label}>Tag:</Text>
               <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
                 {tagOptions.map((tag) => (
                   <TouchableOpacity
