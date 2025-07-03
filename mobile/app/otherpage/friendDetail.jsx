@@ -38,6 +38,7 @@ export default function FriendDetail() {
 
   const fetchFriendData = async () => {
     try {
+      
       setLoading(true);
       const response = await fetch(`${API_URL}/users/${friendId}`, {
         method: "GET",
@@ -45,6 +46,15 @@ export default function FriendDetail() {
           Authorization: `Bearer ${token}`,
         },
       });
+
+      if (response.status === 403) {
+        Alert.alert(
+          "Private Profile",
+          "This user's profile is only visible to friends.",
+          [{ text: "OK", onPress: () => router.back() }]
+        );
+        return;
+      }
 
       if (!response.ok) {
         throw new Error("Failed to fetch friend data");
@@ -55,6 +65,7 @@ export default function FriendDetail() {
     } catch (error) {
       console.error("Error fetching friend data:", error);
       Alert.alert("Error", error.message || "Failed to fetch friend data");
+      router.back();
     } finally {
       setLoading(false);
     }

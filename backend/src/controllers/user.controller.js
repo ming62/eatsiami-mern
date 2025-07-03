@@ -11,14 +11,25 @@ export async function getUserById(req, res) {
       .select("username profileImage bio friends createdAt")
       .populate("friends", "username profileImage bio");
 
-    if(!user) {
+    if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const isFriend = user.friends.some(f => f._id.toString() === currentUserId || userId === currentUserId);
+    if (user.privacy === "private" && userId !== currentUserId) {
+      const currentUser = await User.findById(currentUserId);
+      if (!currentUser.friends.includes(userId)) {
+        return res.status(403).json({
+          message: "This user's profile is private and only visible to friends",
+        });
+      }
+    }
 
-    if(!isFriend) {
-          return res.status(200).json({
+    const isFriend = user.friends.some(
+      (f) => f._id.toString() === currentUserId || userId === currentUserId
+    );
+
+    if (!isFriend) {
+      return res.status(200).json({
         _id: user._id,
         username: user.username,
         profileImage: user.profileImage,
@@ -33,20 +44,18 @@ export async function getUserById(req, res) {
       profileImage: user.profileImage,
       bio: user.bio,
       createdAt: user.createdAt,
-      friends: user.friends.map(friend => ({
+      friends: user.friends.map((friend) => ({
         _id: friend._id,
         username: friend.username,
         profileImage: friend.profileImage,
         bio: friend.bio,
-      }))
+      })),
     });
-  
   } catch (error) {
     console.error("Error in getUserById controller", error.message);
     res.status(500).json({ message: "Internal Server Error" });
   }
 }
-
 
 export async function getMyFriends(req, res) {
   try {
@@ -68,7 +77,9 @@ export async function sendFriendRequest(req, res) {
 
     // prevent sending req to yourselfs
     if (myId === recipientId) {
-      return res.status(400).json({ message: "You can't send friend request to yourself" });
+      return res
+        .status(400)
+        .json({ message: "You can't send friend request to yourself" });
     }
 
     const recipient = await User.findById(recipientId);
@@ -78,7 +89,9 @@ export async function sendFriendRequest(req, res) {
 
     // check if user is already friends
     if (recipient.friends.includes(myId)) {
-      return res.status(400).json({ message: "You are already friends with this user" });
+      return res
+        .status(400)
+        .json({ message: "You are already friends with this user" });
     }
 
     // check if a req already exists
@@ -90,9 +103,9 @@ export async function sendFriendRequest(req, res) {
     });
 
     if (existingRequest) {
-      return res
-        .status(400)
-        .json({ message: "A friend request already exists between you and this user" });
+      return res.status(400).json({
+        message: "A friend request already exists between you and this user",
+      });
     }
 
     const friendRequest = await FriendRequest.create({
@@ -119,7 +132,9 @@ export async function acceptFriendRequest(req, res) {
 
     // Verify the current user is the recipient
     if (friendRequest.recipient.toString() !== req.user.id) {
-      return res.status(403).json({ message: "You are not authorized to accept this request" });
+      return res
+        .status(403)
+        .json({ message: "You are not authorized to accept this request" });
     }
 
     friendRequest.status = "accepted";
@@ -152,40 +167,41 @@ export async function getNotification(req, res) {
       .populate("sender", "username profileImage")
       .sort({ createdAt: -1 });
 
-      const pendingJioReqs = await JioRequest.find({
+    const pendingJioReqs = await JioRequest.find({
       recipient: myId,
       status: "pending",
     })
       .populate("sender", "username profileImage")
       .sort({ createdAt: -1 });
 
-     const acceptedFriendReqs = await FriendRequest.find({
+    const acceptedFriendReqs = await FriendRequest.find({
       sender: myId,
       status: "accepted",
     })
       .populate("recipient", "username profileImage")
       .sort({ updatedAt: -1 });
 
-      const acceptedJioReqs = await JioRequest.find({
+    const acceptedJioReqs = await JioRequest.find({
       sender: myId,
       status: "accepted",
     })
       .populate("recipient", "username profileImage")
       .sort({ updatedAt: -1 });
 
-      const rejectedJioReqs = await JioRequest.find({
+    const rejectedJioReqs = await JioRequest.find({
       sender: myId,
       status: "rejected",
     })
       .populate("recipient", "username profileImage")
       .sort({ updatedAt: -1 });
 
-
-    res.status(200).json({ pendingFriendReqs, 
-  pendingJioReqs,
-  acceptedFriendReqs,
-  acceptedJioReqs,
-  rejectedJioReqs, });
+    res.status(200).json({
+      pendingFriendReqs,
+      pendingJioReqs,
+      acceptedFriendReqs,
+      acceptedJioReqs,
+      rejectedJioReqs,
+    });
   } catch (error) {
     console.log("Error in getPendingFriendRequests controller", error.message);
     res.status(500).json({ message: "Internal Server Error" });
@@ -211,21 +227,21 @@ export async function searchFriends(req, res) {
     const { username } = req.query;
 
     const page = parseInt(req.query.page) || 1;
-const limit = parseInt(req.query.limit) || 10;
-const skip = (page - 1) * limit;
-    
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
     if (!username) {
       return res.status(400).json({ message: "Username is required" });
     }
 
     // Search for users whose username contains the search term
     const friends = await User.find({
-      username: { $regex: username, $options: 'i' },  //case-insensitive and partial match
-      _id: { $ne: req.user.id } // Exclude the current user from results
+      username: { $regex: username, $options: "i" }, //case-insensitive and partial match
+      _id: { $ne: req.user.id }, // Exclude the current user from results
     })
-    .select('username profileImage')
-  .skip(skip)
-  .limit(limit); //allow load more friends
+      .select("username profileImage")
+      .skip(skip)
+      .limit(limit); //allow load more friends
 
     res.status(200).json(friends);
   } catch (error) {
@@ -235,7 +251,7 @@ const skip = (page - 1) * limit;
 }
 
 export async function deleteFriend(req, res) {
-   try {
+  try {
     const myId = req.user.id;
     const { id: friendId } = req.params;
 
@@ -249,7 +265,6 @@ export async function deleteFriend(req, res) {
       return res.status(400).json({ message: "This user is not your friend." });
     }
 
-
     await User.findByIdAndUpdate(myId, {
       $pull: { friends: friendId },
     });
@@ -259,13 +274,12 @@ export async function deleteFriend(req, res) {
     });
 
     //delete friend request between them so that they can add each other in the future
-        await FriendRequest.deleteMany({
+    await FriendRequest.deleteMany({
       $or: [
         { sender: myId, recipient: friendId },
         { sender: friendId, recipient: myId },
       ],
     });
-
 
     res.status(200).json({ message: "Friend removed successfully." });
   } catch (error) {
@@ -277,7 +291,6 @@ export async function deleteFriend(req, res) {
 export async function deleteFriendRequest(req, res) {
   try {
     const { id: requestId } = req.params;
-    
 
     const friendRequest = await FriendRequest.findById(requestId);
 
@@ -287,10 +300,11 @@ export async function deleteFriendRequest(req, res) {
 
     // Verify the current user is the recipient
     if (friendRequest.recipient.toString() !== req.user.id) {
-      return res.status(403).json({ message: "You are not authorized to delete this request" });
+      return res
+        .status(403)
+        .json({ message: "You are not authorized to delete this request" });
     }
 
-  
     await FriendRequest.findByIdAndDelete(requestId);
 
     res.status(200).json({ message: "Friend request deleted" });
@@ -316,28 +330,27 @@ export async function sendJioRequest(req, res) {
     }
 
     // check if user is already friends
-const currentUser = await User.findById(myId);
-if (
-  !currentUser.friends.includes(recipientId) ||
-  !recipient.friends.includes(myId)
-) {
-  return res.status(400).json({ message: "User is not your friend yet!" });
-}
+    const currentUser = await User.findById(myId);
+    if (
+      !currentUser.friends.includes(recipientId) ||
+      !recipient.friends.includes(myId)
+    ) {
+      return res.status(400).json({ message: "User is not your friend yet!" });
+    }
 
     // check if a req already exists
-const existingRequest = await JioRequest.findOne({
-  status: "pending",
-  $or: [
-    { sender: myId, recipient: recipientId },
-    { sender: recipientId, recipient: myId },
-  ],
-});
-
+    const existingRequest = await JioRequest.findOne({
+      status: "pending",
+      $or: [
+        { sender: myId, recipient: recipientId },
+        { sender: recipientId, recipient: myId },
+      ],
+    });
 
     if (existingRequest) {
-      return res
-        .status(400)
-        .json({ message: "A jio request already exists between you and this user" });
+      return res.status(400).json({
+        message: "A jio request already exists between you and this user",
+      });
     }
 
     const jioRequest = await JioRequest.create({
@@ -364,7 +377,9 @@ export async function acceptJioRequest(req, res) {
 
     // Verify the current user is the recipient
     if (jioRequest.recipient.toString() !== req.user.id) {
-      return res.status(403).json({ message: "You are not authorized to accept this request" });
+      return res
+        .status(403)
+        .json({ message: "You are not authorized to accept this request" });
     }
 
     jioRequest.status = "accepted";
@@ -380,7 +395,6 @@ export async function acceptJioRequest(req, res) {
 export async function rejectJioRequest(req, res) {
   try {
     const { id: requestId } = req.params;
-    
 
     const jioRequest = await JioRequest.findById(requestId);
 
@@ -390,10 +404,11 @@ export async function rejectJioRequest(req, res) {
 
     // Verify the current user is the recipient
     if (jioRequest.recipient.toString() !== req.user.id) {
-      return res.status(403).json({ message: "You are not authorized to delete this request" });
+      return res
+        .status(403)
+        .json({ message: "You are not authorized to delete this request" });
     }
 
-  
     jioRequest.status = "rejected";
     await jioRequest.save();
 
@@ -403,8 +418,8 @@ export async function rejectJioRequest(req, res) {
     res.status(500).json({ message: "Internal Server Error" });
   }
 }
-  
-  export async function getOutgoingJioReqs(req, res) {
+
+export async function getOutgoingJioReqs(req, res) {
   try {
     const outgoingRequests = await JioRequest.find({
       sender: req.user.id,
@@ -445,9 +460,32 @@ export async function updateUserProfile(req, res) {
 
     const updatedUser = await user.save();
     res.json({ message: "Profile updated successfully", user: updatedUser });
-
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
   }
-};
+}
+
+export async function updateUserPrivacy(req, res) {
+  try {
+    const { privacy } = req.body;
+
+    if (!privacy || !["public", "private"].includes(privacy)) {
+      return res.status(400).json({ message: "Invalid privacy setting" });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.id,
+      { privacy },
+      { new: true }
+    ).select("-password");
+
+    res.status(200).json({
+      message: "Privacy settings updated successfully",
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.error("Error updating privacy settings:", error.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+}

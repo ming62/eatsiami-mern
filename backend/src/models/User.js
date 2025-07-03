@@ -28,6 +28,11 @@ const userSchema = new mongoose.Schema(
       default: "Introduce yourself...",
       maxLength: 200,
     },
+    privacy: {
+      type: String,
+      enum: ["public", "private"],
+      default: "public",
+    },
     friends: [
       {
         type: mongoose.Schema.Types.ObjectId,

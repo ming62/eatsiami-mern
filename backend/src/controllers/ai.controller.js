@@ -1,0 +1,81 @@
+import { GoogleGenAI } from "@google/genai";
+import "dotenv/config";
+import mongoose from "mongoose";
+import FoodCard from "../models/Foodcard.js";
+
+const API_KEY = process.env.GEMINI_API_KEY;
+if (!API_KEY) {
+  console.error("Error: GEMINI_API_KEY environment variable is not set.");
+  process.exit(1);
+}
+
+const getFoodCards = async (userId) => {
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+  const foodcards = await FoodCard.find({
+    user: new mongoose.Types.ObjectId(userId),
+    createdAt: { $gte: sevenDaysAgo },
+  });
+
+  return foodcards.sort((a, b) => a.createdAt - b.createdAt);
+};
+
+export async function getAIReport(req, res) {
+  try {
+    const { userId } = req.body;
+
+    const foodcards = await getFoodCards(userId);
+    if (foodcards.length === 0) {
+      return res.json({ aiReport: "No food cards found for the past 7 days." });
+    }
+
+    const genAI = new GoogleGenAI(API_KEY);
+
+    const contents = [
+      {
+        role: "user",
+        parts: [
+          {
+            text: "You are a helpful nutritionist. Based on the following food cards, provide a report on the user's eating habits, nutritional balance, and suggestions for improvement.",
+          },
+        ],
+      },
+    ];
+
+    for (const foodcard of foodcards) {
+      const { image, title, tag, caption, createdAt } = foodcard;
+
+      const match = image.match(/^data:(image\/\w+);base64,(.+)$/);
+
+      if (!match) {
+        console.warn(`Skipping invalid image in foodcard titled "${title}"`);
+        continue;
+      }
+
+      const mimeType = match[1];
+      const base64Data = match[2];
+
+      contents[0].parts.push({
+        inlineData: {
+          mimeType,
+          data: base64Data,
+        },
+      });
+
+      contents[0].parts.push({
+        text: `Title: ${title}\nTag: ${tag}\nCaption: ${caption}\nCreated At: ${new Date(createdAt).toDateString()}`,
+      });
+    }
+
+    const result = await genAI.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents,
+    });
+
+    res.json({ aiReport: result.text });
+  } catch (err) {
+    console.error("Error generating AI report:", err);
+    res.status(500).json({ error: "Failed to generate AI report" });
+  }
+}
