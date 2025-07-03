@@ -1,18 +1,14 @@
-import { GoogleGenerativeAI } from "@google/genai";
-import dotenv from "dotenv";
-dotenv.config();
+import { GoogleGenAI } from "@google/genai";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+// The client gets the API key from the environment variable `GEMINI_API_KEY`.
+const ai = new GoogleGenAI({});
 
 async function main() {
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
-  const result = await model.generateContent("Explain how AI works in a few words");
-
-  const response = await result.response;
-  const text = response.text();
-
-  console.log(text);
+  const response = await ai.models.generateContent({
+    model: "gemini-2.5-flash",
+    contents: "Explain how AI works in a few words",
+  });
+  console.log(response.text);
 }
 
 main();
