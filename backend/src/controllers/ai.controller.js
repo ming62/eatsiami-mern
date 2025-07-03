@@ -2,6 +2,7 @@ import { GoogleGenAI } from "@google/genai";
 import "dotenv/config";
 import mongoose from "mongoose";
 import FoodCard from "../models/Foodcard.js";
+import axios from "axios";
 
 const API_KEY = process.env.GEMINI_API_KEY;
 if (!API_KEY) {
@@ -50,8 +51,6 @@ export async function getAIReport(req, res) {
     for (const foodcard of foodcards) {
       const { image, title, tag, caption, createdAt } = foodcard;
 
-      const match = image.trim().match(/^data:(image\/\w+);base64,(.+)$/);
-
       console.log("Foodcard data:");
       console.log("  Title:", title);
       console.log("  Tag:", tag);
@@ -62,20 +61,16 @@ export async function getAIReport(req, res) {
         typeof image === "string" ? image.slice(0, 50) : "(not a string)"
       );
 
-      if (!match) {
-        console.warn(`Skipping invalid image in foodcard titled "${title}"`);
-        continue;
-      }
-
-      const mimeType = match[1];
-      const base64Data = match[2];
+      const response = await axios.get(image, { responseType: "arraybuffer" });
+      const base64ImageData = Buffer.from(response.data).toString("base64");
+      const mimeType = response.headers["content-type"] || "image/jpeg";
 
       console.log(`Processing foodcard: "${title}" | Tag: ${tag}`);
 
       contents[0].parts.push({
         inlineData: {
           mimeType,
-          data: base64Data,
+          data: base64ImageData,
         },
       });
 
@@ -85,12 +80,6 @@ export async function getAIReport(req, res) {
         ).toDateString()}`,
       });
     }
-
-    console.log(
-      "Sending request to Gemini API with",
-      contents[0].parts.length,
-      "parts..."
-    );
 
     const result = await genAI.models.generateContent({
       model: "gemini-2.5-flash",
