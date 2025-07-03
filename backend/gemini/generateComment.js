@@ -1,17 +1,17 @@
-// gemini/generateComment.js
-const { GoogleGenerativeAI } = require('@google/generative-ai');
-// For ES Modules: import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// Access your API key as an environment variable
-const API_KEY = process.env.GEMINI_API_KEY;
 
+const API_KEY = process.env.GEMINI_API_KEY; 
 if (!API_KEY) {
     console.error("Error: GEMINI_API_KEY environment variable is not set.");
+ 
     process.exit(1);
 }
 
 async function run() {
+    
     const genAI = new GoogleGenerativeAI(API_KEY);
+
     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
     const prompt = "Write a short, positive comment about a delicious meal.";
@@ -23,6 +23,13 @@ async function run() {
         console.log(text);
     } catch (error) {
         console.error("Error generating content:", error);
+        
+        if (error.status) {
+            console.error("HTTP Status:", error.status);
+        }
+        if (error.message) {
+            console.error("Error message from API:", error.message);
+        }
     }
 }
 
