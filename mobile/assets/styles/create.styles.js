@@ -99,7 +99,6 @@ const styles = StyleSheet.create({
   tagInput: {
     fontSize: 14,
     fontWeight: "500",
-    textTransform: "capitalize",
   },
   textArea: {
     backgroundColor: "#d9d9d9",
