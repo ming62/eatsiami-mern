@@ -24,13 +24,17 @@ const getFoodCards = async (userId) => {
 export async function getAIReport(req, res) {
   try {
     const { userId } = req.body;
+    console.log("Received userId:", userId);
 
     const foodcards = await getFoodCards(userId);
+    console.log(`Found ${foodcards.length} foodcards in past 7 days.`);
+
     if (foodcards.length === 0) {
       return res.json({ aiReport: "No food cards found for the past 7 days." });
     }
 
     const genAI = new GoogleGenAI(API_KEY);
+    console.log("GoogleGenAI instance created.");
 
     const contents = [
       {
@@ -46,7 +50,17 @@ export async function getAIReport(req, res) {
     for (const foodcard of foodcards) {
       const { image, title, tag, caption, createdAt } = foodcard;
 
-      const match = image.match(/^data:(image\/\w+);base64,(.+)$/);
+      const match = image.trim().match(/^data:(image\/\w+);base64,(.+)$/);
+
+      console.log("Foodcard data:");
+      console.log("  Title:", title);
+      console.log("  Tag:", tag);
+      console.log("  Caption:", caption);
+      console.log("  Created At:", new Date(createdAt).toISOString());
+      console.log(
+        "  Image (first 50 chars):",
+        typeof image === "string" ? image.slice(0, 50) : "(not a string)"
+      );
 
       if (!match) {
         console.warn(`Skipping invalid image in foodcard titled "${title}"`);
@@ -56,6 +70,8 @@ export async function getAIReport(req, res) {
       const mimeType = match[1];
       const base64Data = match[2];
 
+      console.log(`Processing foodcard: "${title}" | Tag: ${tag}`);
+
       contents[0].parts.push({
         inlineData: {
           mimeType,
@@ -64,15 +80,24 @@ export async function getAIReport(req, res) {
       });
 
       contents[0].parts.push({
-        text: `Title: ${title}\nTag: ${tag}\nCaption: ${caption}\nCreated At: ${new Date(createdAt).toDateString()}`,
+        text: `Title: ${title}\nTag: ${tag}\nCaption: ${caption}\nCreated At: ${new Date(
+          createdAt
+        ).toDateString()}`,
       });
     }
+
+    console.log(
+      "Sending request to Gemini API with",
+      contents[0].parts.length,
+      "parts..."
+    );
 
     const result = await genAI.models.generateContent({
       model: "gemini-2.5-flash",
       contents,
     });
 
+    console.log("AI Report received.");
     res.json({ aiReport: result.text });
   } catch (err) {
     console.error("Error generating AI report:", err);
