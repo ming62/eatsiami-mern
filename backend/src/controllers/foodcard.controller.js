@@ -82,7 +82,7 @@ export async function getFoodcardsByUserId(req, res) {
   }
 }
 
-export async function getFoodcardbyId(req, res) {
+export async function getFoodcardById(req, res) {
   try {
     const foodcardId = req.params.id;
     const userId = req.user._id;
