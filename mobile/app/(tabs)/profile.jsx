@@ -40,7 +40,9 @@ export default function Profile() {
 
   const initialLayout = { width: Dimensions.get("window").width };
 
-  const { token } = useAuthStore();
+  const { token, user } = useAuthStore();
+  console.log("Token:", token);
+  console.log("User ID:", user?._id || user?.id);
 
   const router = useRouter();
 

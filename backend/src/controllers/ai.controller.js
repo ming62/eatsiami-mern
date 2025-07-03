@@ -73,7 +73,7 @@ export async function getAIReport(req, res) {
       contents,
     });
 
-    res.json({ aiReport: result.response.text });
+    res.json({ aiReport: result.text });
   } catch (err) {
     console.error("Error generating AI report:", err);
     res.status(500).json({ error: "Failed to generate AI report" });
