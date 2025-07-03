@@ -40,7 +40,7 @@ export default function Preview() {
         ? `image/${fileType.toLowerCase()}`
         : "image/jpeg";
       const imageDataUrl = `data:${imageType};base64,${imageBase64}`;
-
+      console.log(imageDataUrl);
       const response = await fetch(`${API_URL}/foodcards/`, {
         method: "POST",
         headers: {
