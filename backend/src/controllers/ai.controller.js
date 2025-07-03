@@ -1,7 +1,7 @@
 import { GoogleGenAI } from "@google/genai";
 import "dotenv/config";
 import mongoose from "mongoose";
-import FoodCard from "../models/foodcard.js";
+import FoodCard from "../models/Foodcard.js";
 
 const API_KEY = process.env.GEMINI_API_KEY;
 if (!API_KEY) {
