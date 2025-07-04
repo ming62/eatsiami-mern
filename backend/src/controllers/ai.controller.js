@@ -10,13 +10,13 @@ if (!API_KEY) {
   process.exit(1);
 }
 
-const getFoodCards = async (userId) => {
-  const sevenDaysAgo = new Date();
-  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+const getFoodCards = async (userId, days) => {
+  const daysAgo = new Date();
+  daysAgo.setDate(daysAgo.getDate() - days);
 
   const foodcards = await FoodCard.find({
     user: new mongoose.Types.ObjectId(userId),
-    createdAt: { $gte: sevenDaysAgo },
+    createdAt: { $gte: daysAgo },
   });
 
   return foodcards.sort((a, b) => a.createdAt - b.createdAt);
@@ -24,14 +24,17 @@ const getFoodCards = async (userId) => {
 
 export async function getAIReport(req, res) {
   try {
-    const { userId } = req.body;
+    const { userId, days } = req.body;
     console.log("Received userId:", userId);
+    console.log("Received days:", days);
 
-    const foodcards = await getFoodCards(userId);
-    console.log(`Found ${foodcards.length} foodcards in past 7 days.`);
+    const foodcards = await getFoodCards(userId, days);
+    console.log(`Found ${foodcards.length} foodcards in past ${days} days.`);
 
     if (foodcards.length === 0) {
-      return res.json({ aiReport: "No food cards found for the past 7 days." });
+      return res.json({
+        aiReport: `No food cards found for the past ${days} days.`,
+      });
     }
 
     const genAI = new GoogleGenAI(API_KEY);
@@ -42,7 +45,28 @@ export async function getAIReport(req, res) {
         role: "user",
         parts: [
           {
-            text: "You are a helpful nutritionist. Based on the following food cards, provide a report on the user's eating habits, nutritional balance, and suggestions for improvement.",
+            text: `
+You are a professional nutritionist. Your task is to analyze a user's eating habits based on a list of food cards. Each food card includes an image, title, tag (such as 'breakfast', 'lunch', 'dinner', 'snack', 'supper', or 'other'), caption (a description of the meal), and the date it was consumed.
+
+Your response must include the following:
+
+1. **Summary of Meals**:
+   - Total number of meals.
+   - Number of meals for each category (breakfast, lunch, dinner, snack, supper, other).
+
+2. **Analysis**:
+   - Comment on the overall balance of meal timing (e.g., are breakfasts frequently skipped? too many late-night suppers?).
+   - Evaluate variety and nutritional balance across the meals.
+   - Mention any trends (e.g., frequent repetition of certain foods, lack of vegetables, too many high-calorie snacks, etc.).
+
+3. **Suggestions for Improvement**:
+   - Recommend ways to improve the user's eating habits based on the data.
+   - Focus on meal timing, portion balance, food diversity, and nutritional content.
+
+Keep your tone informative, encouraging, and professional. Be concise but thorough in your analysis. Do not make up any data — rely only on the provided food cards.
+
+Begin your report below:
+        `.trim(),
           },
         ],
       },
