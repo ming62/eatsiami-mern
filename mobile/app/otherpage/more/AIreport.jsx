@@ -117,9 +117,6 @@ export default function AIreport() {
             </Text>
           </View>
           <Text style={styles.reportText}>{aiReport}</Text>
-          <Text style={styles.disclaimer}>
-            This report is AI-generated and for reference only
-          </Text>
         </ScrollView>
       )}
     </SafeAreaView>
