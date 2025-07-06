@@ -72,11 +72,12 @@ export async function getMyFriends(req, res) {
 
 export async function sendFriendRequest(req, res) {
   try {
-    const myId = req.user.id;
+    const senderId = req.user.id;
     const { id: recipientId } = req.params;
+    const sender = await User.findById(senderId);
 
     // prevent sending req to yourselfs
-    if (myId === recipientId) {
+    if (senderId === recipientId) {
       return res
         .status(400)
         .json({ message: "You can't send friend request to yourself" });
@@ -88,7 +89,7 @@ export async function sendFriendRequest(req, res) {
     }
 
     // check if user is already friends
-    if (recipient.friends.includes(myId)) {
+    if (recipient.friends.includes(senderId)) {
       return res
         .status(400)
         .json({ message: "You are already friends with this user" });
@@ -97,8 +98,8 @@ export async function sendFriendRequest(req, res) {
     // check if a req already exists
     const existingRequest = await FriendRequest.findOne({
       $or: [
-        { sender: myId, recipient: recipientId },
-        { sender: recipientId, recipient: myId },
+        { sender: senderId, recipient: recipientId },
+        { sender: recipientId, recipient: senderId },
       ],
     });
 
@@ -109,9 +110,17 @@ export async function sendFriendRequest(req, res) {
     }
 
     const friendRequest = await FriendRequest.create({
-      sender: myId,
+      sender: senderId,
       recipient: recipientId,
     });
+
+    if (recipient?.expoPushToken) {
+      await sendPushNotification(recipient.expoPushToken, {
+        title: "New Friend Request",
+        body: `${sender.username} sent you a friend request!`,
+        data: { type: "friend-request", fromUserId: senderId },
+      });
+    }
 
     res.status(201).json(friendRequest);
   } catch (error) {

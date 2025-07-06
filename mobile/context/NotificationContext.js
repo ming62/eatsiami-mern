@@ -8,6 +8,7 @@ import React, {
 import * as Notifications from "expo-notifications";
 import { registerForPushNotificationsAsync } from "@/utils/registerForPushNotificationsAsync";
 import { useAuthStore } from "../store/authStore";
+import { API_URL } from "../constants/api";
 
 const NotificationContext = createContext(undefined);
 
@@ -25,15 +26,19 @@ export const NotificationProvider = ({ children }) => {
   const [expoPushToken, setExpoPushToken] = useState(null);
   const [notification, setNotification] = useState(null);
   const [error, setError] = useState(null);
-  const { user } = useAuthStore();
+  const { user, token } = useAuthStore();
 
   const notificationListener = useRef();
   const responseListener = useRef();
 
   useEffect(() => {
     registerForPushNotificationsAsync().then(
-      (token) => setExpoPushToken(token),
-      (err) => setError(err)
+      (token) => {
+        setExpoPushToken(token);
+      },
+      (err) => {
+        setError(err);
+      }
     );
 
     notificationListener.current =
@@ -65,13 +70,13 @@ export const NotificationProvider = ({ children }) => {
 
   useEffect(() => {
     const sendTokenToBackend = async () => {
-      if (!expoPushToken || !user?.token) return;
+      if (!expoPushToken || !token) return;
 
       try {
         await fetch(`${API_URL}/users/save-push-token`, {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${user.token}`,
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ expoPushToken }),
@@ -83,7 +88,7 @@ export const NotificationProvider = ({ children }) => {
     };
 
     sendTokenToBackend();
-  }, [expoPushToken, user?.token]);
+  }, [expoPushToken, token]);
 
   return (
     <NotificationContext.Provider
