@@ -1,6 +1,7 @@
 import User from "../models/User.js";
 import FriendRequest from "../models/FriendRequest.js";
 import JioRequest from "../models/JioRequest.js";
+import { sendPushNotification } from "../lib/notification.js";
 
 export async function getUserById(req, res) {
   try {
