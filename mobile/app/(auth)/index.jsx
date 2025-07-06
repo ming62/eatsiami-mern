@@ -202,7 +202,6 @@ const styles = StyleSheet.create({
     fontSize: 34,
     color: "#2c2c2c",
     fontWeight: "400",
-    // Note: You'll need to add the custom font family if available
     fontFamily: "Konkhmer_Sleokchher-Regular",
   },
   subtitleText: {
@@ -275,7 +274,7 @@ const styles = StyleSheet.create({
   },
 
   passwordInput: {
-    paddingRight: 40, // Make room for the eye icon
+    paddingRight: 40, 
   },
 
   eyeIcon: {
