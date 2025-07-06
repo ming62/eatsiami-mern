@@ -52,8 +52,27 @@ export default function SignUpContainer() {
 
   const handleSignUp = async () => {
     const result = await register(username, email, password);
+    if (result.success) {
+      Alert.alert("Success", "Registration successful!");
+      router.push("/otherpage/profilePreview");
+    } else {
+      Alert.alert("Error", result.error);
+    }
+  };
 
-    if (!result.success) Alert.alert("Error", result.error);
+  const handlePreview = async () => {
+    if (!username || !email || !password) {
+      Alert.alert("Error", "Please fill in all fields");
+      return;
+    }
+    router.push({
+      pathname: "otherpage/profilePreview",
+      params: {
+        username,
+        email,
+        password,
+      },
+    });
   };
 
   if (!fontsLoaded) {
@@ -126,6 +145,16 @@ export default function SignUpContainer() {
                 secureTextEntry={!showPassword}
                 autoCapitalize="none"
               />
+              <TouchableOpacity
+                onPress={() => setShowPassword(!showPassword)}
+                style={styles.eyeIcon}
+              >
+                <Ionicons
+                  name={showPassword ? "eye-outline" : "eye-off-outline"}
+                  size={23}
+                  color="#8e8e8e"
+                />
+              </TouchableOpacity>
             </View>
           </View>
 
@@ -173,9 +202,9 @@ const styles = StyleSheet.create({
 
   signUpCard: {
     position: "absolute",
-    bottom: 0, // Change from top: 216 to bottom: 0
-    left: 0, // Add this
-    right: 0, // Add this
+    bottom: 0,
+    left: 0,
+    right: 0,
     height: 600,
     backgroundColor: "#ffffff",
     borderTopLeftRadius: 40,
@@ -207,7 +236,7 @@ const styles = StyleSheet.create({
     fontWeight: "400",
     color: "#2c2c2c",
     textAlign: "center",
-    fontFamily: "Konkhmer_Sleokchher-Regular", // Uncomment when font is loaded
+    fontFamily: "Konkhmer_Sleokchher-Regular",
   },
   subtitleText: {
     fontSize: 15,
@@ -215,7 +244,7 @@ const styles = StyleSheet.create({
     color: "#8e8e8e",
     textAlign: "center",
     marginTop: -20,
-    fontFamily: "Konkhmer_Sleokchher-Regular", // Uncomment when font is loaded
+    fontFamily: "Konkhmer_Sleokchher-Regular",
   },
   formContainer: {
     width: "100%",
@@ -239,7 +268,7 @@ const styles = StyleSheet.create({
     color: "#8e8e8e",
     textAlign: "left",
     zIndex: 1,
-    fontFamily: "Konkhmer_Sleokchher-Regular", // Uncomment when font is loaded
+    fontFamily: "Konkhmer_Sleokchher-Regular",
   },
   textInput: {
     flex: 1,
@@ -248,7 +277,7 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
     fontSize: 16,
     color: "#2c2c2c",
-    fontFamily: "Konkhmer_Sleokchher-Regular", // Uncomment when font is loaded
+    fontFamily: "Konkhmer_Sleokchher-Regular",
   },
   signUpButton: {
     width: "100%",
@@ -267,7 +296,7 @@ const styles = StyleSheet.create({
     color: "#ffffff",
     fontSize: 20,
     fontWeight: "400",
-    fontFamily: "Konkhmer_Sleokchher-Regular", // Uncomment when font is loaded
+    fontFamily: "Konkhmer_Sleokchher-Regular",
   },
   loginLinkContainer: {
     marginTop: 8,
@@ -279,6 +308,14 @@ const styles = StyleSheet.create({
     color: "#f27609",
     marginTop: -10,
     textAlign: "center",
-    fontFamily: "Konkhmer_Sleokchher-Regular", // Uncomment when font is loaded
+    fontFamily: "Konkhmer_Sleokchher-Regular",
+  },
+    eyeIcon: {
+    position: "absolute",
+    right: 15,
+    top: "40%",
+    transform: [{ translateY: -10 }],
+    padding: 5,
+    zIndex: 2,
   },
 });
