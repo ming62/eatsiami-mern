@@ -24,6 +24,7 @@ import { sleep } from "./index";
 import Loader from "../../components/Loader";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
+import { Button } from "react-native-web";
 
 export default function Profile() {
   const [foodcards, setFoodcards] = useState([]);
@@ -352,6 +353,7 @@ export default function Profile() {
       <View style={styles.header}>
         <Text style={styles.headerTitle}> Profile </Text>
       </View>
+
 
       <ProfileHeader userData={null} showMore={true} />
 
