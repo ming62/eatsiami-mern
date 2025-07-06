@@ -45,6 +45,6 @@ router.put("/update/:id", updateUserProfile);
 
 router.put("/privacy", updateUserPrivacy);
 
-router.push("/save-push-token", savePushToken);
+router.post("/save-push-token", savePushToken);
 
 export default router;
