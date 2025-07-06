@@ -489,3 +489,21 @@ export async function updateUserPrivacy(req, res) {
     res.status(500).json({ message: "Internal Server Error" });
   }
 }
+
+export async function savePushToken(req, res) {
+  const userId = req.user.id;
+  const { expoPushToken } = req.body;
+
+  if (!expoPushToken) {
+    return res.status(400).json({ error: "expoPushToken is required" });
+  }
+
+  try {
+    await User.findByIdAndUpdate(userId, { expoPushToken });
+    res.status(200).json({ message: "Push token saved" });
+    console.log("Push token saved to backend!");
+  } catch (err) {
+    console.error("Failed to save token:", err);
+    res.status(500).json({ error: "Failed to save token" });
+  }
+}

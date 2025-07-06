@@ -41,6 +41,5 @@ app-example
 # Firebase secrets
 firebase-service-account.json
 
-google-services.json
 /ios
 /android
