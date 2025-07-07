@@ -2,6 +2,8 @@ import User from "../models/User.js";
 import FriendRequest from "../models/FriendRequest.js";
 import JioRequest from "../models/JioRequest.js";
 import { sendPushNotification } from "../lib/notification.js";
+import Comment from "../models/Comment.js";
+import Foodcard from "../models/Foodcard.js";
 
 export async function getUserById(req, res) {
   try {
@@ -217,12 +219,34 @@ export async function getNotification(req, res) {
       .populate("recipient", "username profileImage")
       .sort({ updatedAt: -1 });
 
+    const myPosts = await Foodcard.find({ userId: myId }, "_id");
+    const myPostIds = myPosts.map((post) => post._id);
+
+    const commentsOnMyPosts = await Comment.find({
+      postId: { $in: myPostIds },
+      userId: { $ne: myId },
+    })
+      .populate("userId", "username profileImage")
+      .sort({ createdAt: -1 });
+
+    const myComments = await Comment.find({ userId: myId }, "_id");
+    const myCommentIds = myComments.map((c) => c._id);
+
+    const repliesToMyComments = await Comment.find({
+      parentId: { $in: myCommentIds },
+      userId: { $ne: myId },
+    })
+      .populate("userId", "username profileImage")
+      .sort({ createdAt: -1 });
+
     res.status(200).json({
       pendingFriendReqs,
       pendingJioReqs,
       acceptedFriendReqs,
       acceptedJioReqs,
       rejectedJioReqs,
+      commentsOnMyPosts,
+      repliesToMyComments,
     });
   } catch (error) {
     console.log("Error in getPendingFriendRequests controller", error.message);

@@ -28,8 +28,10 @@ export default function Notification() {
     pendingFriendReqs: [],
     pendingJioReqs: [],
     acceptedFriendReqs: [],
-    acceptedJioRequest: [],
-    rejectedJioRequest: [],
+    acceptedJioReqs: [],
+    rejectedJioReqs: [],
+    commentsOnMyPosts: [],
+    repliesToMyComments: [],
   });
 
   const fetchNotification = async (refresh = false) => {
@@ -52,8 +54,10 @@ export default function Notification() {
         pendingFriendReqs: data.pendingFriendReqs || [],
         pendingJioReqs: data.pendingJioReqs || [],
         acceptedFriendReqs: data.acceptedFriendReqs || [],
-        acceptedJioRequest: data.acceptedJioRequest || [],
-        rejectedJioRequest: data.rejectedJioRequest || [],
+        acceptedJioReqs: data.acceptedJioReqs || [],
+        rejectedJioReqs: data.rejectedJioReqs || [],
+        commentsOnMyPosts: data.commentsOnMyPosts || [],
+        repliesToMyComments: data.repliesToMyComments || [],
       });
     } catch (error) {
       console.error("Error fetching friend requests:", error);
@@ -137,13 +141,21 @@ export default function Notification() {
       ...item,
       type: "acceptedFriend",
     })),
-    ...Notification.acceptedJioRequest.map((item) => ({
+    ...Notification.acceptedJioReqs.map((item) => ({
       ...item,
       type: "acceptedJio",
     })),
-    ...Notification.rejectedJioRequest.map((item) => ({
+    ...Notification.rejectedJioReqs.map((item) => ({
       ...item,
       type: "rejectedJio",
+    })),
+    ...Notification.commentsOnMyPosts.map((item) => ({
+      ...item,
+      type: "comments",
+    })),
+    ...Notification.repliesToMyComments.map((item) => ({
+      ...item,
+      type: "replies",
     })),
   ].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
 
@@ -244,7 +256,7 @@ export default function Notification() {
               );
             }}
           >
-            <Ionicons name="trash-outline" size={20} color="#6A6968"  />
+            <Ionicons name="trash-outline" size={20} color="#6A6968" />
           </TouchableOpacity>
         </View>
       </View>
@@ -255,6 +267,8 @@ export default function Notification() {
     const isFriendRequest = item.type === "acceptedFriend";
     const isJioAccepted = item.type === "acceptedJio";
     const isJioRejected = item.type === "rejectedJio";
+    const isComment = item.type === "comments";
+    const isReplies = item.type === "replies";
 
     return (
       <View style={styles.requestCard}>
@@ -278,7 +292,11 @@ export default function Notification() {
                 ? "accepted your jio request!"
                 : isJioRejected
                   ? "don't want jia beng"
-                  : null}
+                  : isComment
+                    ? "comment on your food card"
+                    : isReplies
+                      ? "reply to your comment"
+                      : null}
           </Text>
         </View>
       </View>
@@ -290,15 +308,6 @@ export default function Notification() {
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Notification</Text>
       </View>
-
-      {/* <View style={styles.searchContainer}>
-        <Ionicons name="search" size={30} color={COLORS.textSecondary} style= {{ marginLeft: 5}}/>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="search notifications..."
-          placeholderTextColor={COLORS.textSecondary}
-        />
-      </View> */}
 
       {loading ? (
         <ActivityIndicator
