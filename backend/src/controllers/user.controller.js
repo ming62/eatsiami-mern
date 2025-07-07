@@ -115,6 +115,7 @@ export async function sendFriendRequest(req, res) {
       recipient: recipientId,
     });
 
+    //send a push notification
     if (recipient?.expoPushToken) {
       await sendPushNotification(recipient.expoPushToken, {
         title: "New Friend Request",
@@ -160,6 +161,17 @@ export async function acceptFriendRequest(req, res) {
       $addToSet: { friends: friendRequest.sender },
     });
 
+    //send a push notification
+    const sender = await User.findById(friendRequest.sender);
+    const recipient = await User.findById(friendRequest.recipient);
+
+    if (sender?.expoPushToken) {
+      await sendPushNotification(sender.expoPushToken, {
+        title: "Friend Request Accepted",
+        body: `${recipient.username} has accepted your friend request!`,
+        data: { type: "friend_accept", friendId: recipient._id.toString() },
+      });
+    }
     res.status(200).json({ message: "Friend request accepted" });
   } catch (error) {
     console.log("Error in acceptFriendRequest controller", error.message);
@@ -326,11 +338,11 @@ export async function deleteFriendRequest(req, res) {
 
 export async function sendJioRequest(req, res) {
   try {
-    const myId = req.user.id;
+    const senderId = req.user.id;
     const { id: recipientId } = req.params;
 
     // prevent sending req to yourselfs
-    if (myId === recipientId) {
+    if (senderId === recipientId) {
       return res.status(400).json({ message: "You can't jio yourself" });
     }
 
@@ -340,10 +352,10 @@ export async function sendJioRequest(req, res) {
     }
 
     // check if user is already friends
-    const currentUser = await User.findById(myId);
+    const sender = await User.findById(senderId);
     if (
-      !currentUser.friends.includes(recipientId) ||
-      !recipient.friends.includes(myId)
+      !sender.friends.includes(recipientId) ||
+      !recipient.friends.includes(senderId)
     ) {
       return res.status(400).json({ message: "User is not your friend yet!" });
     }
@@ -352,8 +364,8 @@ export async function sendJioRequest(req, res) {
     const existingRequest = await JioRequest.findOne({
       status: "pending",
       $or: [
-        { sender: myId, recipient: recipientId },
-        { sender: recipientId, recipient: myId },
+        { sender: senderId, recipient: recipientId },
+        { sender: recipientId, recipient: senderId },
       ],
     });
 
@@ -364,9 +376,18 @@ export async function sendJioRequest(req, res) {
     }
 
     const jioRequest = await JioRequest.create({
-      sender: myId,
+      sender: senderId,
       recipient: recipientId,
     });
+
+    //send a push notification
+    if (recipient?.expoPushToken) {
+      await sendPushNotification(recipient.expoPushToken, {
+        title: "New Jio Request",
+        body: `${sender.username} jio you for a meal!`,
+        data: { type: "jio-request", fromUserId: senderId },
+      });
+    }
 
     res.status(201).json(jioRequest);
   } catch (error) {
@@ -395,6 +416,18 @@ export async function acceptJioRequest(req, res) {
     jioRequest.status = "accepted";
     await jioRequest.save();
 
+    //send a push notification
+    const sender = await User.findById(jioRequest.sender);
+    const recipient = await User.findById(jioRequest.recipient);
+
+    if (sender?.expoPushToken) {
+      await sendPushNotification(sender.expoPushToken, {
+        title: "Jio Request Accepted",
+        body: `${recipient.username} has onz your jio request!`,
+        data: { type: "jio_accept", friendId: recipient._id.toString() },
+      });
+    }
+
     res.status(200).json({ message: "Jio request accepted" });
   } catch (error) {
     console.log("Error in acceptJioRequest controller", error.message);
@@ -422,7 +455,19 @@ export async function rejectJioRequest(req, res) {
     jioRequest.status = "rejected";
     await jioRequest.save();
 
-    res.status(200).json({ message: "Jiorequest rejected" });
+    //send a push notification
+    const sender = await User.findById(jioRequest.sender);
+    const recipient = await User.findById(jioRequest.recipient);
+
+    if (sender?.expoPushToken) {
+      await sendPushNotification(sender.expoPushToken, {
+        title: "Jio Request Rejected",
+        body: `${recipient.username} don't want jia beng!`,
+        data: { type: "jio_reject", friendId: recipient._id.toString() },
+      });
+    }
+
+    res.status(200).json({ message: "Jio request rejected" });
   } catch (error) {
     console.log("Error in rejectJioRequest controller", error.message);
     res.status(500).json({ message: "Internal Server Error" });
