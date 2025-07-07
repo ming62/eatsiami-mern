@@ -284,7 +284,9 @@ export default function Notification() {
         <View style={styles.userInfo}>
           <View style={styles.time}>
             <Text style={styles.notificationName}>
-              {item.recipient.username}
+              {item.recipient.username ||
+                item.user?.username ||
+                item.userId?.username}
             </Text>
             <Text style={styles.notificationTime}>
               {formatPublishDate(item.createdAt)}
