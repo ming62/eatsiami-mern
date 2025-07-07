@@ -273,7 +273,12 @@ export default function Notification() {
     return (
       <View style={styles.requestCard}>
         <Image
-          source={{ uri: item.recipient.profileImage }}
+          source={{
+            uri:
+              item.recipient?.profileImage ||
+              item.user?.profileImage ||
+              item.userId?.profileImage,
+          }}
           style={styles.avatar}
         />
         <View style={styles.userInfo}>

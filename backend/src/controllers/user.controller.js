@@ -219,14 +219,14 @@ export async function getNotification(req, res) {
       .populate("recipient", "username profileImage")
       .sort({ updatedAt: -1 });
 
-    const myPosts = await Foodcard.find({ userId: myId }, "_id");
+    const myPosts = await Foodcard.find({ user: myId }, "_id");
     const myPostIds = myPosts.map((post) => post._id);
 
     const commentsOnMyPosts = await Comment.find({
       postId: { $in: myPostIds },
       userId: { $ne: myId },
     })
-      .populate("userId", "username profileImage")
+      .populate("user", "username profileImage")
       .sort({ createdAt: -1 });
 
     const myComments = await Comment.find({ userId: myId }, "_id");
