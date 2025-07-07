@@ -41,6 +41,11 @@ export default function CardDetail() {
   const [posting, setPosting] = useState(false);
   const [replyToCommentId, setReplyToCommentId] = useState(null);
   const [replyToUsername, setReplyToUsername] = useState(null);
+  const [showShareModal, setShowShareModal] = useState(false);
+
+  const handleShare = () => {
+    setShowShareModal(true);
+  };
 
   const fetchComments = async () => {
     try {
@@ -352,7 +357,7 @@ export default function CardDetail() {
 
   return (
     <SafeAreaView style={styles.container} edges={["left", "right", "bottom"]}>
-      {/* Header - Matching Friends page */}
+      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => router.back()}
@@ -363,6 +368,15 @@ export default function CardDetail() {
         <Text style={styles.headerTitle}>
           {foodcard.user.username}'s {foodcard.title}
         </Text>
+
+        {foodcard.user.privacy === "public" && (
+          <TouchableOpacity
+            onPress={handleShare}
+            style={styles.shareHeaderButton}
+          >
+            <Ionicons name="share-outline" size={24} color={COLORS.white} />
+          </TouchableOpacity>
+        )}
       </View>
 
       <ScrollView
@@ -490,6 +504,15 @@ export default function CardDetail() {
             )}
           </View>
         </View>
+
+        {/* Sharing */}
+        {foodcard.user.privacy === "public" && (
+          <FriendSelectionModal
+            visible={showShareModal}
+            onClose={() => setShowShareModal(false)}
+            foodcardId={cardId}
+          />
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -825,5 +848,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 5,
     borderRadius: 12,
+  },
+  shareHeaderButton: {
+    position: "absolute",
+    right: 20,
+    top: "50%",
+    marginTop: -12,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1,
   },
 });

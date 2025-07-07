@@ -22,6 +22,7 @@ import {
   MessageInput,
 } from "stream-chat-react-native";
 import { useAuthStore } from "../../store/authStore";
+import FoodcardMessage from "../../components/FoodcardMessage";
 
 export default function ChatPage() {
   const router = useRouter();
@@ -45,6 +46,15 @@ export default function ChatPage() {
       return data.token;
     } catch {
       return null;
+    }
+  };
+
+  const CustomMessage = (props) => {
+    const { message } = props;
+
+    // Check if message has foodcard attachment
+    if (message.attachments && message.attachments[0]?.type === "foodcard") {
+      return <FoodcardMessage message={message} />;
     }
   };
 
@@ -133,7 +143,7 @@ export default function ChatPage() {
 
                   <View style={styles.rightSpace} />
                 </View>
-                <MessageList />
+                <MessageList MessageSimple={CustomMessage} />
                 <MessageInput />
               </View>
             </Channel>
