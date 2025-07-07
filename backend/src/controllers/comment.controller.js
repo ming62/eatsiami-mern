@@ -65,7 +65,7 @@ export async function createComment(req, res) {
     if (post && post.user.id !== userId) {
       await sendPushNotification(post.user.expoPushToken, {
         title: "New Comment",
-        body: `${req.user.username} commented on your food card.`,
+        body: `${req.user.username} commented on your food card ${post.title}.`,
         data: { type: "new-comment", fromUserId: userId },
       });
     }
