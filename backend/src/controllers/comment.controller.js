@@ -1,4 +1,6 @@
 import Comment from "../models/Comment.js";
+import { sendPushNotification } from "../lib/notification.js";
+import Foodcard from "../models/Foodcard.js";
 
 export async function getComment(req, res) {
   try {
@@ -53,6 +55,20 @@ export async function createComment(req, res) {
     });
 
     const populated = await comment.populate("userId", "username profileImage");
+
+    //send push notification
+    const post = await Foodcard.findById(postId).populate(
+      "user",
+      "expoPushToken username"
+    );
+
+    if (post && post.user.id !== userId) {
+      await sendPushNotification(
+        post.user.expoPushToken,
+        "New Comment",
+        `${req.user.username} commented on your food card.`
+      );
+    }
     res.status(201).json(populated);
   } catch (error) {
     console.error("createComment error:", error);
@@ -88,6 +104,15 @@ export async function replyComment(req, res) {
     });
 
     const populated = await comment.populate("userId", "username profileImage");
+
+    if (parentComment.userId.id !== userId) {
+      await sendPushNotification(
+        parentComment.userId.expoPushToken,
+        "New Reply",
+        `${req.user.username} replied to your comment.`
+      );
+    }
+
     res.status(201).json(populated);
   } catch (error) {
     console.error("createComment error:", error);
