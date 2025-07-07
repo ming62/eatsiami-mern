@@ -274,19 +274,14 @@ export default function Notification() {
       <View style={styles.requestCard}>
         <Image
           source={{
-            uri:
-              item.recipient?.profileImage ||
-              item.user?.profileImage ||
-              item.userId?.profileImage,
+            uri: item.recipient?.profileImage || item.userId?.profileImage,
           }}
           style={styles.avatar}
         />
         <View style={styles.userInfo}>
           <View style={styles.time}>
             <Text style={styles.notificationName}>
-              {item.recipient.username ||
-                item.user?.username ||
-                item.userId?.username}
+              {item.recipient.username || item.userId?.username}
             </Text>
             <Text style={styles.notificationTime}>
               {formatPublishDate(item.createdAt)}
