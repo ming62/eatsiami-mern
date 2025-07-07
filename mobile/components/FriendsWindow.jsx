@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
-  TouchableOpacity,
   FlatList,
   StyleSheet,
   Modal,
@@ -15,9 +14,8 @@ import { Image } from "expo-image";
 import { API_URL } from "../constants/api";
 import { useAuthStore } from "../store/authStore";
 import COLORS from "../constants/colors";
-import { set } from "mongoose";
 
-const FriendSelectionModal = ({ visible, onClose, foodcardId }) => {
+const FriendsWindow = ({ visible, onClose, foodcardId }) => {
   const { token } = useAuthStore();
   const [friends, setFriends] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -248,4 +246,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default FriendSelectionModal;
+export default FriendsWindow;

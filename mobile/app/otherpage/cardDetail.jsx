@@ -21,6 +21,7 @@ import COLORS from "../../constants/colors";
 import { formatPublishDate } from "../../lib/utils";
 import { Loader } from "../../components/Loader";
 import { Colors } from "react-native/Libraries/NewAppScreen";
+import FriendsWindow  from "../../components/FriendsWindow";
 
 const CARD_WIDTH = 303;
 const CARD_HEIGHT = 517;
@@ -507,7 +508,7 @@ export default function CardDetail() {
 
         {/* Sharing */}
         {foodcard.user.privacy === "public" && (
-          <FriendSelectionModal
+          <FriendsWindow
             visible={showShareModal}
             onClose={() => setShowShareModal(false)}
             foodcardId={cardId}

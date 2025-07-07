@@ -17,7 +17,6 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json()); // Middleware to parse JSON bodies
 app.use(cors()); 
 
-
 //ROUTER
 app.use("/api/auth", authRoutes); // login, register
 app.use("/api/foodcards", foodcardsRoutes);

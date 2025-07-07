@@ -14,16 +14,37 @@ export async function getStreamToken(req, res) {
 
 export async function shareFoodcard(req, res) {
   try {
-    const { foodcardId, recipeintId } = req.body;
-    const userId = req.user.id;
+    const { foodcardId, recipientId } = req.body;
+    const userId = req.user._id;
 
-    const foodcard = await Foodcard.findById(foodcardId).populate("user", "username profileImage");
+    console.log("Share request:", { foodcardId, recipientId, userId });
+
+    // Validate required fields
+    if (!foodcardId || !recipientId) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    // Get foodcard details with populated user
+    const foodcard = await Foodcard.findById(foodcardId)
+      .populate("user", "username profileImage privacy");
 
     if (!foodcard) {
       return res.status(404).json({ message: "Foodcard not found" });
     }
 
-    const channelId = [user.id, friendId].sort().join("-");
+    console.log("Foodcard found:", foodcard.title);
+    console.log("Foodcard owner privacy:", foodcard.user.privacy);
+
+    // Check if foodcard owner has public privacy
+    if (foodcard.user.privacy === "private") {
+      return res.status(403).json({ message: "Cannot share private foodcard" });
+    }
+
+    // Create channel ID (sorted user IDs)
+    const channelId = [userId.toString(), recipientId].sort().join("-");
+    console.log("Channel ID:", channelId);
+
+    // Create custom message with foodcard attachment
     const message = {
       text: `${req.user.username} shared a foodcard with you!`,
       user_id: userId.toString(),
@@ -52,9 +73,11 @@ export async function shareFoodcard(req, res) {
 
     const channel = streamClient.channel('messaging', channelId);
     await channel.sendMessage(message);
+
+    console.log("Message sent successfully");
     res.status(200).json({ message: "Foodcard shared successfully" });
   } catch (error) {
-    console.log("Error in shareFoodcard controller:", error.message);
+    console.error("Error in shareFoodcard controller:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 }
