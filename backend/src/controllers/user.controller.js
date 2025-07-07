@@ -225,6 +225,7 @@ export async function getNotification(req, res) {
     const commentsOnMyPosts = await Comment.find({
       postId: { $in: myPostIds },
       userId: { $ne: myId },
+      parentId: null,
     })
       .populate("userId", "username profileImage")
       .sort({ createdAt: -1 });

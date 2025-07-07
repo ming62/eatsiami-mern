@@ -134,8 +134,16 @@ export default function Notification() {
     fetchNotification();
   }, []);
 
-  const pendingFriendReqs = Notification?.pendingFriendReqs || [];
-  const pendingJioReqs = Notification?.pendingJioReqs || [];
+  const pendingFriendReqs = (Notification?.pendingFriendReqs || []).map(
+    (item) => ({
+      ...item,
+      type: "pendingFriend",
+    })
+  );
+  const pendingJioReqs = (Notification?.pendingJioReqs || []).map((item) => ({
+    ...item,
+    type: "pendingJio",
+  }));
   const otherNotification = [
     ...Notification.acceptedFriendReqs.map((item) => ({
       ...item,
@@ -281,7 +289,7 @@ export default function Notification() {
         <View style={styles.userInfo}>
           <View style={styles.time}>
             <Text style={styles.notificationName}>
-              {item.recipient.username || item.userId?.username}
+              {item.recipient?.username || item.userId?.username}
             </Text>
             <Text style={styles.notificationTime}>
               {formatPublishDate(item.createdAt)}
@@ -320,7 +328,7 @@ export default function Notification() {
       ) : (
         <FlatList
           data={[...pendingFriendReqs, ...pendingJioReqs, ...otherNotification]}
-          keyExtractor={(item) => item._id}
+          keyExtractor={(item) => `${item.type}-${item._id}`}
           renderItem={({ item }) => {
             if (pendingFriendReqs.some((req) => req._id === item._id)) {
               return renderFriendRequest({ item });
