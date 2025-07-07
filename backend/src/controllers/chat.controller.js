@@ -1,9 +1,10 @@
-import { generateStreamToken } from "../lib/stream.js";
+import { generateStreamToken, streamClient } from "../lib/stream.js";
+import Foodcard from "../models/Foodcard.js";
 
 export async function getStreamToken(req, res) {
   try {
     console.log("userid: ", req.user.id)
-    const token = generateStreamToken(req.user.id);
+    const token = generateStreamToken(req.user._id);
 
     res.status(200).json({ token });
   } catch (error) {
@@ -14,8 +15,9 @@ export async function getStreamToken(req, res) {
 
 export async function shareFoodcard(req, res) {
   try {
+    // Fix typo: recipeintId -> recipientId
     const { foodcardId, recipientId } = req.body;
-    const userId = req.user._id;
+    const userId = req.user._id; // Use _id instead of id
 
     console.log("Share request:", { foodcardId, recipientId, userId });
 
@@ -24,7 +26,6 @@ export async function shareFoodcard(req, res) {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
-    // Get foodcard details with populated user
     const foodcard = await Foodcard.findById(foodcardId)
       .populate("user", "username profileImage privacy");
 
@@ -32,19 +33,14 @@ export async function shareFoodcard(req, res) {
       return res.status(404).json({ message: "Foodcard not found" });
     }
 
-    console.log("Foodcard found:", foodcard.title);
-    console.log("Foodcard owner privacy:", foodcard.user.privacy);
-
-    // Check if foodcard owner has public privacy
+    // Check privacy settings
     if (foodcard.user.privacy === "private") {
       return res.status(403).json({ message: "Cannot share private foodcard" });
     }
 
-    // Create channel ID (sorted user IDs)
+    // Fix variable names: use userId and recipientId instead of user.id and friendId
     const channelId = [userId.toString(), recipientId].sort().join("-");
-    console.log("Channel ID:", channelId);
-
-    // Create custom message with foodcard attachment
+    
     const message = {
       text: `${req.user.username} shared a foodcard with you!`,
       user_id: userId.toString(),
@@ -73,11 +69,11 @@ export async function shareFoodcard(req, res) {
 
     const channel = streamClient.channel('messaging', channelId);
     await channel.sendMessage(message);
-
+    
     console.log("Message sent successfully");
     res.status(200).json({ message: "Foodcard shared successfully" });
   } catch (error) {
-    console.error("Error in shareFoodcard controller:", error);
+    console.log("Error in shareFoodcard controller:", error.message);
     res.status(500).json({ message: "Internal Server Error" });
   }
 }
