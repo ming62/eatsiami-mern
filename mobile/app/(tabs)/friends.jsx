@@ -31,6 +31,7 @@ export default function Friends() {
 
   const onRefresh = useCallback(() => {
     fetchFriends(true);
+    fetchOutgoingJioRequests(true);
   }, []);
 
   const fetchFriends = async (refresh = false) => {
@@ -66,7 +67,7 @@ export default function Friends() {
     }
   };
 
-  const fetchOutgoingJioRequests = async () => {
+  const fetchOutgoingJioRequests = async (refresh = false) => {
     try {
       const response = await fetch(`${API_URL}/users/outgoing-jio-requests`, {
         headers: {
