@@ -63,6 +63,7 @@ export async function createComment(req, res) {
     );
 
     if (post && post.user.id !== userId) {
+      console.log("post id", post.user.id);
       await sendPushNotification(post.user.expoPushToken, {
         title: "New Comment",
         body: `${req.user.username} commented on your food card ${post.title}.`,
@@ -88,7 +89,11 @@ export async function replyComment(req, res) {
         .json({ error: "postId and content are required." });
     }
 
-    const parentComment = await Comment.findById(parentId);
+    const parentComment = await Comment.findById(parentId).populate(
+      "userId",
+      "expoPushToken username"
+    );
+
     if (!parentComment)
       return res.status(404).json({ error: "Parent comment not found" });
 
@@ -106,6 +111,7 @@ export async function replyComment(req, res) {
     const populated = await comment.populate("userId", "username profileImage");
 
     if (parentComment.userId.id !== userId) {
+      console.log("parentcomment id", parentComment.userId.id);
       await sendPushNotification(parentComment.userId.expoPushToken, {
         title: "New Reply",
         body: `${req.user.username} replied to your comment.`,
