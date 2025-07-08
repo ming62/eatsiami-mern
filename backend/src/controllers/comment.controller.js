@@ -62,6 +62,7 @@ export async function createComment(req, res) {
       "expoPushToken username"
     );
 
+    //send push notification exclude comment on self post
     if (post && post.user.id !== userId) {
       console.log("post id", post.user.id);
       await sendPushNotification(post.user.expoPushToken, {
@@ -110,6 +111,7 @@ export async function replyComment(req, res) {
 
     const populated = await comment.populate("userId", "username profileImage");
 
+    //send push notification to all comment that reply own comment
     if (parentComment.userId.id !== userId) {
       console.log("parentcomment id", parentComment.userId.id);
       await sendPushNotification(parentComment.userId.expoPushToken, {

@@ -8,6 +8,8 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import COLORS from "../constants/colors";
 import { NotificationProvider } from "../context/NotificationContext";
 import * as Notifications from "expo-notifications";
+import { useNotificationStore } from "../store/notificationStore";
+import { fetchNotificationCount } from "../hooks/countNotifications";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -27,6 +29,7 @@ export default function RootLayout() {
   const [isReady, setIsReady] = useState(false);
 
   const { checkAuth, user, token } = useAuthStore();
+  const setBadgeCount = useNotificationStore((s) => s.setBadgeCount);
   SplashScreen.preventAutoHideAsync();
 
   const [fontsLoaded] = useFonts({
@@ -64,6 +67,20 @@ export default function RootLayout() {
       router.replace("/(tabs)");
     }
   }, [user, token, segments, isReady]);
+
+  useEffect(() => {
+    if (!token) return;
+
+    // Fetch immediately
+    fetchNotificationCount(token, setBadgeCount);
+
+    // fetch every 30 seconds
+    const interval = setInterval(() => {
+      fetchNotificationCount(token, setBadgeCount);
+    }, 30000); //30 seconds
+
+    return () => clearInterval(interval);
+  }, [token]);
 
   if (!isReady) {
     return null;

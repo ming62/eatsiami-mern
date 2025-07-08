@@ -18,6 +18,8 @@ import styles from "../../assets/styles/notification.styles";
 import COLORS from "../../constants/colors";
 import { formatPublishDate } from "../../lib/utils";
 import { Image } from "expo-image";
+import { fetchNotificationCount } from "../../hooks/countNotifications";
+import { useNotificationStore } from "../../store/notificationStore";
 
 export default function Notification() {
   const { token } = useAuthStore();
@@ -33,7 +35,7 @@ export default function Notification() {
     commentsOnMyPosts: [],
     repliesToMyComments: [],
   });
-
+  const setBadgeCount = useNotificationStore((state) => state.setBadgeCount);
   const fetchNotification = async (refresh = false) => {
     try {
       if (refresh) {
@@ -93,6 +95,7 @@ export default function Notification() {
           (request) => request._id !== requestId
         ),
       }));
+      fetchNotificationCount(token, setBadgeCount);
     } catch (error) {
       console.error(`Error ${action}ing friend request:`, error);
     }
@@ -121,6 +124,7 @@ export default function Notification() {
           (request) => request._id !== requestId
         ),
       }));
+      fetchNotificationCount(token, setBadgeCount);
     } catch (error) {
       console.error(`Error ${action}ing jio request:`, error);
     }
@@ -128,9 +132,11 @@ export default function Notification() {
 
   const onRefresh = useCallback(() => {
     fetchNotification(true);
+    fetchNotificationCount(token, setBadgeCount);
   }, []);
 
   useEffect(() => {
+    fetchNotificationCount(token, setBadgeCount);
     fetchNotification();
   }, []);
 

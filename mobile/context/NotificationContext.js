@@ -9,6 +9,9 @@ import * as Notifications from "expo-notifications";
 import { registerForPushNotificationsAsync } from "@/utils/registerForPushNotificationsAsync";
 import { useAuthStore } from "../store/authStore";
 import { API_URL } from "../constants/api";
+import { fetchNotificationCount } from "../hooks/countNotifications";
+import { useNotificationStore } from "../store/notificationStore";
+import { Tabs, useRouter } from "expo-router";
 
 const NotificationContext = createContext(undefined);
 
@@ -27,9 +30,10 @@ export const NotificationProvider = ({ children }) => {
   const [notification, setNotification] = useState(null);
   const [error, setError] = useState(null);
   const { user, token } = useAuthStore();
-
+  const router = useRouter();
   const notificationListener = useRef();
   const responseListener = useRef();
+  const setBadgeCount = useNotificationStore((state) => state.setBadgeCount);
 
   useEffect(() => {
     registerForPushNotificationsAsync().then(
@@ -45,6 +49,7 @@ export const NotificationProvider = ({ children }) => {
       Notifications.addNotificationReceivedListener((notification) => {
         console.log("Notification Received: ", notification);
         setNotification(notification);
+        fetchNotificationCount(token, setBadgeCount);
       });
 
     responseListener.current =
@@ -54,7 +59,8 @@ export const NotificationProvider = ({ children }) => {
           JSON.stringify(response, null, 2),
           JSON.stringify(response.notification.request.content.data, null, 2)
         );
-        // Handle the notification response here
+        fetchNotificationCount(token, setBadgeCount);
+        router.push("/(tabs)/notification");
       });
 
     return () => {
