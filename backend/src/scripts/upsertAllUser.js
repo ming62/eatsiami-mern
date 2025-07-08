@@ -1,13 +1,10 @@
 // scripts/upsertAllUsers.js
 import mongoose from "mongoose";
-import dotenv from "dotenv";
+import "dotenv/config";
 import User from "../models/User.js";
 import { upsertStreamUser } from "../lib/stream.js";
 
-dotenv.config(); // Load environment variables from .env
-
-const MONGO_URI = process.env.MONGO_URI; // Make sure this is in your .env file
-
+const MONGO_URI = process.env.MONGO_URI;
 const run = async () => {
   try {
     console.log("🔄 Connecting to MongoDB...");
