@@ -1,0 +1,43 @@
+// scripts/upsertAllUsers.js
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import User from "../models/User.js";
+import { upsertStreamUser } from "../lib/stream.js";
+
+dotenv.config(); // Load environment variables from .env
+
+const MONGO_URI = process.env.MONGO_URI; // Make sure this is in your .env file
+
+const run = async () => {
+  try {
+    console.log("🔄 Connecting to MongoDB...");
+    await mongoose.connect(MONGO_URI);
+    console.log("✅ Connected to MongoDB");
+
+    const users = await User.find({});
+    console.log(`👥 Found ${users.length} users`);
+
+    for (const user of users) {
+      const streamUser = {
+        id: user._id.toString(),
+        name: user.username,
+        image: user.profileImage,
+      };
+
+      try {
+        await upsertStreamUser(streamUser);
+        console.log(`✅ Upserted user: ${user.username}`);
+      } catch (err) {
+        console.error(`❌ Failed to upsert ${user.username}:`, err.message);
+      }
+    }
+
+    console.log("🎉 All users processed");
+  } catch (err) {
+    console.error("🚨 Script failed:", err);
+  } finally {
+    mongoose.disconnect();
+  }
+};
+
+run();
