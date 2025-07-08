@@ -1,14 +1,13 @@
 // scripts/upsertAllUsers.js
 import mongoose from "mongoose";
-import "dotenv/config";
 import User from "../models/User.js";
+import "dotenv/config";
 import { upsertStreamUser } from "../lib/stream.js";
 
-const MONGO_URI = process.env.MONGO_URI;
 const run = async () => {
   try {
     console.log("🔄 Connecting to MongoDB...");
-    await mongoose.connect(MONGO_URI);
+    await mongoose.connect(process.env.MONGO_URI);
     console.log("✅ Connected to MongoDB");
 
     const users = await User.find({});
