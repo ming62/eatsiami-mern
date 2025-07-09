@@ -97,6 +97,12 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
+    await upsertStreamUser({
+      id: user._id.toString(),
+      name: user.username,
+      image: user.profileImage,
+    });
+
     const token = generateToken(user._id); // user._id is from mongoDB
     res.status(200).json({
       token,
