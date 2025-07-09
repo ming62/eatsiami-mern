@@ -19,8 +19,6 @@ import { Keyboard, TouchableWithoutFeedback } from "react-native";
 import { API_URL } from "../../constants/api";
 import COLORS from "../../constants/colors";
 import { formatPublishDate } from "../../lib/utils";
-import { Loader } from "../../components/Loader";
-import { Colors } from "react-native/Libraries/NewAppScreen";
 import FriendsWindow  from "../../components/FriendsWindow";
 
 const CARD_WIDTH = 303;
@@ -35,6 +33,7 @@ export default function CardDetail() {
 
   const [foodcard, setFoodcard] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [saved, setSaved] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [comments, setComments] = useState([]);
@@ -138,6 +137,7 @@ export default function CardDetail() {
   const fetchCardDetails = async () => {
     try {
       setLoading(true);
+      setError(null);
       const response = await fetch(`${API_URL}/foodcards/${cardId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -154,7 +154,6 @@ export default function CardDetail() {
     } catch (error) {
       console.error("Error fetching card details:", error);
       Alert.alert("Error", error.message || "Failed to fetch card details");
-      router.back();
     } finally {
       setLoading(false);
     }
@@ -326,13 +325,26 @@ export default function CardDetail() {
 
   if (loading) {
     return (
-      <SafeAreaView
-        style={styles.container}
-        edges={["left", "right", "bottom"]}
-      >
+      <SafeAreaView style={styles.container} edges={["left", "right", "bottom"]}>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={COLORS.primary} />
           <Text style={styles.loadingText}>Loading foodcard...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (error) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => router.back()}
+          >
+            <Text style={styles.backButtonText}>Go Back</Text>
+          </TouchableOpacity>
         </View>
       </SafeAreaView>
     );

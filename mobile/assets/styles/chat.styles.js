@@ -2,7 +2,7 @@ import { StyleSheet } from "react-native";
 import COLORS from "../../constants/colors";
 
 const styles = StyleSheet.create({
-    loaderContainer: {
+  loaderContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
     marginRight: 12,
-    borderWidth: 1,             
+    borderWidth: 1,
     borderColor: "#ccc",
   },
   friendName: {
@@ -44,6 +44,10 @@ const styles = StyleSheet.create({
   },
   rightSpace: {
     width: 40,
+  },
+  messageList: {
+    flex: 1, 
+
   },
 });
 

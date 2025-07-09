@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import {
   View,
@@ -20,6 +20,8 @@ import {
   Channel,
   MessageList,
   MessageInput,
+  MessageSimple,
+  useMessageContext,
 } from "stream-chat-react-native";
 import { useAuthStore } from "../../store/authStore";
 import FoodcardMessage from "../../components/FoodcardMessage";
@@ -27,10 +29,11 @@ import FoodcardMessage from "../../components/FoodcardMessage";
 export default function ChatPage() {
   const router = useRouter();
   const { friendId, friendName, friendImage } = useLocalSearchParams();
-
   const { token, user } = useAuthStore();
   const [channel, setChannel] = useState(null);
   const [loading, setLoading] = useState(true);
+  const clientRef = useRef(chatClient);
+  const isMountedRef = useRef(true);
 
   const fetchStreamToken = async () => {
     try {
@@ -39,36 +42,49 @@ export default function ChatPage() {
           Authorization: `Bearer ${token}`,
         },
       });
-
       if (!res.ok) throw new Error("Failed to get Stream token");
-
       const data = await res.json();
       return data.token;
-    } catch {
+    } catch (error) {
+      console.error("Failed to fetch stream token:", error);
       return null;
     }
   };
 
-  const CustomMessage = (props) => {
-    const { message } = props;
-
-    // Check if message has foodcard attachment
-    if (message.attachments && message.attachments[0]?.type === "foodcard") {
-      return <FoodcardMessage message={message} />;
+  const CustomMessageSimple = (props) => {
+    const { message } = useMessageContext();
+    
+    if (
+      message?.attachments &&
+      Array.isArray(message.attachments) &&
+      message.attachments.length > 0
+    ) {
+      const attachment = message.attachments[0];
+      if (attachment?.type === "foodcard") {
+        return <FoodcardMessage message={message} />;
+      }
     }
+
+    return <MessageSimple {...props} />;
   };
 
   useEffect(() => {
+    isMountedRef.current = true;
+
     const initChat = async () => {
       if (!user || !token || !friendId) return;
 
       setLoading(true);
       const streamToken = await fetchStreamToken();
-      if (!streamToken) return;
+      if (!streamToken) {
+        setLoading(false);
+        return;
+      }
 
       try {
-        if (!chatClient.userID) {
-          await chatClient.connectUser(
+        if (!clientRef.current.userID && isMountedRef.current) {
+          console.log("Connecting user to Stream Chat...");
+          await clientRef.current.connectUser(
             {
               id: user.id,
               name: user.username,
@@ -76,26 +92,39 @@ export default function ChatPage() {
             },
             streamToken
           );
+          console.log("User connected successfully");
         }
 
+        if (!isMountedRef.current) return;
+
         const channelId = [user.id, friendId].sort().join("-");
-        const chatChannel = chatClient.channel("messaging", channelId, {
+        console.log("Creating/watching channel:", channelId);
+
+        const chatChannel = clientRef.current.channel("messaging", channelId, {
           members: [user.id, friendId],
         });
 
         await chatChannel.watch();
-        setChannel(chatChannel);
-      } catch {
+        console.log("Channel watched successfully");
+
+        if (isMountedRef.current) {
+          setChannel(chatChannel);
+        }
+      } catch (error) {
+        console.error("Chat initialization error:", error);
       } finally {
-        setLoading(false);
+        if (isMountedRef.current) {
+          setLoading(false);
+        }
       }
     };
 
     initChat();
 
     return () => {
-      if (chatClient.userID) {
-        chatClient.disconnectUser();
+      isMountedRef.current = false;
+      if (channel) {
+        channel.stopWatching().catch(console.error);
       }
     };
   }, [user?.id, friendId]);
@@ -104,6 +133,7 @@ export default function ChatPage() {
     return (
       <View style={styles.loaderContainer}>
         <ActivityIndicator size="large" />
+        <Text style={{ marginTop: 10 }}>Loading chat...</Text>
       </View>
     );
   }
@@ -116,8 +146,11 @@ export default function ChatPage() {
         keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 35}
       >
         <OverlayProvider>
-          <Chat client={chatClient}>
-            <Channel channel={channel}>
+          <Chat client={clientRef.current}>
+            <Channel 
+              channel={channel}
+              MessageSimple={CustomMessageSimple}
+            >
               <View style={styles.chatContainer}>
                 <View style={styles.customHeader}>
                   <TouchableOpacity
@@ -140,11 +173,16 @@ export default function ChatPage() {
                     />
                     <Text style={styles.friendName}>{friendName}</Text>
                   </TouchableOpacity>
-
                   <View style={styles.rightSpace} />
                 </View>
-                <MessageList MessageSimple={CustomMessage} />
-                <MessageInput />
+
+                <MessageList />
+
+                <MessageInput
+                  additionalTextInputProps={{
+                    placeholder: "Type a message...",
+                  }}
+                />
               </View>
             </Channel>
           </Chat>

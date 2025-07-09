@@ -13,9 +13,11 @@ import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { API_URL } from "../constants/api";
 import { useAuthStore } from "../store/authStore";
+import { useRouter } from "expo-router";
 import COLORS from "../constants/colors";
 
 const FriendsWindow = ({ visible, onClose, foodcardId }) => {
+  const router = useRouter();
   const { token } = useAuthStore();
   const [friends, setFriends] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -27,7 +29,7 @@ const FriendsWindow = ({ visible, onClose, foodcardId }) => {
     }
   }, [visible]);
 
-  const fetchFriends = async (refresh = false) => {
+  const fetchFriends = async () => {
     try {
       setLoading(true);
       const response = await fetch(`${API_URL}/users/friends`, {
@@ -52,9 +54,10 @@ const FriendsWindow = ({ visible, onClose, foodcardId }) => {
     }
   };
 
-  const handleShare = async (friendId) => {
+  const handleShare = async (friend) => {
     try {
-      setSharing(friendId);
+      setSharing(friend._id);
+
       const response = await fetch(`${API_URL}/chat/share-foodcard`, {
         method: "POST",
         headers: {
@@ -63,17 +66,31 @@ const FriendsWindow = ({ visible, onClose, foodcardId }) => {
         },
         body: JSON.stringify({
           foodcardId: foodcardId,
-          recipientId: friendId,
+          recipientId: friend._id,
         }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Failed to share foodcard");
-      } else {
-        Alert.alert("Success", "Foodcard shared successfully!");
-        onClose();
       }
+      
+      Alert.alert("Success", "Foodcard shared successfully!", [
+        {
+          text: "OK",
+          onPress: () => {
+            onClose();
+            router.push({
+              pathname: "/otherpage/chatPage",
+              params: {
+                friendId: friend._id,
+                friendName: friend.username,
+                friendImage: friend.profileImage,
+              },
+            });
+          },
+        },
+      ]);
     } catch (error) {
       console.error("Error sharing foodcard:", error);
       Alert.alert("Error", error.message || "Failed to share foodcard");
@@ -85,7 +102,7 @@ const FriendsWindow = ({ visible, onClose, foodcardId }) => {
   const renderFriend = ({ item }) => (
     <TouchableOpacity
       style={styles.friendItem}
-      onPress={() => handleShare(item._id)}
+      onPress={() => handleShare(item)}
       disabled={sharing === item._id}
     >
       <Image source={{ uri: item.profileImage }} style={styles.avatar} />
@@ -109,7 +126,6 @@ const FriendsWindow = ({ visible, onClose, foodcardId }) => {
     >
       <View style={styles.overlay}>
         <View style={styles.modalContainer}>
-          {/* Header */}
           <View style={styles.header}>
             <Text style={styles.headerTitle}>Share Foodcard</Text>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
@@ -117,7 +133,6 @@ const FriendsWindow = ({ visible, onClose, foodcardId }) => {
             </TouchableOpacity>
           </View>
 
-          {/* Friends List */}
           <View style={styles.content}>
             {loading ? (
               <View style={styles.loadingContainer}>

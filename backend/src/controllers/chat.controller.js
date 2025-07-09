@@ -15,13 +15,11 @@ export async function getStreamToken(req, res) {
 
 export async function shareFoodcard(req, res) {
   try {
-    // Fix typo: recipeintId -> recipientId
     const { foodcardId, recipientId } = req.body;
-    const userId = req.user._id; // Use _id instead of id
+    const userId = req.user._id; 
 
     console.log("Share request:", { foodcardId, recipientId, userId });
 
-    // Validate required fields
     if (!foodcardId || !recipientId) {
       return res.status(400).json({ message: "Missing required fields" });
     }
@@ -33,13 +31,20 @@ export async function shareFoodcard(req, res) {
       return res.status(404).json({ message: "Foodcard not found" });
     }
 
-    // Check privacy settings
     if (foodcard.user.privacy === "private") {
       return res.status(403).json({ message: "Cannot share private foodcard" });
     }
 
-    // Fix variable names: use userId and recipientId instead of user.id and friendId
+
     const channelId = [userId.toString(), recipientId].sort().join("-");
+    console.log("Channel ID:", channelId);
+
+    const channel = streamClient.channel('messaging', channelId, {
+      members: [userId.toString(), recipientId],
+      created_by_id: userId.toString(),
+    });
+
+    await channel.create();
     
     const message = {
       text: `${req.user.username} shared a foodcard with you!`,
@@ -67,7 +72,6 @@ export async function shareFoodcard(req, res) {
       }]
     };
 
-    const channel = streamClient.channel('messaging', channelId);
     await channel.sendMessage(message);
     
     console.log("Message sent successfully");

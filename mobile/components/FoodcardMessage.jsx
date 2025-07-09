@@ -1,24 +1,27 @@
-import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Image } from "expo-image";
-import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router"; 
 import { LinearGradient } from "expo-linear-gradient";
+import { useMessageContext } from "stream-chat-react-native";
 import COLORS from "../constants/colors";
 
 const FoodcardMessage = ({ message }) => {
-    const router = useRouter();
-    const attachment = message.attachments[0];
-    const foodcardId = attachment.actions[0].value;
+  const router = useRouter();
+  const { isMyMessage } = useMessageContext();
+  const attachment = message.attachments[0];
+  const foodcardId = attachment.actions[0].value;
 
-    const handlePress = () => {
-        router.push(`/otherpage/foodcardPage?id=${foodcardId}`);
-    };
+  const handleViewFoodcard = () => {
+    router.push(`/otherpage/cardDetail?cardId=${foodcardId}`);
+  };
 
 
+  
   return (
-    <View style={styles.messageContainer}>
-      <Text style={styles.shareText}>{message.text}</Text>
-      
+    <View style={[
+      styles.container,
+      isMyMessage ? styles.myContainer : styles.theirContainer
+    ]}>
       <TouchableOpacity
         onPress={handleViewFoodcard}
         activeOpacity={0.8}
@@ -47,31 +50,30 @@ const FoodcardMessage = ({ message }) => {
       </TouchableOpacity>
     </View>
   );
-
-}
+};
 
 const styles = StyleSheet.create({
-  messageContainer: {
-    marginVertical: 8,
-    paddingHorizontal: 16,
+  container: {
+    marginVertical: 4,
+    marginHorizontal: 8,
+    maxWidth: 180, 
   },
-  shareText: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 8,
-    textAlign: 'center',
+  myContainer: {
+    alignSelf: 'flex-end',
+  },
+  theirContainer: {
+    alignSelf: 'flex-start',
   },
   foodcardContainer: {
-    borderRadius: 16,
+    borderRadius: 12,
     overflow: 'hidden',
     aspectRatio: 9 / 16,
-    maxWidth: 200,
-    alignSelf: 'center',
-    elevation: 8,
+    width: 160,
+    elevation: 4,
     shadowColor: COLORS.black,
-    shadowOffset: { width: 2, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
+    shadowOffset: { width: 1, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
   },
   imageContainer: {
     flex: 1,
@@ -80,21 +82,21 @@ const styles = StyleSheet.create({
   cardImage: {
     width: '100%',
     height: '100%',
-    borderRadius: 16,
+    borderRadius: 12,
   },
   gradientOverlay: {
     ...StyleSheet.absoluteFillObject,
     justifyContent: 'flex-end',
-    borderRadius: 16,
+    borderRadius: 12,
   },
   foodcardDetails: {
-    paddingHorizontal: 12,
-    paddingBottom: 12,
+    paddingHorizontal: 8,
+    paddingBottom: 8,
     marginTop: 0,
     zIndex: 1,
   },
   foodcardTitle: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
     color: COLORS.white,
     fontFamily: 'Konkhmer_Sleokchher-Regular',
