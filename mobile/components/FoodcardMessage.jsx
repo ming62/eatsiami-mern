@@ -15,8 +15,6 @@ const FoodcardMessage = ({ message }) => {
     router.push(`/otherpage/cardDetail?cardId=${foodcardId}`);
   };
 
-
-  
   return (
     <View style={[
       styles.container,
@@ -56,7 +54,7 @@ const styles = StyleSheet.create({
   container: {
     marginVertical: 4,
     marginHorizontal: 8,
-    maxWidth: 180, 
+    maxWidth: 180, // Slightly larger for just the image
   },
   myContainer: {
     alignSelf: 'flex-end',

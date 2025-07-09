@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import {
   View,
@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
+import { API_URL } from "../../constants/api";
 import { chatClient } from "../../lib/chatClient";
 import styles from "../../assets/styles/chat.styles";
 import {
@@ -20,7 +21,6 @@ import {
   MessageList,
   MessageInput,
   MessageSimple,
-  useMessageContext,
 } from "stream-chat-react-native";
 import { useAuthStore } from "../../store/authStore";
 import FoodcardMessage from "../../components/FoodcardMessage";
@@ -28,6 +28,7 @@ import FoodcardMessage from "../../components/FoodcardMessage";
 export default function ChatPage() {
   const router = useRouter();
   const { friendId, friendName, friendImage } = useLocalSearchParams();
+
   const { token, user } = useAuthStore();
   const [channel, setChannel] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -49,40 +50,74 @@ export default function ChatPage() {
     }
   };
 
-  useEffect(() => {
-    isMountedRef.current = true;
+  const CustomMessageSimple = (props) => {
+    const { message } = props;
 
+    console.log("Message:", message);
+    console.log("Attachments:", message?.attachments);
+
+    if (
+      message?.attachments &&
+      Array.isArray(message.attachments) &&
+      message.attachments.length > 0
+    ) {
+      const attachment = message.attachments[0];
+      if (attachment?.type === "foodcard") {
+        return <FoodcardMessage message={message} />;
+      }
+    }
+
+    return <MessageSimple {...props} />;
+  };
+
+  useEffect(() => {
     const initChat = async () => {
+      if (!user || !token || !friendId) return;
       if (!user || !friendId) return;
 
       setLoading(true);
-      try {
-        const channelId = [user.id, friendId].sort().join("-");
-        console.log("Creating/watching channel:", channelId);
+      const streamToken = await fetchStreamToken();
+      if (!streamToken) return;
 
-        const chatChannel = clientRef.current.channel("messaging", channelId, {
+      try {
+        if (!chatClient.userID) {
+          await chatClient.connectUser(
+            {
+              id: user.id,
+              name: user.username,
+              image: user.profileImage,
+            },
+            streamToken
+          );
+        }
+
+        const channelId = [user.id, friendId].sort().join("-");
+        const chatChannel = chatClient.channel("messaging", channelId, {
           members: [user.id, friendId],
         });
 
         await chatChannel.watch();
         setChannel(chatChannel);
-      } catch (err) {
+      } catch {
         console.error("[ChatPage] Failed to initialize channel:", err);
       } finally {
-        if (isMountedRef.current) {
-          setLoading(false);
-        }
+        setLoading(false);
       }
     };
 
     initChat();
+
+    return () => {
+      if (chatClient.userID) {
+        chatClient.disconnectUser();
+      }
+    };
   }, [user?.id, friendId]);
 
   if (loading || !channel) {
     return (
       <View style={styles.loaderContainer}>
         <ActivityIndicator size="large" />
-        <Text style={{ marginTop: 10 }}>Loading chat...</Text>
       </View>
     );
   }
@@ -95,11 +130,8 @@ export default function ChatPage() {
         keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 35}
       >
         <OverlayProvider>
-          <Chat client={clientRef.current}>
-            <Channel 
-              channel={channel}
-              MessageSimple={CustomMessageSimple}
-            >
+          <Chat client={chatClient}>
+            <Channel channel={channel} MessageSimple={CustomMessageSimple}>
               <View style={styles.chatContainer}>
                 <View style={styles.customHeader}>
                   <TouchableOpacity
@@ -122,16 +154,11 @@ export default function ChatPage() {
                     />
                     <Text style={styles.friendName}>{friendName}</Text>
                   </TouchableOpacity>
+
                   <View style={styles.rightSpace} />
                 </View>
-
                 <MessageList />
-
-                <MessageInput
-                  additionalTextInputProps={{
-                    placeholder: "Type a message...",
-                  }}
-                />
+                <MessageInput />
               </View>
             </Channel>
           </Chat>

@@ -19,7 +19,7 @@ import { Keyboard, TouchableWithoutFeedback } from "react-native";
 import { API_URL } from "../../constants/api";
 import COLORS from "../../constants/colors";
 import { formatPublishDate } from "../../lib/utils";
-import FriendsWindow  from "../../components/FriendsWindow";
+import FriendsWindow from "../../components/FriendsWindow";
 
 const CARD_WIDTH = 303;
 const CARD_HEIGHT = 517;
@@ -32,7 +32,6 @@ export default function CardDetail() {
   const { token, user } = useAuthStore();
 
   const [foodcard, setFoodcard] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [saved, setSaved] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
@@ -43,13 +42,16 @@ export default function CardDetail() {
   const [replyToUsername, setReplyToUsername] = useState(null);
   const [showShareModal, setShowShareModal] = useState(false);
 
+  const [cardLoading, setCardLoading] = useState(true);
+  const [commentsLoading, setCommentsLoading] = useState(true);
+
   const handleShare = () => {
     setShowShareModal(true);
   };
 
   const fetchComments = async () => {
     try {
-      setLoading(true);
+      setCommentsLoading(true);
       const response = await fetch(`${API_URL}/comments/${cardId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -64,7 +66,7 @@ export default function CardDetail() {
     } catch (error) {
       Alert.alert("Error", error.message || "Failed to fetch comments");
     } finally {
-      setLoading(false);
+      setCommentsLoading(false);
     }
   };
 
@@ -136,7 +138,7 @@ export default function CardDetail() {
 
   const fetchCardDetails = async () => {
     try {
-      setLoading(true);
+      setCardLoading(true);
       setError(null);
       const response = await fetch(`${API_URL}/foodcards/${cardId}`, {
         headers: {
@@ -151,11 +153,13 @@ export default function CardDetail() {
 
       setFoodcard(data);
       setSaved(data.isSaved || false);
+
+      console.log("foodcard.user.privacy:", foodcard.user.privacy);
     } catch (error) {
       console.error("Error fetching card details:", error);
       Alert.alert("Error", error.message || "Failed to fetch card details");
     } finally {
-      setLoading(false);
+      setCardLoading(false);
     }
   };
 
@@ -323,9 +327,12 @@ export default function CardDetail() {
     }
   }, [cardId]);
 
-  if (loading) {
+  if (cardLoading) {
     return (
-      <SafeAreaView style={styles.container} edges={["left", "right", "bottom"]}>
+      <SafeAreaView
+        style={styles.container}
+        edges={["left", "right", "bottom"]}
+      >
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={COLORS.primary} />
           <Text style={styles.loadingText}>Loading foodcard...</Text>
@@ -506,7 +513,7 @@ export default function CardDetail() {
               </TouchableOpacity>
             </View>
 
-            {comments.length === 0 && !loading ? (
+            {comments.length === 0 && !commentsLoading ? (
               <Text style={{ textAlign: "center", color: COLORS.white }}>
                 No comments yet.
               </Text>
