@@ -73,7 +73,7 @@ export async function getFoodcardsByUserId(req, res) {
 
     const foodcards = await Foodcard.find({ user: userId })
       .sort({ createdAt: -1 })
-      .populate("user", "username profileImage");
+      .populate("user", "username profileImage privacy");
 
     res.json(foodcards);
   } catch (error) {
@@ -261,7 +261,7 @@ export async function getSavedFoodcards(req, res) {
       path: "savedFoodcards",
       populate: {
         path: "user",
-        select: "username profileImage",
+        select: "username profileImage privacy",
       },
     });
 

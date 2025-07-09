@@ -19,8 +19,7 @@ import { Keyboard, TouchableWithoutFeedback } from "react-native";
 import { API_URL } from "../../constants/api";
 import COLORS from "../../constants/colors";
 import { formatPublishDate } from "../../lib/utils";
-import { Loader } from "../../components/Loader";
-import { Colors } from "react-native/Libraries/NewAppScreen";
+import FriendsWindow  from "../../components/FriendsWindow";
 
 const CARD_WIDTH = 303;
 const CARD_HEIGHT = 517;
@@ -34,6 +33,7 @@ export default function CardDetail() {
 
   const [foodcard, setFoodcard] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [saved, setSaved] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [comments, setComments] = useState([]);
@@ -41,6 +41,11 @@ export default function CardDetail() {
   const [posting, setPosting] = useState(false);
   const [replyToCommentId, setReplyToCommentId] = useState(null);
   const [replyToUsername, setReplyToUsername] = useState(null);
+  const [showShareModal, setShowShareModal] = useState(false);
+
+  const handleShare = () => {
+    setShowShareModal(true);
+  };
 
   const fetchComments = async () => {
     try {
@@ -132,6 +137,7 @@ export default function CardDetail() {
   const fetchCardDetails = async () => {
     try {
       setLoading(true);
+      setError(null);
       const response = await fetch(`${API_URL}/foodcards/${cardId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -148,7 +154,6 @@ export default function CardDetail() {
     } catch (error) {
       console.error("Error fetching card details:", error);
       Alert.alert("Error", error.message || "Failed to fetch card details");
-      router.back();
     } finally {
       setLoading(false);
     }
@@ -320,13 +325,26 @@ export default function CardDetail() {
 
   if (loading) {
     return (
-      <SafeAreaView
-        style={styles.container}
-        edges={["left", "right", "bottom"]}
-      >
+      <SafeAreaView style={styles.container} edges={["left", "right", "bottom"]}>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={COLORS.primary} />
           <Text style={styles.loadingText}>Loading foodcard...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (error) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => router.back()}
+          >
+            <Text style={styles.backButtonText}>Go Back</Text>
+          </TouchableOpacity>
         </View>
       </SafeAreaView>
     );
@@ -352,7 +370,7 @@ export default function CardDetail() {
 
   return (
     <SafeAreaView style={styles.container} edges={["left", "right", "bottom"]}>
-      {/* Header - Matching Friends page */}
+      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => router.back()}
@@ -363,6 +381,15 @@ export default function CardDetail() {
         <Text style={styles.headerTitle}>
           {foodcard.user.username}'s {foodcard.title}
         </Text>
+
+        {foodcard.user.privacy === "public" && (
+          <TouchableOpacity
+            onPress={handleShare}
+            style={styles.shareHeaderButton}
+          >
+            <Ionicons name="share-outline" size={24} color={COLORS.white} />
+          </TouchableOpacity>
+        )}
       </View>
 
       <ScrollView
@@ -490,6 +517,15 @@ export default function CardDetail() {
             )}
           </View>
         </View>
+
+        {/* Sharing */}
+        {foodcard.user.privacy === "public" && (
+          <FriendsWindow
+            visible={showShareModal}
+            onClose={() => setShowShareModal(false)}
+            foodcardId={cardId}
+          />
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -825,5 +861,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 5,
     borderRadius: 12,
+  },
+  shareHeaderButton: {
+    position: "absolute",
+    right: 20,
+    top: "50%",
+    marginTop: -12,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1,
   },
 });

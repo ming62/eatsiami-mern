@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import {
   View,
@@ -19,25 +19,48 @@ import {
   Channel,
   MessageList,
   MessageInput,
+  MessageSimple,
+  useMessageContext,
 } from "stream-chat-react-native";
 import { useAuthStore } from "../../store/authStore";
+import FoodcardMessage from "../../components/FoodcardMessage";
 
 export default function ChatPage() {
   const router = useRouter();
   const { friendId, friendName, friendImage } = useLocalSearchParams();
-  const { user } = useAuthStore();
-
+  const { token, user } = useAuthStore();
   const [channel, setChannel] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const fetchStreamToken = async () => {
+    try {
+      const res = await fetch(`${API_URL}/chat/token`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) throw new Error("Failed to get Stream token");
+
+      const data = await res.json();
+      return data.token;
+    } catch {
+      return null;
+    }
+  };
+
   useEffect(() => {
+    isMountedRef.current = true;
+
     const initChat = async () => {
       if (!user || !friendId) return;
 
       setLoading(true);
       try {
         const channelId = [user.id, friendId].sort().join("-");
-        const chatChannel = chatClient.channel("messaging", channelId, {
+        console.log("Creating/watching channel:", channelId);
+
+        const chatChannel = clientRef.current.channel("messaging", channelId, {
           members: [user.id, friendId],
         });
 
@@ -46,7 +69,9 @@ export default function ChatPage() {
       } catch (err) {
         console.error("[ChatPage] Failed to initialize channel:", err);
       } finally {
-        setLoading(false);
+        if (isMountedRef.current) {
+          setLoading(false);
+        }
       }
     };
 
@@ -57,6 +82,7 @@ export default function ChatPage() {
     return (
       <View style={styles.loaderContainer}>
         <ActivityIndicator size="large" />
+        <Text style={{ marginTop: 10 }}>Loading chat...</Text>
       </View>
     );
   }
@@ -69,8 +95,11 @@ export default function ChatPage() {
         keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 35}
       >
         <OverlayProvider>
-          <Chat client={chatClient}>
-            <Channel channel={channel}>
+          <Chat client={clientRef.current}>
+            <Channel 
+              channel={channel}
+              MessageSimple={CustomMessageSimple}
+            >
               <View style={styles.chatContainer}>
                 <View style={styles.customHeader}>
                   <TouchableOpacity
@@ -95,8 +124,14 @@ export default function ChatPage() {
                   </TouchableOpacity>
                   <View style={styles.rightSpace} />
                 </View>
+
                 <MessageList />
-                <MessageInput />
+
+                <MessageInput
+                  additionalTextInputProps={{
+                    placeholder: "Type a message...",
+                  }}
+                />
               </View>
             </Channel>
           </Chat>

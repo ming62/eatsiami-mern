@@ -446,7 +446,6 @@ export async function updateUserProfile(req, res) {
       return res.status(403).json({ message: "Unauthorized" });
     }
 
-    //check no repeat username, exclude user itself
     if (username && username !== user.username) {
       const existingUser = await User.findOne({ username });
       if (existingUser) {
