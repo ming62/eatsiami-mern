@@ -23,7 +23,7 @@ const migrateProfileImages = async () => {
       const { profileImage } = user;
 
       if (isValidImageUrl(profileImage)) {
-        console.log(`⏭️  Skipping user ${user._id}: Valid image URL.`);
+        console.log(`⏭️  Skipping user ${user.username}: Valid image URL.`);
         continue;
       }
 
@@ -38,7 +38,9 @@ const migrateProfileImages = async () => {
 
         console.log(`✅ Uploaded and updated image for user ${user._id}`);
       } catch (uploadErr) {
-        console.error(`❌ Failed for user ${user._id}: ${uploadErr.message}`);
+        console.error(
+          `❌ Failed for user ${user.username}: ${uploadErr.message}`
+        );
       }
     }
 
