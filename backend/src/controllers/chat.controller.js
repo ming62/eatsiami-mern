@@ -3,10 +3,9 @@ import Foodcard from "../models/Foodcard.js";
 
 export async function getStreamToken(req, res) {
   try {
-    const userId = req.user.id || req.user._id;  // Handle both formats
-    console.log("userid: ", userId);
-    const token = generateStreamToken(userId);
-    
+    console.log("userid: ", req.user.id)
+    const token = generateStreamToken(req.user._id);
+
     res.status(200).json({ token });
   } catch (error) {
     console.log("Error in getStreamToken controller:", error.message);
@@ -17,7 +16,7 @@ export async function getStreamToken(req, res) {
 export async function shareFoodcard(req, res) {
   try {
     const { foodcardId, recipientId } = req.body;
-    const userId = (req.user.id || req.user._id).toString(); 
+    const userId = req.user._id; 
 
     console.log("Share request:", { foodcardId, recipientId, userId });
 
@@ -49,7 +48,7 @@ export async function shareFoodcard(req, res) {
     
     const message = {
       text: `${req.user.username} shared a foodcard with you!`,
-      user_id: userId,
+      user_id: userId.toString(),
       attachments: [{
         type: 'foodcard',
         title: foodcard.title,
@@ -67,14 +66,13 @@ export async function shareFoodcard(req, res) {
             name: 'view_foodcard',
             text: 'View Details',
             type: 'button',
-            value: foodcardId.toString()  // Ensure foodcardId is a string
+            value: foodcardId
           }
         ]
       }]
     };
 
     await channel.sendMessage(message);
-    console.log("Message sent:", message);
     
     console.log("Message sent successfully");
     res.status(200).json({ message: "Foodcard shared successfully" });

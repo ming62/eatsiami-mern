@@ -21,6 +21,7 @@ import {
   MessageList,
   MessageInput,
   MessageSimple,
+  useMessageContext,
 } from "stream-chat-react-native";
 import { useAuthStore } from "../../store/authStore";
 import FoodcardMessage from "../../components/FoodcardMessage";
@@ -51,10 +52,7 @@ export default function ChatPage() {
   };
 
   const CustomMessageSimple = (props) => {
-    const { message } = props;
-
-    console.log("Message:", message);
-    console.log("Attachments:", message?.attachments);
+    const { message } = useMessageContext();
 
     if (
       message?.attachments &&
@@ -67,7 +65,7 @@ export default function ChatPage() {
       }
     }
 
-    return <MessageSimple {...props} />;
+    return <MessageSimple {...props}/>;
   };
 
   useEffect(() => {
