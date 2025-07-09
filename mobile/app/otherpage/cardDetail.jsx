@@ -154,7 +154,6 @@ export default function CardDetail() {
       setFoodcard(data);
       setSaved(data.isSaved || false);
 
-      console.log("foodcard.user.privacy:", foodcard.user.privacy);
     } catch (error) {
       console.error("Error fetching card details:", error);
       Alert.alert("Error", error.message || "Failed to fetch card details");

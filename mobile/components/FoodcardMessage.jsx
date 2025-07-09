@@ -54,13 +54,14 @@ const styles = StyleSheet.create({
   container: {
     marginVertical: 4,
     marginHorizontal: 8,
-    maxWidth: 180, // Slightly larger for just the image
+    maxWidth: 180, 
   },
   myContainer: {
     alignSelf: 'flex-end',
   },
   theirContainer: {
     alignSelf: 'flex-start',
+    paddingLeft: 24,
   },
   foodcardContainer: {
     borderRadius: 12,
