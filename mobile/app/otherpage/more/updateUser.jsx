@@ -83,6 +83,13 @@ export default function UpdateProfile() {
     setIsLoading(true);
 
     try {
+      const uriParts = profileImage.split(".");
+      const fileType = uriParts[uriParts.length - 1];
+      const imageType = fileType
+        ? `image/${fileType.toLowerCase()}`
+        : "image/jpeg";
+      const imageDataUrl = `data:${imageType};base64,${imageBase64}`;
+
       const res = await fetch(`${API_URL}/users/update/${user.id}`, {
         method: "PUT",
         headers: {
@@ -92,7 +99,7 @@ export default function UpdateProfile() {
         body: JSON.stringify({
           username,
           bio,
-          profileImage,
+          profileImage: imageDataUrl,
         }),
       });
       const data = await res.json();

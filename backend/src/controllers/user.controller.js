@@ -4,6 +4,7 @@ import JioRequest from "../models/JioRequest.js";
 import { sendPushNotification } from "../lib/notification.js";
 import Comment from "../models/Comment.js";
 import Foodcard from "../models/Foodcard.js";
+import cloudinary from "../lib/cloudinary.js";
 
 export async function getUserById(req, res) {
   try {
@@ -534,9 +535,15 @@ export async function updateUserProfile(req, res) {
       user.username = username;
     }
 
+    let imageUrl;
+    if (profileImage) {
+      const uploadResponse = await cloudinary.uploader.upload(profileImage);
+      imageUrl = uploadResponse.secure_url;
+    }
+
     // Update other fields
     if (bio !== undefined) user.bio = bio;
-    if (profileImage !== undefined) user.profileImage = profileImage;
+    if (imageUrl !== undefined) user.profileImage = imageUrl;
 
     const updatedUser = await user.save();
     res.json({ message: "Profile updated successfully", user: updatedUser });
