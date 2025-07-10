@@ -25,6 +25,7 @@
     "mime-types": "^3.0.1",
     "mongoose": "^8.15.1",
     "node-fetch": "^3.3.2",
+    "nodemailer": "^7.0.5",
     "stream-chat": "^9.10.0"
   },
   "devDependencies": {

@@ -39,7 +39,6 @@ const styles = StyleSheet.create({
     marginTop: -15,
   },
 
-
   foodcard: {
     borderRadius: 16,
     marginBottom: 50,
@@ -58,41 +57,39 @@ const styles = StyleSheet.create({
   },
 
   gradientOverlay: {
-  ...StyleSheet.absoluteFillObject,
-  justifyContent: "flex-end",
-  borderRadius: 16,
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "flex-end",
+    borderRadius: 16,
+  },
 
-},
+  userInfo: {
+    position: "absolute",
+    alignItems: "center",
+    top: 12,
+    right: 12,
+  },
 
-userInfo: {
-  position: "absolute",
-  alignItems: "center",
-  top: 12, 
-  right: 12,
-},
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: COLORS.white,
+  },
 
-avatar: {
-  width: 40, 
-  height: 40,
-  borderRadius: 20,
-  borderWidth: 2,
-  borderColor: COLORS.white,
-},
+  foodcardDetails: {
+    paddingHorizontal: 12,
+    paddingBottom: 12,
+    marginTop: 0,
+    zIndex: 1,
+  },
 
-foodcardDetails: {
-  paddingHorizontal: 12,
-  paddingBottom: 12,
-  marginTop: 0,
-  zIndex: 1,
-},
-
-foodcardTitle: {
-  fontSize: 16, 
-  fontWeight: "600",
-  color: COLORS.white,
-  fontFamily: "Konkhmer_Sleokchher-Regular",
-
-},
+  foodcardTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: COLORS.white,
+    fontFamily: "Konkhmer_Sleokchher-Regular",
+  },
   imageContainer: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: COLORS.border,
@@ -346,6 +343,17 @@ foodcardTitle: {
     color: COLORS.textSecondary,
     textAlign: "center",
     marginTop: 8,
+  },
+
+  forgotPasswordButton: {
+    alignItems: "center",
+    marginTop: 15,
+  },
+  forgotPasswordText: {
+    fontSize: 16,
+    color: "#f27609",
+    fontWeight: "400",
+    fontFamily: "Konkhmer_Sleokchher-Regular",
   },
 });
 

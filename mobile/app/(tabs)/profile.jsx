@@ -354,8 +354,14 @@ export default function Profile() {
         <Text style={styles.headerTitle}> Profile </Text>
       </View>
 
-
       <ProfileHeader userData={null} showMore={true} />
+
+      <TouchableOpacity
+        style={styles.forgotPasswordButton}
+        onPress={() => router.push("/otherpage/passwordReset/forgotPassword")}
+      >
+        <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+      </TouchableOpacity>
 
       <TabView
         navigationState={{ index, routes }}
