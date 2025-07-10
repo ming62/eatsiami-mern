@@ -1,6 +1,7 @@
 import { generateStreamToken, streamClient } from "../lib/stream.js";
 import Foodcard from "../models/Foodcard.js";
 import User from "../models/User.js";
+import { sendPushNotification } from "../lib/notification.js";
 
 export async function getStreamToken(req, res) {
   try {
