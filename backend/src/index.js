@@ -23,6 +23,7 @@ app.use("/api/foodcards", foodcardsRoutes);
 app.use("/api/users", userRoutes); 
 app.use("/api/chat", chatRoutes);
 app.use("/api/comments", commentRoutes); 
+app.use("/api/email", emailRouter);
 app.use("/api/ai", aiRoutes);
 
 

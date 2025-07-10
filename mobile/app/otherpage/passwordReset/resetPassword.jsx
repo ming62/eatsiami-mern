@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -8,16 +8,16 @@ import {
   StyleSheet,
   SafeAreaView,
   ActivityIndicator,
-} from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
-import { useAuthStore } from '../../../store/authStore';
-import { API_URL } from '../../../constants/api';
+} from "react-native";
+import { useRouter, useLocalSearchParams } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
+import { Ionicons } from "@expo/vector-icons";
+import { useAuthStore } from "../../../store/authStore";
+import { API_URL } from "../../../constants/api";
 
 export default function ResetPassword() {
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -27,50 +27,52 @@ export default function ResetPassword() {
 
   const handleResetPassword = async () => {
     if (!newPassword || !confirmPassword) {
-      Alert.alert('Error', 'Please fill in all fields');
+      Alert.alert("Error", "Please fill in all fields");
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match');
+      Alert.alert("Error", "Passwords do not match");
       return;
     }
 
     if (newPassword.length < 6) {
-      Alert.alert('Error', 'Password must be at least 6 characters');
+      Alert.alert("Error", "Password must be at least 6 characters");
       return;
     }
 
     setIsLoading(true);
     try {
       const response = await fetch(`${API_URL}/auth/reset-password`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, resetCode, newPassword }),
       });
 
       const data = await response.json();
-      
+
       if (response.ok) {
         Alert.alert(
-          'Success',
-          'Password reset successful! Please login with your new password.',
-          [{ 
-            text: 'OK', 
-            onPress: () => {
-              logout(); // Log out user so they can login with new password
-              router.replace('/(auth)');
-            }
-          }]
+          "Success",
+          "Password reset successful! Please login with your new password.",
+          [
+            {
+              text: "OK",
+              onPress: () => {
+                logout(); // Log out user so they can login with new password
+                router.replace("/(auth)");
+              },
+            },
+          ]
         );
       } else {
-        Alert.alert('Error', data.message || 'Something went wrong');
+        Alert.alert("Error", data.message || "Something went wrong");
       }
     } catch (error) {
-      console.error('Reset password error:', error);
-      Alert.alert('Error', 'Network error. Please try again.');
+      console.error("Reset password error:", error);
+      Alert.alert("Error", "Network error. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -79,16 +81,17 @@ export default function ResetPassword() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={styles.backButton}
+        >
           <Ionicons name="arrow-back" size={24} color="#000" />
         </TouchableOpacity>
         <Text style={styles.title}>New Password</Text>
       </View>
 
       <View style={styles.content}>
-        <Text style={styles.subtitle}>
-          Enter your new password
-        </Text>
+        <Text style={styles.subtitle}>Enter your new password</Text>
 
         <View style={styles.inputContainer}>
           <Text style={styles.inputLabel}>New Password</Text>
@@ -139,12 +142,20 @@ export default function ResetPassword() {
         </View>
 
         <TouchableOpacity
-          style={[styles.resetButton, (!newPassword || !confirmPassword || isLoading) && styles.disabledButton]}
+          style={[
+            styles.resetButton,
+            (!newPassword || !confirmPassword || isLoading) &&
+              styles.disabledButton,
+          ]}
           onPress={handleResetPassword}
           disabled={isLoading || !newPassword || !confirmPassword}
         >
           <LinearGradient
-            colors={(!newPassword || !confirmPassword || isLoading) ? ['#ccc', '#999'] : ['#ff5f00', '#ff8c00', '#ffb300']}
+            colors={
+              !newPassword || !confirmPassword || isLoading
+                ? ["#ccc", "#999"]
+                : ["#ff5f00", "#ff8c00", "#ffb300"]
+            }
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={styles.buttonGradient}
@@ -164,11 +175,11 @@ export default function ResetPassword() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 20,
     paddingTop: 60,
     paddingBottom: 20,
@@ -178,8 +189,8 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#000',
+    fontWeight: "bold",
+    color: "#000",
   },
   content: {
     flex: 1,
@@ -188,8 +199,8 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
+    color: "#666",
+    textAlign: "center",
     marginBottom: 40,
     lineHeight: 24,
   },
@@ -198,26 +209,26 @@ const styles = StyleSheet.create({
   },
   inputLabel: {
     fontSize: 16,
-    color: '#000',
+    color: "#000",
     marginBottom: 8,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   passwordWrapper: {
-    position: 'relative',
+    position: "relative",
   },
   textInput: {
     height: 67,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
     borderRadius: 18,
     paddingHorizontal: 21,
     paddingRight: 50,
     fontSize: 16,
-    color: '#2c2c2c',
+    color: "#2c2c2c",
     borderWidth: 2,
-    borderColor: '#e0e0e0',
+    borderColor: "#e0e0e0",
   },
   eyeIcon: {
-    position: 'absolute',
+    position: "absolute",
     right: 15,
     top: 23,
     padding: 5,
@@ -233,12 +244,12 @@ const styles = StyleSheet.create({
   buttonGradient: {
     flex: 1,
     borderRadius: 18,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   buttonText: {
-    color: '#ffffff',
+    color: "#ffffff",
     fontSize: 20,
-    fontWeight: '400',
+    fontWeight: "400",
   },
 });
