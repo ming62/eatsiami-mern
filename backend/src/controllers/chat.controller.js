@@ -91,7 +91,7 @@ export async function sendNotif(req, res) {
   try {
     console.log("✅ [Webhook Triggered] Incoming event:", req.body?.type);
 
-    const { type, message } = req.body;
+    const { type, message, members } = req.body;
 
     if (type !== "message.new") {
       console.log("ℹ️ [Webhook Ignored] Type is not 'message.new':", type);
@@ -99,13 +99,14 @@ export async function sendNotif(req, res) {
     }
 
     const senderId = message.user.id;
-    const channelMembers = message.channel?.members ?? [];
 
     console.log("👤 Sender ID:", senderId);
     console.log(
-      "👥 Channel Members:",
-      channelMembers.map((m) => m.user?.id)
+      "👥 Channel Members from webhook:",
+      members?.map((m) => m.user_id)
     );
+
+    const channelMembers = members ?? [];
 
     // Ensure channel has at least 2 members
     if (channelMembers.length < 2) {
@@ -116,8 +117,9 @@ export async function sendNotif(req, res) {
     }
 
     // Find recipient by excluding the sender
-    const recipientId = channelMembers.find((m) => m.user.id !== senderId)?.user
-      .id;
+    const recipientId = channelMembers.find(
+      (m) => m.user_id !== senderId
+    )?.user_id;
 
     if (!recipientId) {
       console.warn("❌ Recipient not found in channel members");
@@ -162,7 +164,7 @@ export async function sendNotif(req, res) {
     console.log("✅ Push notification sent successfully");
     res.sendStatus(200);
   } catch (error) {
-    console.error("❗ Error in sendNotif controller:", error.message);
+    console.error("❗ Error in sendNotif controller:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 }
