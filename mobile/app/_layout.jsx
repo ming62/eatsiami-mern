@@ -6,6 +6,20 @@ import { useAuthStore } from "../store/authStore";
 import { useFonts } from "expo-font";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import COLORS from "../constants/colors";
+import { NotificationProvider } from "../context/NotificationContext";
+import * as Notifications from "expo-notifications";
+import { useNotificationStore } from "../store/notificationStore";
+import { fetchNotificationCount } from "../hooks/countNotifications";
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+    shouldShowBanner: true,
+    shouldShowList: true,
+  }),
+});
 
 SplashScreen.preventAutoHideAsync();
 
@@ -15,6 +29,7 @@ export default function RootLayout() {
   const [isReady, setIsReady] = useState(false);
 
   const { checkAuth, user, token } = useAuthStore();
+  const setBadgeCount = useNotificationStore((s) => s.setBadgeCount);
   SplashScreen.preventAutoHideAsync();
 
   const [fontsLoaded] = useFonts({
@@ -53,21 +68,36 @@ export default function RootLayout() {
     }
   }, [user, token, segments, isReady]);
 
+  useEffect(() => {
+    if (!token) return;
+
+    // Fetch immediately
+    fetchNotificationCount(token, setBadgeCount);
+
+    // fetch every 30 seconds
+    const interval = setInterval(() => {
+      fetchNotificationCount(token, setBadgeCount);
+    }, 30000); //30 seconds
+
+    return () => clearInterval(interval);
+  }, [token]);
+
   if (!isReady) {
     return null;
   }
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaProvider style={{ flex: 1 }}>
-        <SafeScreen>
-
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="(tabs)" />
-            <Stack.Screen name="(auth)" />
-          </Stack>
-        </SafeScreen>
-      </SafeAreaProvider>
-    </GestureHandlerRootView>
+    <NotificationProvider>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <SafeAreaProvider style={{ flex: 1 }}>
+          <SafeScreen>
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="(tabs)" />
+              <Stack.Screen name="(auth)" />
+            </Stack>
+          </SafeScreen>
+        </SafeAreaProvider>
+      </GestureHandlerRootView>
+    </NotificationProvider>
   );
 }

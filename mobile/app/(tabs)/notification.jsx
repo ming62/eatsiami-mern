@@ -18,6 +18,8 @@ import styles from "../../assets/styles/notification.styles";
 import COLORS from "../../constants/colors";
 import { formatPublishDate } from "../../lib/utils";
 import { Image } from "expo-image";
+import { fetchNotificationCount } from "../../hooks/countNotifications";
+import { useNotificationStore } from "../../store/notificationStore";
 
 export default function Notification() {
   const { token } = useAuthStore();
@@ -28,10 +30,12 @@ export default function Notification() {
     pendingFriendReqs: [],
     pendingJioReqs: [],
     acceptedFriendReqs: [],
-    acceptedJioRequest: [],
-    rejectedJioRequest: [],
+    acceptedJioReqs: [],
+    rejectedJioReqs: [],
+    commentsOnMyPosts: [],
+    repliesToMyComments: [],
   });
-
+  const setBadgeCount = useNotificationStore((state) => state.setBadgeCount);
   const fetchNotification = async (refresh = false) => {
     try {
       if (refresh) {
@@ -52,8 +56,10 @@ export default function Notification() {
         pendingFriendReqs: data.pendingFriendReqs || [],
         pendingJioReqs: data.pendingJioReqs || [],
         acceptedFriendReqs: data.acceptedFriendReqs || [],
-        acceptedJioRequest: data.acceptedJioRequest || [],
-        rejectedJioRequest: data.rejectedJioRequest || [],
+        acceptedJioReqs: data.acceptedJioReqs || [],
+        rejectedJioReqs: data.rejectedJioReqs || [],
+        commentsOnMyPosts: data.commentsOnMyPosts || [],
+        repliesToMyComments: data.repliesToMyComments || [],
       });
     } catch (error) {
       console.error("Error fetching friend requests:", error);
@@ -89,6 +95,7 @@ export default function Notification() {
           (request) => request._id !== requestId
         ),
       }));
+      fetchNotificationCount(token, setBadgeCount);
     } catch (error) {
       console.error(`Error ${action}ing friend request:`, error);
     }
@@ -117,6 +124,7 @@ export default function Notification() {
           (request) => request._id !== requestId
         ),
       }));
+      fetchNotificationCount(token, setBadgeCount);
     } catch (error) {
       console.error(`Error ${action}ing jio request:`, error);
     }
@@ -124,26 +132,44 @@ export default function Notification() {
 
   const onRefresh = useCallback(() => {
     fetchNotification(true);
+    fetchNotificationCount(token, setBadgeCount);
   }, []);
 
   useEffect(() => {
+    fetchNotificationCount(token, setBadgeCount);
     fetchNotification();
   }, []);
 
-  const pendingFriendReqs = Notification?.pendingFriendReqs || [];
-  const pendingJioReqs = Notification?.pendingJioReqs || [];
+  const pendingFriendReqs = (Notification?.pendingFriendReqs || []).map(
+    (item) => ({
+      ...item,
+      type: "pendingFriend",
+    })
+  );
+  const pendingJioReqs = (Notification?.pendingJioReqs || []).map((item) => ({
+    ...item,
+    type: "pendingJio",
+  }));
   const otherNotification = [
     ...Notification.acceptedFriendReqs.map((item) => ({
       ...item,
       type: "acceptedFriend",
     })),
-    ...Notification.acceptedJioRequest.map((item) => ({
+    ...Notification.acceptedJioReqs.map((item) => ({
       ...item,
       type: "acceptedJio",
     })),
-    ...Notification.rejectedJioRequest.map((item) => ({
+    ...Notification.rejectedJioReqs.map((item) => ({
       ...item,
       type: "rejectedJio",
+    })),
+    ...Notification.commentsOnMyPosts.map((item) => ({
+      ...item,
+      type: "comments",
+    })),
+    ...Notification.repliesToMyComments.map((item) => ({
+      ...item,
+      type: "replies",
     })),
   ].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
 
@@ -244,7 +270,7 @@ export default function Notification() {
               );
             }}
           >
-            <Ionicons name="trash-outline" size={20} color="#6A6968"  />
+            <Ionicons name="trash-outline" size={20} color="#6A6968" />
           </TouchableOpacity>
         </View>
       </View>
@@ -255,17 +281,21 @@ export default function Notification() {
     const isFriendRequest = item.type === "acceptedFriend";
     const isJioAccepted = item.type === "acceptedJio";
     const isJioRejected = item.type === "rejectedJio";
+    const isComment = item.type === "comments";
+    const isReplies = item.type === "replies";
 
     return (
       <View style={styles.requestCard}>
         <Image
-          source={{ uri: item.recipient.profileImage }}
+          source={{
+            uri: item.recipient?.profileImage || item.userId?.profileImage,
+          }}
           style={styles.avatar}
         />
         <View style={styles.userInfo}>
           <View style={styles.time}>
             <Text style={styles.notificationName}>
-              {item.recipient.username}
+              {item.recipient?.username || item.userId?.username}
             </Text>
             <Text style={styles.notificationTime}>
               {formatPublishDate(item.createdAt)}
@@ -278,7 +308,11 @@ export default function Notification() {
                 ? "accepted your jio request!"
                 : isJioRejected
                   ? "don't want jia beng"
-                  : null}
+                  : isComment
+                    ? "comment on your food card"
+                    : isReplies
+                      ? "reply to your comment"
+                      : null}
           </Text>
         </View>
       </View>
@@ -291,15 +325,6 @@ export default function Notification() {
         <Text style={styles.headerTitle}>Notification</Text>
       </View>
 
-      {/* <View style={styles.searchContainer}>
-        <Ionicons name="search" size={30} color={COLORS.textSecondary} style= {{ marginLeft: 5}}/>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="search notifications..."
-          placeholderTextColor={COLORS.textSecondary}
-        />
-      </View> */}
-
       {loading ? (
         <ActivityIndicator
           size="large"
@@ -309,7 +334,7 @@ export default function Notification() {
       ) : (
         <FlatList
           data={[...pendingFriendReqs, ...pendingJioReqs, ...otherNotification]}
-          keyExtractor={(item) => item._id}
+          keyExtractor={(item) => `${item.type}-${item._id}`}
           renderItem={({ item }) => {
             if (pendingFriendReqs.some((req) => req._id === item._id)) {
               return renderFriendRequest({ item });

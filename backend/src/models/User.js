@@ -45,6 +45,10 @@ const userSchema = new mongoose.Schema(
         ref: "Foodcard",
       },
     ],
+    expoPushToken: {
+      type: String,
+      default: null,
+    },
   },
   { timestamps: true }
 );

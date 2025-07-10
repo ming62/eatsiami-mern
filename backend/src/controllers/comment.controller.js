@@ -1,4 +1,6 @@
 import Comment from "../models/Comment.js";
+import { sendPushNotification } from "../lib/notification.js";
+import Foodcard from "../models/Foodcard.js";
 
 export async function getComment(req, res) {
   try {
@@ -53,6 +55,22 @@ export async function createComment(req, res) {
     });
 
     const populated = await comment.populate("userId", "username profileImage");
+
+    //send push notification
+    const post = await Foodcard.findById(postId).populate(
+      "user",
+      "expoPushToken username"
+    );
+
+    //send push notification exclude comment on self post
+    if (post && post.user.id !== userId) {
+      console.log("post id", post.user.id);
+      await sendPushNotification(post.user.expoPushToken, {
+        title: "New Comment",
+        body: `${req.user.username} commented on your food card ${post.title}.`,
+        data: { type: "new-comment", fromUserId: userId },
+      });
+    }
     res.status(201).json(populated);
   } catch (error) {
     console.error("createComment error:", error);
@@ -72,7 +90,11 @@ export async function replyComment(req, res) {
         .json({ error: "postId and content are required." });
     }
 
-    const parentComment = await Comment.findById(parentId);
+    const parentComment = await Comment.findById(parentId).populate(
+      "userId",
+      "expoPushToken username"
+    );
+
     if (!parentComment)
       return res.status(404).json({ error: "Parent comment not found" });
 
@@ -88,6 +110,17 @@ export async function replyComment(req, res) {
     });
 
     const populated = await comment.populate("userId", "username profileImage");
+
+    //send push notification to all comment that reply own comment
+    if (parentComment.userId.id !== userId) {
+      console.log("parentcomment id", parentComment.userId.id);
+      await sendPushNotification(parentComment.userId.expoPushToken, {
+        title: "New Reply",
+        body: `${req.user.username} replied to your comment.`,
+        data: { type: "reply-comment", fromUserId: userId },
+      });
+    }
+
     res.status(201).json(populated);
   } catch (error) {
     console.error("createComment error:", error);
