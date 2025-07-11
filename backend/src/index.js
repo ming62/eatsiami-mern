@@ -6,6 +6,7 @@ import foodcardsRoutes from './routes/foodcardsRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
 import commentRoutes from "./routes/commentRoutes.js";
+import emailRoutes from "./routes/emailRoutes.js";
 import aiRoutes from "./routes/aiRoutes.js";
 import { connectDB } from './lib/db.js';
 import job  from './lib/cron.js';
@@ -23,6 +24,7 @@ app.use("/api/foodcards", foodcardsRoutes);
 app.use("/api/users", userRoutes); 
 app.use("/api/chat", chatRoutes);
 app.use("/api/comments", commentRoutes); 
+app.use("/api/email", emailRoutes);
 app.use("/api/ai", aiRoutes);
 
 

@@ -58,12 +58,17 @@ export default function RootLayout() {
   // handle navigation based on auth state
   useEffect(() => {
     if (!isReady) return;
-    const inAuthScreen = segments[0] === "(auth)";
+    const inAuthScreen =
+      segments[0] === "(auth)" &&
+      (segments[1] === undefined || segments[1] === "signup");
+    const inResetScreen =
+      segments[0] === "(auth)" && ( segments[1] === "resetPassword" || segments[1] === "forgotPassword");
     const isSignedIn = user && token;
 
-    if (!isSignedIn && !inAuthScreen) {
+    if (!isSignedIn && !inAuthScreen && !inResetScreen) {
       router.replace("/(auth)");
-    } else if (isSignedIn && inAuthScreen) {
+    }
+    if (isSignedIn && inAuthScreen) {
       router.replace("/(tabs)");
     }
   }, [user, token, segments, isReady]);

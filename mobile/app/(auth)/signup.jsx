@@ -50,7 +50,18 @@ export default function SignUpContainer() {
 
   const router = useRouter();
 
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+
   const handleSignUp = async () => {
+    if (!validateEmail(email)) {
+      Alert.alert("Error", "Please enter a valid email address");
+      return;
+    }
+
     const result = await register(username, email, password);
     if (result.success) {
       Alert.alert("Success", "Registration successful!");
@@ -310,7 +321,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontFamily: "Konkhmer_Sleokchher-Regular",
   },
-    eyeIcon: {
+  eyeIcon: {
     position: "absolute",
     right: 15,
     top: "40%",

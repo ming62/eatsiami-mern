@@ -17,7 +17,7 @@ import {
 import { useState, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import COLORS from "../../constants/colors";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { useAuthStore } from "../../store/authStore";
 import { LinearGradient } from "expo-linear-gradient";
 import { useFonts } from "expo-font";
@@ -26,6 +26,7 @@ import { SplashScreen } from "expo-router";
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 
 export default function LoginContainer() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -90,9 +91,9 @@ export default function LoginContainer() {
 
             {/* Form fields */}
             <View style={styles.formContainer}>
-              {/* Username field */}
+              {/* Email field */}
               <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>username</Text>
+                <Text style={styles.inputLabel}>email address</Text>
                 <TextInput
                   style={styles.textInput}
                   placeholder=""
@@ -156,6 +157,16 @@ export default function LoginContainer() {
                 </Text>
               </TouchableOpacity>
             </Link>
+
+            {/* Create account link */}
+            <Link href="/forgotPassword" asChild>
+              <TouchableOpacity style={styles.createAccountContainer}>
+                <Text style={styles.createAccountText}>
+                    forgot your password
+                </Text>
+              </TouchableOpacity>
+            </Link>
+
           </View>
         </View>
       </KeyboardAvoidingView>
@@ -274,7 +285,7 @@ const styles = StyleSheet.create({
   },
 
   passwordInput: {
-    paddingRight: 40, 
+    paddingRight: 40,
   },
 
   eyeIcon: {
