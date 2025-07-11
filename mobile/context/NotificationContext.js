@@ -54,13 +54,35 @@ export const NotificationProvider = ({ children }) => {
 
     responseListener.current =
       Notifications.addNotificationResponseReceivedListener((response) => {
+        let type;
+
+        try {
+          if (response.notification.request.content.data?.type) {
+            type = response.notification.request.content.data.type;
+          } else if (response.notification.request.content.data?.dataString) {
+            const parsed = JSON.parse(
+              response.notification.request.content.data.dataString
+            );
+            type = parsed?.type;
+          }
+        } catch (e) {
+          console.error("Failed to parse notification type", e);
+        }
+        console.log("Notification type:", type);
         console.log(
           "Notification Response: ",
           JSON.stringify(response, null, 2),
           JSON.stringify(response.notification.request.content.data, null, 2)
         );
-        fetchNotificationCount(token, setBadgeCount);
+
+        if (type === "chat-message") {
+          router.push("/(tabs)/friends");
+          return;
+        }
+
         router.push("/(tabs)/notification");
+
+        fetchNotificationCount(token, setBadgeCount);
       });
 
     return () => {

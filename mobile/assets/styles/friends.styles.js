@@ -76,8 +76,8 @@ const styles = StyleSheet.create({
   profileImage: {
     borderWidth: 1,
     borderColor: COLORS.gray,
-    width: 50, 
-    height: 50, 
+    width: 50,
+    height: 50,
     borderRadius: 25,
     marginRight: 15,
     backgroundColor: "#d3d3d3",
@@ -86,12 +86,12 @@ const styles = StyleSheet.create({
   username: {
     fontSize: 18,
     fontFamily: "Konkhmer_Sleokchher-Regular",
-    fontWeight: "600", 
+    fontWeight: "600",
     color: "#333",
   },
 
   addButton: {
-    paddingVertical: 10, 
+    paddingVertical: 10,
     paddingHorizontal: 25,
     borderRadius: 15,
     backgroundColor: COLORS.primary,
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#666",
     textAlign: "center",
-    marginTop: 50, 
+    marginTop: 50,
   },
 
   deleteButton: {
@@ -135,6 +135,22 @@ const styles = StyleSheet.create({
     top: "50%",
     marginTop: -10,
     zIndex: 1,
+  },
+  badgeContainer: {
+    position: "absolute",
+    top: -5,
+    right: -5,
+    backgroundColor: "red",
+    borderRadius: 10,
+    paddingHorizontal: 5,
+    minWidth: 18,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  badgeText: {
+    color: "white",
+    fontSize: 10,
+    fontWeight: "bold",
   },
 });
 
