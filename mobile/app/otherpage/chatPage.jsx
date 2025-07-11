@@ -65,7 +65,7 @@ export default function ChatPage() {
       }
     }
 
-    return <MessageSimple {...props}/>;
+    return <MessageSimple {...props} />;
   };
 
   useEffect(() => {
