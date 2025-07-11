@@ -49,7 +49,7 @@ export default function ForgotPassword() {
       return;
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       Alert.alert("Error", "Please enter a valid email address");
       return;
@@ -202,7 +202,7 @@ export default function ForgotPassword() {
 
       <View style={styles.infoContainer}>
         <Text style={styles.infoText}>
-          ℹ️ The reset code will be sent to your registered email address and
+          The reset code will be sent to your registered email address and
           will expire in 10 minutes.
         </Text>
       </View>
@@ -277,7 +277,7 @@ export default function ForgotPassword() {
 
       <View style={styles.infoContainer}>
         <Text style={styles.infoText}>
-          ⏰ This code will expire in 10 minutes. If you don't receive it, check
+          This code will expire in 10 minutes. If you don't receive it, check
           your spam folder.
         </Text>
       </View>

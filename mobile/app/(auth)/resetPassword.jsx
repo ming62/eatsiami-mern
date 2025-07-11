@@ -61,7 +61,7 @@ export default function ResetPassword() {
             {
               text: "OK",
               onPress: () => {
-                logout(); // Log out user so they can login with new password
+                logout(); 
                 router.replace("/(auth)");
               },
             },

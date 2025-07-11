@@ -360,7 +360,7 @@ export default function Profile() {
         style={styles.forgotPasswordButton}
         onPress={() => router.push("/(auth)/forgotPassword")}
       >
-        <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+        <Text style={styles.forgotPasswordText}>Forgot Password</Text>
       </TouchableOpacity>
 
       <TabView
