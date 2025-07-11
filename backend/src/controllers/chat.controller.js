@@ -89,28 +89,18 @@ export async function shareFoodcard(req, res) {
 
 export async function sendNotif(req, res) {
   try {
-    console.log("✅ [Webhook Triggered] Incoming event:", req.body?.type);
-
     const { type, message, members } = req.body;
 
     if (type !== "message.new") {
-      console.log("ℹ️ [Webhook Ignored] Type is not 'message.new':", type);
       return res.sendStatus(200);
     }
 
     const senderId = message.user.id;
 
-    console.log("👤 Sender ID:", senderId);
-    console.log(
-      "👥 Channel Members from webhook:",
-      members?.map((m) => m.user_id)
-    );
-
     const channelMembers = members ?? [];
 
     // Ensure channel has at least 2 members
     if (channelMembers.length < 2) {
-      console.warn("⚠️ Not enough members in channel to notify");
       return res
         .status(400)
         .json({ message: "Not enough members in channel to notify" });
@@ -122,13 +112,10 @@ export async function sendNotif(req, res) {
     )?.user_id;
 
     if (!recipientId) {
-      console.warn("❌ Recipient not found in channel members");
       return res
         .status(404)
         .json({ message: "Recipient not found in channel members" });
     }
-
-    console.log("🎯 Recipient ID:", recipientId);
 
     // Find the recipient's push token from db
     const recipient = await User.findById(recipientId).select(
@@ -136,15 +123,10 @@ export async function sendNotif(req, res) {
     );
 
     if (!recipient) {
-      console.warn("❌ Recipient not found in DB");
       return res.status(404).json({ message: "Recipient not found in DB" });
     }
 
-    console.log("📱 Found Recipient:", recipient.username);
-    console.log("🔐 Expo Push Token:", recipient.expoPushToken);
-
     if (!recipient.expoPushToken) {
-      console.warn("❌ Expo push token not found for recipient");
       return res
         .status(404)
         .json({ message: "Expo push token not found for recipient" });
@@ -157,14 +139,10 @@ export async function sendNotif(req, res) {
       data: { type: "chat-message", chatId: message.channel_id },
     };
 
-    console.log("📤 Sending push notification with payload:", payload);
-
     await sendPushNotification(recipient.expoPushToken, payload);
 
-    console.log("✅ Push notification sent successfully");
     res.sendStatus(200);
   } catch (error) {
-    console.error("❗ Error in sendNotif controller:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 }
