@@ -21,7 +21,7 @@ import { Image } from "expo-image";
 
 export default function Friends() {
   // State Management
-  const { token } = useAuthStore();
+  const { token, perChannelUnread, user } = useAuthStore();
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [friends, setFriends] = useState([]);
@@ -145,6 +145,14 @@ export default function Friends() {
 
   //friends card for added friends
   const renderFriend = ({ item }) => {
+    const userId = user?.id;
+    if (!userId) return null;
+
+    const sortedIds = [userId, item._id].sort();
+
+    const channelId = `${sortedIds.join("-")}`;
+
+    const unreadCount = perChannelUnread?.[channelId] ?? 0;
     const requestAlreadySent = outgoingJioRequestIds.has(item._id);
     return (
       <View style={styles.friendCard}>
@@ -180,6 +188,11 @@ export default function Friends() {
             size={20}
             color="#ffffff"
           />
+          {unreadCount > 0 && (
+            <View style={styles.badgeContainer}>
+              <Text style={styles.badgeText}>{unreadCount}</Text>
+            </View>
+          )}
         </TouchableOpacity>
         <TouchableOpacity
           style={[

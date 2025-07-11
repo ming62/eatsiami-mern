@@ -90,6 +90,7 @@ export default function ChatPage() {
         }
 
         const channelId = [user.id, friendId].sort().join("-");
+
         const chatChannel = chatClient.channel("messaging", channelId, {
           members: [user.id, friendId],
         });
@@ -104,12 +105,6 @@ export default function ChatPage() {
     };
 
     initChat();
-
-    return () => {
-      if (chatClient.userID) {
-        chatClient.disconnectUser();
-      }
-    };
   }, [user?.id, friendId]);
 
   if (loading || !channel) {
