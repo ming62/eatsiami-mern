@@ -358,7 +358,7 @@ export default function Profile() {
 
       <TouchableOpacity
         style={styles.forgotPasswordButton}
-        onPress={() => router.push("/otherpage/passwordReset/forgotPassword")}
+        onPress={() => router.push("/(auth)/forgotPassword")}
       >
         <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
       </TouchableOpacity>

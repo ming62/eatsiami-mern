@@ -12,8 +12,8 @@ import {
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
-import { useAuthStore } from "../../../store/authStore";
-import { API_URL } from "../../../constants/api";
+import { useAuthStore } from "../../store/authStore";
+import { API_URL } from "../../constants/api";
 
 export default function ResetPassword() {
   const [newPassword, setNewPassword] = useState("");
@@ -43,7 +43,7 @@ export default function ResetPassword() {
 
     setIsLoading(true);
     try {
-      const response = await fetch(`${API_URL}/auth/reset-password`, {
+      const response = await fetch(`${API_URL}/email/reset-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

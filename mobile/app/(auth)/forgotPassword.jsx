@@ -12,26 +12,26 @@ import {
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
-import { useAuthStore } from "../../../store/authStore";
-import { API_URL } from "../../../constants/api";
+import { useAuthStore } from "../../store/authStore";
+import { API_URL } from "../../constants/api";
 
 export default function ForgotPassword() {
   const router = useRouter();
   const { user } = useAuthStore();
-  
-  const [step, setStep] = useState(1); 
+
+  const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [countdown, setCountdown] = useState(0);
 
   useEffect(() => {
     if (user) {
       setEmail(user.email);
+      setIsLoggedIn(true);
     } else {
-      Alert.alert("Login Required", "Please login to reset your password", [
-        { text: "OK", onPress: () => router.replace("/(auth)") },
-      ]);
+      setIsLoggedIn(false);
     }
   }, [user]);
 
@@ -49,9 +49,15 @@ export default function ForgotPassword() {
       return;
     }
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+/;
+    if (!emailRegex.test(email)) {
+      Alert.alert("Error", "Please enter a valid email address");
+      return;
+    }
+
     setIsLoading(true);
     try {
-      const response = await fetch(`${API_URL}/auth/forgot-password`, {
+      const response = await fetch(`${API_URL}/email/forgot-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -64,7 +70,7 @@ export default function ForgotPassword() {
       if (response.ok) {
         Alert.alert("Success", `Reset code sent to ${email}`);
         setStep(2);
-        setCountdown(60); 
+        setCountdown(60);
       } else {
         Alert.alert("Error", data.message || "Something went wrong");
       }
@@ -84,7 +90,7 @@ export default function ForgotPassword() {
 
     setIsLoading(true);
     try {
-      const response = await fetch(`${API_URL}/auth/verify-reset-code`, {
+      const response = await fetch(`${API_URL}/email/verify-reset-code`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -96,7 +102,7 @@ export default function ForgotPassword() {
 
       if (response.ok) {
         router.push({
-          pathname: "/otherpage/passwordReset/resetPassword",
+          pathname: "/(auth)/resetPassword",
           params: { email, resetCode: code },
         });
       } else {
@@ -112,18 +118,18 @@ export default function ForgotPassword() {
 
   const handleResendCode = () => {
     if (countdown > 0) return;
-    
+
     Alert.alert(
       "Resend Code",
       "Are you sure you want to resend the verification code?",
       [
         { text: "Cancel", style: "cancel" },
-        { 
-          text: "Resend", 
+        {
+          text: "Resend",
           onPress: () => {
-            setCode(""); 
+            setCode("");
             handleSendCode();
-          }
+          },
         },
       ]
     );
@@ -147,10 +153,25 @@ export default function ForgotPassword() {
 
       <View style={styles.emailContainer}>
         <Text style={styles.emailLabel}>Email Address</Text>
-        <View style={styles.emailBox}>
-          <Text style={styles.emailText}>{email || "Loading..."}</Text>
-          <Ionicons name="mail-outline" size={20} color="#666" />
-        </View>
+
+        {isLoggedIn ? (
+          <View style={styles.emailBox}>
+            <Text style={styles.emailText}>{email || "Loading..."}</Text>
+            <Ionicons name="mail-outline" size={20} color="#666" />
+          </View>
+        ) : (
+          <TextInput
+            style={styles.emailInput}
+            placeholder="Enter your email"
+            placeholderTextColor="#ccc"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            autoCorrect={false}
+            autoFocus={true}
+          />
+        )}
       </View>
 
       <TouchableOpacity
@@ -243,10 +264,12 @@ export default function ForgotPassword() {
           disabled={countdown > 0}
           style={styles.resendButton}
         >
-          <Text style={[
-            styles.resendButtonText,
-            countdown > 0 && styles.disabledText
-          ]}>
+          <Text
+            style={[
+              styles.resendButtonText,
+              countdown > 0 && styles.disabledText,
+            ]}
+          >
             {countdown > 0 ? `Resend in ${countdown}s` : "Resend Code"}
           </Text>
         </TouchableOpacity>
@@ -254,7 +277,8 @@ export default function ForgotPassword() {
 
       <View style={styles.infoContainer}>
         <Text style={styles.infoText}>
-          ⏰ This code will expire in 10 minutes. If you don't receive it, check your spam folder.
+          ⏰ This code will expire in 10 minutes. If you don't receive it, check
+          your spam folder.
         </Text>
       </View>
     </>
@@ -274,16 +298,14 @@ export default function ForgotPassword() {
       {/* Progress Indicator */}
       <View style={styles.progressContainer}>
         <View style={styles.progressBar}>
-          <View 
+          <View
             style={[
-              styles.progressFill, 
-              { width: step === 1 ? "50%" : "100%" }
-            ]} 
+              styles.progressFill,
+              { width: step === 1 ? "50%" : "100%" },
+            ]}
           />
         </View>
-        <Text style={styles.progressText}>
-          Step {step} of 2
-        </Text>
+        <Text style={styles.progressText}>Step {step} of 2</Text>
       </View>
 
       <View style={styles.content}>
@@ -374,6 +396,16 @@ const styles = StyleSheet.create({
     color: "#000",
     fontWeight: "500",
     flex: 1,
+  },
+  emailInput: {
+    height: 67,
+    backgroundColor: "#f5f5f5",
+    borderRadius: 12,
+    paddingHorizontal: 20,
+    fontSize: 16,
+    color: "#000",
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
   },
   inputContainer: {
     marginBottom: 30,
