@@ -305,7 +305,7 @@ export default function CardDetail() {
             </View>
             <TouchableOpacity
               onPress={() => {
-                setReplyToCommentId(comment._id);
+                setReplyToCommentId(reply._id);
                 setReplyToUsername(reply.userId.username);
                 setNewComment(`@${reply.userId.username} `);
                 inputRef.current?.focus();

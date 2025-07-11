@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "99037797059",
+    "project_id": "eatsiami-46117",
+    "storage_bucket": "eatsiami-46117.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:99037797059:android:b3cfec35c586dd0f77a076",
+        "android_client_info": {
+          "package_name": "com.eatsiami.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCwzJgV-FtR2ixrDnkreXPuzxywqzMQBEo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -266,7 +266,7 @@ export default function Home() {
       <View style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>EatSiaMi</Text>
+          <Text style={styles.headerTitle}>eatsiami</Text>
         </View>
       </View>
 
