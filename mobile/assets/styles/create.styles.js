@@ -25,22 +25,22 @@ const styles = StyleSheet.create({
     borderColor: COLORS.border,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 20,
     marginTop: -20,
-    position: 'relative',
+    position: "relative",
   },
   backButton: {
-    width:32,
+    width: 32,
     zIndex: 2,
     padding: 8,
   },
   title: {
     flex: 1,
-    textAlign: 'center',
+    textAlign: "center",
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: COLORS.black,
     fontFamily: "Konkhmer_Sleokchher-Regular",
   },
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,
-    backgroundColor:COLORS.grayLight,
+    backgroundColor: COLORS.grayLight,
     borderColor: COLORS.gray,
   },
 
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     height: 100,
     color: COLORS.textDark,
     fontSize: 14,
-    textAlignVertical: 'top',
+    textAlignVertical: "top",
     fontFamily: "Konkhmer_Sleokchher-Regular",
   },
   ratingContainer: {
@@ -174,6 +174,35 @@ const styles = StyleSheet.create({
   },
   buttonIcon: {
     marginRight: 8,
+  },
+  imagePreviewContainer: {
+    position: "relative",
+    width: "100%",
+    height: 200,
+    borderRadius: 12,
+    overflow: "hidden",
+  },
+  retakeButton: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    backgroundColor: "rgba(0,0,0,0.7)",
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  retakeButtonText: {
+    color: "white",
+    fontSize: 12,
+    marginLeft: 5,
+    fontWeight: "bold",
+  },
+  retakeHeaderButton: {
+    padding: 10,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 
