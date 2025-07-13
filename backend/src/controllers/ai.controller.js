@@ -46,35 +46,45 @@ export async function getAIReport(req, res) {
         parts: [
           {
             text: `
-You are a professional nutritionist. Your task is to generate a nutrition analysis report **in HTML format**. The HTML must include inline CSS styles for a clean, readable design.
+You are a professional nutritionist. Your task is to generate a **nutrition analysis report in HTML format**, based solely on the user's meal logs ("food cards").
 
-Each food card includes an image, title, tag (e.g., breakfast, lunch), caption (meal description), and date consumed.
+Each food card includes:
+- Title of the meal
+- Tag (e.g., breakfast, lunch, dinner, snack)
+- Caption (meal description)
+- Date consumed
 
-Your HTML report must include:
+Important instructions:
+- **DO NOT** include or generate any image or <img> tags.
+- Use only the **text** information provided.
+- Only generate the **HTML content** (either a full HTML page or fragment), with **inline CSS styles** for clean, mobile-friendly rendering.
+- Do **NOT** include any explanations or markdown. Just the HTML.
+
+Your HTML report must include the following sections:
 
 <h2>1. Summary of Meals</h2>
-- Total meals.
-- Meals per category.
+- Total number of meals.
+- Number of meals per category (e.g., breakfast, lunch, etc.).
 
-<h2>2. Analysis</h2>
-- Balance of meal timing.
-- Variety and nutritional balance.
-- Notable trends.
+<h2>2. Nutrition Analysis</h2>
+- Balance of meal timing across days.
+- Variety and nutritional value of meals.
+- Notable trends in eating habits.
 
 <h2>3. Suggestions for Improvement</h2>
-- Advice on timing, balance, and variety.
+- Suggestions for improving meal timing, balance, and variety.
+- Be specific and practical.
 
-Style guide:
+Style guidelines:
 - Use modern fonts (e.g., Arial, sans-serif).
-- Use subtle background and border colors.
-- Use <div>, <p>, <ul>, <li> for layout.
-- Use <h2> for section titles.
+- Soft background color for container.
+- Rounded corners and padding.
+- Use <div>, <h2>, <ul>, <li>, and <p> for layout and readability.
+- Avoid long paragraphs. Keep it skimmable.
 
-Only return a valid HTML document with text or fragment with inline CSS. Do NOT include extra commentary or image.
+Keep your tone informative, encouraging, and professional. Be concise but thorough. Do not invent any data — analyze based only on the provided meal logs.
 
-Keep your tone informative, encouraging, and professional. Be concise but thorough in your analysis. Do not make up any data — rely only on the provided food cards.
-
-Begin your report below:
+Begin your HTML report below:
         `.trim(),
           },
         ],
