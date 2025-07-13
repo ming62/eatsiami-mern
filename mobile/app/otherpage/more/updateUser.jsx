@@ -30,7 +30,7 @@ export default function UpdateProfile() {
   const [profileImage, setProfileImage] = useState(user.profileImage);
   const [imageBase64, setImageBase64] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-
+  console.log("userprofile", user.profileImage);
   const pickImage = async () => {
     try {
       if (Platform.OS !== "web") {
@@ -83,12 +83,22 @@ export default function UpdateProfile() {
     setIsLoading(true);
 
     try {
-      const uriParts = profileImage.split(".");
-      const fileType = uriParts[uriParts.length - 1];
-      const imageType = fileType
-        ? `image/${fileType.toLowerCase()}`
-        : "image/jpeg";
-      const imageDataUrl = `data:${imageType};base64,${imageBase64}`;
+      let imageDataUrl;
+
+      const isCloudinaryUrl = profileImage.startsWith(
+        "https://res.cloudinary.com/"
+      );
+      console.log("iscloundinary", isCloudinaryUrl);
+      if (isCloudinaryUrl) {
+        imageDataUrl = profileImage;
+      } else {
+        const uriParts = profileImage.split(".");
+        const fileType = uriParts[uriParts.length - 1];
+        const imageType = fileType
+          ? `image/${fileType.toLowerCase()}`
+          : "image/jpeg";
+        imageDataUrl = `data:${imageType};base64,${imageBase64}`;
+      }
 
       const res = await fetch(`${API_URL}/users/update/${user.id}`, {
         method: "PUT",

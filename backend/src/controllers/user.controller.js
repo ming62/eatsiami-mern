@@ -526,6 +526,7 @@ export async function updateUserProfile(req, res) {
       return res.status(403).json({ message: "Unauthorized" });
     }
 
+    //update user name
     if (username && username !== user.username) {
       const existingUser = await User.findOne({ username });
       if (existingUser) {
@@ -534,15 +535,21 @@ export async function updateUserProfile(req, res) {
       user.username = username;
     }
 
-    let imageUrl;
+    //update profile image
     if (profileImage) {
-      const uploadResponse = await cloudinary.uploader.upload(profileImage);
-      imageUrl = uploadResponse.secure_url;
+      const isCloudinaryUrl = profileImage.startsWith(
+        "https://res.cloudinary.com/"
+      );
+      if (!isCloudinaryUrl) {
+        const uploadResponse = await cloudinary.uploader.upload(profileImage);
+        user.profileImage = uploadResponse.secure_url;
+      } else {
+        user.profileImage = profileImage;
+      }
     }
 
     // Update other fields
     if (bio !== undefined) user.bio = bio;
-    if (imageUrl !== undefined) user.profileImage = imageUrl;
 
     const updatedUser = await user.save();
     res.json({ message: "Profile updated successfully", user: updatedUser });
