@@ -70,7 +70,7 @@ Style guide:
 - Use <div>, <p>, <ul>, <li> for layout.
 - Use <h2> for section titles.
 
-Only return a valid HTML document or fragment with inline CSS. Do NOT include extra commentary.
+Only return a valid HTML document with text or fragment with inline CSS. Do NOT include extra commentary or image.
 
 Keep your tone informative, encouraging, and professional. Be concise but thorough in your analysis. Do not make up any data — rely only on the provided food cards.
 

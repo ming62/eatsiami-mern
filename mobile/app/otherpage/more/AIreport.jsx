@@ -5,6 +5,7 @@ import {
   Alert,
   ActivityIndicator,
   ScrollView,
+  Dimensions,
 } from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -17,7 +18,7 @@ import Loader from "../../../components/Loader";
 import Slider from "@react-native-community/slider";
 import styles from "../../../assets/styles/AIreport.js";
 import RenderHtml from "react-native-render-html";
-import { useWindowDimensions } from "react-native";
+import { WebView } from "react-native-webview";
 
 export default function AIreport() {
   const router = useRouter();
@@ -27,7 +28,7 @@ export default function AIreport() {
   const [days, setDays] = useState(7);
   const [statusMessage, setStatusMessage] = useState("");
   const userID = user.id;
-  const { width } = useWindowDimensions();
+  const { width } = Dimensions.get("window");
 
   const handleGenerateReport = async () => {
     setStatusMessage("fetching user data...");
@@ -54,6 +55,7 @@ export default function AIreport() {
       }
 
       const data = await response.json();
+      console.log("data", data);
       setAiReport(data.aiReport || "No report returned.");
       setStatusMessage("report sucessfully created!");
     } catch (error) {
@@ -112,15 +114,19 @@ export default function AIreport() {
       )}
 
       {aiReport !== "" && (
-        <ScrollView style={styles.reportBox}>
+        <View style={{ flex: 1, marginTop: 20 }}>
           <View style={styles.reportHeader}>
             <Text style={styles.reportTitle}>Report</Text>
             <Text style={styles.disclaimer}>
               This report is AI-generated and for reference only
             </Text>
           </View>
-          <RenderHtml contentWidth={width} source={{ html: aiReport }} />
-        </ScrollView>
+          <WebView
+            originWhitelist={["*"]}
+            source={{ html: aiReport }}
+            style={{ width: width, height: 1000 }}
+          />
+        </View>
       )}
     </SafeAreaView>
   );
