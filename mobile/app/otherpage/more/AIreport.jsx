@@ -17,7 +17,6 @@ import COLORS from "../../../constants/colors";
 import Loader from "../../../components/Loader";
 import Slider from "@react-native-community/slider";
 import styles from "../../../assets/styles/AIreport.js";
-import RenderHtml from "react-native-render-html";
 import { WebView } from "react-native-webview";
 
 export default function AIreport() {
