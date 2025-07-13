@@ -545,7 +545,9 @@ export async function updateUserProfile(req, res) {
     if (bio !== undefined) user.bio = bio;
 
     const updatedUser = await user.save();
-    res.json({ message: "Profile updated successfully", user: updatedUser });
+    const userObj = updatedUser.toObject();
+    userObj.id = userObj._id.toString();
+    res.json({ message: "Profile updated successfully", user: userObj });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });

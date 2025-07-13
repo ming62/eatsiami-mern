@@ -100,7 +100,7 @@ export default function UpdateProfile() {
         imageDataUrl = `data:${imageType};base64,${imageBase64}`;
       }
 
-      const res = await fetch(`${API_URL}/users/update/${user._id}`, {
+      const res = await fetch(`${API_URL}/users/update/${user.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

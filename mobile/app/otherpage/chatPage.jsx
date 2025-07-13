@@ -31,6 +31,7 @@ export default function ChatPage() {
   const { friendId, friendName, friendImage } = useLocalSearchParams();
 
   const { token, user } = useAuthStore();
+  console.log("user", user);
   const [channel, setChannel] = useState(null);
   const [loading, setLoading] = useState(true);
 
