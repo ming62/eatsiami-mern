@@ -15,6 +15,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // job.start(); // for cron job 
+app.use(express.json({ limit: '10mb' }));
 app.use(express.json()); // Middleware to parse JSON bodies
 app.use(cors()); 
 

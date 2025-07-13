@@ -70,7 +70,8 @@ export default function RootLayout() {
     }
     if (isSignedIn && inAuthScreen) {
       router.replace("/(tabs)");
-    }
+    } 
+    console.log("Current segments:", segments);
   }, [user, token, segments, isReady]);
 
   useEffect(() => {
