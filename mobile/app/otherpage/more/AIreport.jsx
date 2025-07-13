@@ -5,6 +5,7 @@ import {
   Alert,
   ActivityIndicator,
   ScrollView,
+  Dimensions,
 } from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -16,6 +17,7 @@ import COLORS from "../../../constants/colors";
 import Loader from "../../../components/Loader";
 import Slider from "@react-native-community/slider";
 import styles from "../../../assets/styles/AIreport.js";
+import { WebView } from "react-native-webview";
 
 export default function AIreport() {
   const router = useRouter();
@@ -25,6 +27,7 @@ export default function AIreport() {
   const [days, setDays] = useState(7);
   const [statusMessage, setStatusMessage] = useState("");
   const userID = user.id;
+  const { width } = Dimensions.get("window");
 
   const handleGenerateReport = async () => {
     setStatusMessage("fetching user data...");
@@ -51,7 +54,18 @@ export default function AIreport() {
       }
 
       const data = await response.json();
-      setAiReport(data.aiReport || "No report returned.");
+      console.log("data", data);
+      let cleaned = (data.aiReport || "").trim();
+
+      // Remove ```html and ```
+      if (cleaned.startsWith("```html")) {
+        cleaned = cleaned.replace(/^```html/, "").trim();
+      }
+      if (cleaned.endsWith("```")) {
+        cleaned = cleaned.replace(/```$/, "").trim();
+      }
+
+      setAiReport(cleaned);
       setStatusMessage("report sucessfully created!");
     } catch (error) {
       console.error("Error generating report:", error);
@@ -109,15 +123,19 @@ export default function AIreport() {
       )}
 
       {aiReport !== "" && (
-        <ScrollView style={styles.reportBox}>
+        <View style={{ flex: 1, marginTop: 20 }}>
           <View style={styles.reportHeader}>
             <Text style={styles.reportTitle}>Report</Text>
             <Text style={styles.disclaimer}>
               This report is AI-generated and for reference only
             </Text>
           </View>
-          <Text style={styles.reportText}>{aiReport}</Text>
-        </ScrollView>
+          <WebView
+            originWhitelist={["*"]}
+            source={{ html: aiReport }}
+            style={{ width: width, height: 1000 }}
+          />
+        </View>
       )}
     </SafeAreaView>
   );

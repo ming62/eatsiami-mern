@@ -34,6 +34,8 @@ export default function SignUpContainer() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { user, isLoading, register } = useAuthStore();
 
   SplashScreen.preventAutoHideAsync();
@@ -55,10 +57,19 @@ export default function SignUpContainer() {
     return emailRegex.test(email);
   };
 
-
   const handleSignUp = async () => {
+    if (!email || !username || !password || !confirmPassword) {
+      Alert.alert("Error", "Please fill in all fields");
+      return;
+    }
+
     if (!validateEmail(email)) {
       Alert.alert("Error", "Please enter a valid email address");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      Alert.alert("Error", "Passwords do not match");
       return;
     }
 
@@ -167,6 +178,30 @@ export default function SignUpContainer() {
                 />
               </TouchableOpacity>
             </View>
+
+            {/* Confirm Password field */}
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>confirm password</Text>
+              <TextInput
+                style={styles.textInput}
+                placeholder=""
+                placeholderTextColor="#8e8e8e"
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+                secureTextEntry={!showConfirmPassword}
+                autoCapitalize="none"
+              />
+              <TouchableOpacity
+                onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+                style={styles.eyeIcon}
+              >
+                <Ionicons
+                  name={showConfirmPassword ? "eye-outline" : "eye-off-outline"}
+                  size={23}
+                  color="#8e8e8e"
+                />
+              </TouchableOpacity>
+            </View>
           </View>
 
           {/* Sign Up Button */}
@@ -216,7 +251,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    height: 600,
+    height: 650,
     backgroundColor: "#ffffff",
     borderTopLeftRadius: 40,
     borderTopRightRadius: 40,

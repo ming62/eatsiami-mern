@@ -130,13 +130,18 @@ export default function SearchScreen() {
     const requestAlreadySent = outgoingRequestIds.has(item._id);
     return (
       <View style={styles.friendCard}>
-        <View style={styles.userInfo}>
+        <TouchableOpacity
+          style={styles.userInfo}
+          onPress={() =>
+            router.push(`/otherpage/friendDetail?friendId=${item._id}`)
+          }
+        >
           <Image
             source={{ uri: item.profileImage }}
             style={styles.profileImage}
           />
           <Text style={styles.username}>{item.username}</Text>
-        </View>
+        </TouchableOpacity>
         <TouchableOpacity
           style={[
             styles.addButton,
@@ -161,7 +166,6 @@ export default function SearchScreen() {
           <Ionicons name="arrow-back" size={24} color={COLORS.white} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Discover</Text>
-
       </View>
 
       {/* Search Section - Similar to Friends page */}
