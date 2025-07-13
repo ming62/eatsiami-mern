@@ -16,6 +16,8 @@ import COLORS from "../../../constants/colors";
 import Loader from "../../../components/Loader";
 import Slider from "@react-native-community/slider";
 import styles from "../../../assets/styles/AIreport.js";
+import RenderHtml from "react-native-render-html";
+import { useWindowDimensions } from "react-native";
 
 export default function AIreport() {
   const router = useRouter();
@@ -25,6 +27,7 @@ export default function AIreport() {
   const [days, setDays] = useState(7);
   const [statusMessage, setStatusMessage] = useState("");
   const userID = user.id;
+  const { width } = useWindowDimensions();
 
   const handleGenerateReport = async () => {
     setStatusMessage("fetching user data...");
@@ -116,7 +119,7 @@ export default function AIreport() {
               This report is AI-generated and for reference only
             </Text>
           </View>
-          <Text style={styles.reportText}>{aiReport}</Text>
+          <RenderHtml contentWidth={width} source={{ html: aiReport }} />
         </ScrollView>
       )}
     </SafeAreaView>

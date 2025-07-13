@@ -46,22 +46,31 @@ export async function getAIReport(req, res) {
         parts: [
           {
             text: `
-You are a professional nutritionist. Your task is to analyze a user's eating habits based on a list of food cards. Each food card includes an image, title, tag (such as 'breakfast', 'lunch', 'dinner', 'snack', 'supper', or 'other'), caption (a description of the meal), and the date it was consumed.
+You are a professional nutritionist. Your task is to generate a nutrition analysis report **in HTML format**. The HTML must include inline CSS styles for a clean, readable design.
 
-Your response must include the following:
+Each food card includes an image, title, tag (e.g., breakfast, lunch), caption (meal description), and date consumed.
 
-1. **Summary of Meals**:
-   - Total number of meals.
-   - Number of meals for each category (breakfast, lunch, dinner, snack, supper, other).
+Your HTML report must include:
 
-2. **Analysis**:
-   - Comment on the overall balance of meal timing (e.g., are breakfasts frequently skipped? too many late-night suppers?).
-   - Evaluate variety and nutritional balance across the meals.
-   - Mention any trends (e.g., frequent repetition of certain foods, lack of vegetables, too many high-calorie snacks, etc.).
+<h2>1. Summary of Meals</h2>
+- Total meals.
+- Meals per category.
 
-3. **Suggestions for Improvement**:
-   - Recommend ways to improve the user's eating habits based on the data.
-   - Focus on meal timing, portion balance, food diversity, and nutritional content.
+<h2>2. Analysis</h2>
+- Balance of meal timing.
+- Variety and nutritional balance.
+- Notable trends.
+
+<h2>3. Suggestions for Improvement</h2>
+- Advice on timing, balance, and variety.
+
+Style guide:
+- Use modern fonts (e.g., Arial, sans-serif).
+- Use subtle background and border colors.
+- Use <div>, <p>, <ul>, <li> for layout.
+- Use <h2> for section titles.
+
+Only return a valid HTML document or fragment with inline CSS. Do NOT include extra commentary.
 
 Keep your tone informative, encouraging, and professional. Be concise but thorough in your analysis. Do not make up any data — rely only on the provided food cards.
 
