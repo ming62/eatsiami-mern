@@ -24,7 +24,7 @@ import { API_URL } from "../../../constants/api";
 export default function UpdateProfile() {
   const { user, token, setUser } = useAuthStore();
   const router = useRouter();
-
+  console.log("user", user);
   const [username, setUsername] = useState(user.username);
   const [bio, setBio] = useState(user.bio);
   const [profileImage, setProfileImage] = useState(user.profileImage);
@@ -88,7 +88,7 @@ export default function UpdateProfile() {
       const isCloudinaryUrl = profileImage.startsWith(
         "https://res.cloudinary.com/"
       );
-      console.log("iscloundinary", isCloudinaryUrl);
+
       if (isCloudinaryUrl) {
         imageDataUrl = profileImage;
       } else {
@@ -100,7 +100,7 @@ export default function UpdateProfile() {
         imageDataUrl = `data:${imageType};base64,${imageBase64}`;
       }
 
-      const res = await fetch(`${API_URL}/users/update/${user.id}`, {
+      const res = await fetch(`${API_URL}/users/update/${user._id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

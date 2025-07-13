@@ -536,16 +536,9 @@ export async function updateUserProfile(req, res) {
     }
 
     //update profile image
-    if (profileImage) {
-      const isCloudinaryUrl = profileImage.startsWith(
-        "https://res.cloudinary.com/"
-      );
-      if (!isCloudinaryUrl) {
-        const uploadResponse = await cloudinary.uploader.upload(profileImage);
-        user.profileImage = uploadResponse.secure_url;
-      } else {
-        user.profileImage = profileImage;
-      }
+    if (profileImage && profileImage !== user.profileImage) {
+      const uploadResponse = await cloudinary.uploader.upload(profileImage);
+      user.profileImage = uploadResponse.secure_url;
     }
 
     // Update other fields
