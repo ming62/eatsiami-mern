@@ -56,7 +56,17 @@ export default function AIreport() {
 
       const data = await response.json();
       console.log("data", data);
-      setAiReport(data.aiReport || "No report returned.");
+      let cleaned = (data.aiReport || "").trim();
+
+      // Remove ```html and ```
+      if (cleaned.startsWith("```html")) {
+        cleaned = cleaned.replace(/^```html/, "").trim();
+      }
+      if (cleaned.endsWith("```")) {
+        cleaned = cleaned.replace(/```$/, "").trim();
+      }
+
+      setAiReport(cleaned);
       setStatusMessage("report sucessfully created!");
     } catch (error) {
       console.error("Error generating report:", error);

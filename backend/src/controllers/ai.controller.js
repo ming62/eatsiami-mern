@@ -129,17 +129,8 @@ Begin your HTML report below:
       contents,
     });
 
-    let cleanedResult = result.text.trim();
-
-    if (cleanedResult.startsWith("```html")) {
-      cleanedResult = cleanedResult.replace(/^```html/, "").trim();
-    }
-    if (cleanedResult.endsWith("```")) {
-      cleanedResult = cleanedResult.replace(/```$/, "").trim();
-    }
-
     console.log("AI Report received.");
-    res.json({ aiReport: cleanedResult });
+    res.json({ aiReport: result.text });
   } catch (err) {
     console.error("Error generating AI report:", err);
     res.status(500).json({ error: "Failed to generate AI report" });
