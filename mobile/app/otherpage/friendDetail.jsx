@@ -28,6 +28,7 @@ export default function FriendDetail() {
   const router = useRouter();
   const { friendId } = useLocalSearchParams();
   const { token } = useAuthStore();
+  const [isPrivate, setIsPrivate] = useState(false);
 
   const [friendData, setFriendData] = useState(null);
   const [friendFoodcards, setFriendFoodcards] = useState([]);
@@ -45,15 +46,6 @@ export default function FriendDetail() {
           Authorization: `Bearer ${token}`,
         },
       });
-
-      if (response.status === 403) {
-        Alert.alert(
-          "Private Profile",
-          "This user's profile is only visible to friends.",
-          [{ text: "OK", onPress: () => router.back() }]
-        );
-        return;
-      }
 
       if (!response.ok) {
         throw new Error("Failed to fetch friend data");
@@ -73,6 +65,7 @@ export default function FriendDetail() {
   const fetchFriendFoodcards = async () => {
     try {
       setLoading(true);
+      setIsPrivate(false);
       const response = await fetch(`${API_URL}/foodcards/user/${friendId}`, {
         method: "GET",
         headers: {
@@ -81,11 +74,7 @@ export default function FriendDetail() {
       });
 
       if (response.status === 403) {
-        Alert.alert(
-          "Private Profile",
-          "This user's profile is only visible to friends.",
-          [{ text: "OK", onPress: () => router.back() }]
-        );
+        setIsPrivate(true);
         return;
       }
 
@@ -169,12 +158,6 @@ export default function FriendDetail() {
             color={COLORS.textSecondary}
           />
           <Text style={styles.emptyListText}>No foodcards found.</Text>
-          <TouchableOpacity
-            style={styles.addButton}
-            onPress={() => router.push("/create")}
-          >
-            <Text style={styles.addButtonText}>Add Foodcard</Text>
-          </TouchableOpacity>
         </View>
       }
     />
@@ -197,7 +180,25 @@ export default function FriendDetail() {
   }
 
   const renderScene = SceneMap({
-    foodcards: FoodcardsRoute,
+    foodcards: () =>
+      isPrivate ? (
+        <View style={styles.privateAccountContainer}>
+          <Ionicons
+            name="lock-closed-outline"
+            size={48}
+            color={COLORS.textSecondary}
+            style={styles.privateAccountIcon}
+          />
+          <Text style={styles.privateAccountTitle}>
+            This is a private account.
+          </Text>
+          <Text style={styles.privateAccountSubtitle}>
+            Add friend to view food cards.
+          </Text>
+        </View>
+      ) : (
+        <FoodcardsRoute />
+      ),
   });
 
   return (
@@ -393,5 +394,31 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 30,
     elevation: 5,
     marginTop: -15,
+  },
+  privateAccountContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: COLORS.white,
+    paddingHorizontal: 32,
+    paddingTop: 40,
+  },
+
+  privateAccountIcon: {
+    marginBottom: 20,
+  },
+
+  privateAccountTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: COLORS.textPrimary,
+    textAlign: "center",
+    marginBottom: 8,
+  },
+
+  privateAccountSubtitle: {
+    fontSize: 15,
+    color: COLORS.textSecondary,
+    textAlign: "center",
   },
 });

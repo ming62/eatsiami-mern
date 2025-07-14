@@ -35,10 +35,6 @@ export default function ProfileHeader({ userData, showMore }) {
         {user.bio !== "Introduce yourself..." ? (
           <Text style={styles.bio}>{user.bio}</Text>
         ) : null}
-
-        <Text style={styles.memberSince}>
-          Joined {formatMemberSince(user.createdAt)}
-        </Text>
       </View>
     </View>
   );
