@@ -13,7 +13,8 @@ import {
   StyleSheet,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import styles from "../../assets/styles/create.styles";
 import COLORS from "../../constants/colors";
 import { Ionicons } from "@expo/vector-icons";
@@ -52,11 +53,22 @@ export default function Create() {
 
   const router = useRouter();
 
-  useEffect(() => {
+useFocusEffect(
+  useCallback(() => {
     if (!permission?.granted) {
       requestPermission();
     }
-  }, []);
+    setShowCamera(true);
+    setImage(null);
+    setImageBase64(null);
+    return () => {
+      setShowCamera(false);
+      if (cameraRef.current) {
+        cameraRef.current = null;
+      }
+    };
+  }, [permission])
+);
 
   const handleBack = () => {
     if (showCamera) {
@@ -309,30 +321,30 @@ export default function Create() {
     );
   }
 
-const renderCardRatingStars = (rating) => {
-  const stars = [];
-  for (let i = 1; i <= rating; i++) {
-    stars.push(
-      <Ionicons
-        key={i}
-        name="star"
-        size={CARD_WIDTH * 0.066 * 0.7}
-        color={i <= rating ? "#F4B400" : COLORS.textSecondary}
-        style={{ marginRight: CARD_WIDTH * 0.0066  * 0.7}}
-      />
+  const renderCardRatingStars = (rating) => {
+    const stars = [];
+    for (let i = 1; i <= rating; i++) {
+      stars.push(
+        <Ionicons
+          key={i}
+          name="star"
+          size={CARD_WIDTH * 0.066 * 0.7}
+          color={i <= rating ? "#F4B400" : COLORS.textSecondary}
+          style={{ marginRight: CARD_WIDTH * 0.0066 * 0.7 }}
+        />
+      );
+    }
+    return (
+      <View
+        style={{
+          flexDirection: "row",
+          marginBottom: -CARD_HEIGHT * 0.015 * 0.7,
+        }}
+      >
+        {stars}
+      </View>
     );
-  }
-  return (
-    <View
-      style={{
-        flexDirection: "row",
-        marginBottom: -CARD_HEIGHT * 0.015 * 0.7,
-      }}
-    >
-      {stars}
-    </View>
-  );
-};
+  };
 
   const renderFoodCardPreview = () => {
     return (
@@ -569,26 +581,26 @@ const foodCardStyles = {
   },
   placeholderText: {
     color: COLORS.textSecondary,
-    fontSize: CARD_WIDTH * 0.7 * 0.046, 
-    marginTop: CARD_HEIGHT * 0.7 * 0.015, 
+    fontSize: CARD_WIDTH * 0.7 * 0.046,
+    marginTop: CARD_HEIGHT * 0.7 * 0.015,
     fontFamily: "Konkhmer_Sleokchher-Regular",
   },
   retakeOverlay: {
     position: "absolute",
-    top: CARD_HEIGHT * 0.7 * 0.019, 
-    right: CARD_WIDTH * 0.7 * 0.033, 
+    top: CARD_HEIGHT * 0.7 * 0.019,
+    right: CARD_WIDTH * 0.7 * 0.033,
     backgroundColor: "rgba(0,0,0,0.7)",
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: CARD_WIDTH * 0.7 * 0.026, 
-    paddingVertical: CARD_HEIGHT * 0.7 * 0.012, 
-    borderRadius: CARD_WIDTH * 0.7 * 0.04, 
+    paddingHorizontal: CARD_WIDTH * 0.7 * 0.026,
+    paddingVertical: CARD_HEIGHT * 0.7 * 0.012,
+    borderRadius: CARD_WIDTH * 0.7 * 0.04,
     zIndex: 2,
   },
   retakeText: {
     color: "white",
-    fontSize: CARD_WIDTH * 0.7 * 0.033, 
-    marginLeft: CARD_WIDTH * 0.7 * 0.013, 
+    fontSize: CARD_WIDTH * 0.7 * 0.033,
+    marginLeft: CARD_WIDTH * 0.7 * 0.013,
     fontWeight: "500",
   },
   gradientOverlay: {
