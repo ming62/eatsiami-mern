@@ -137,19 +137,20 @@ export default function UpdateProfile() {
         style={styles.scrollViewStyle}
       >
         {/* header */}
-        <View style={styles.container}>
-          <View style={styles.header}>
-            <TouchableOpacity
-              onPress={() => router.back()}
-              style={styles.backButton}
-            >
-              <Ionicons name="arrow-back" size={24} color={COLORS.black} />
-            </TouchableOpacity>
-            <Text style={styles.title}>Edit Profile</Text>
-            <View style={styles.backButton} />
-          </View>
 
-          {/* Avatar */}
+        <View style={styles.header}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => router.back()}
+          >
+            <Ionicons name="arrow-back" size={24} color={COLORS.white} />
+          </TouchableOpacity>
+
+          <Text style={styles.headerTitle}>Edit Profile</Text>
+        </View>
+
+        {/* Avatar */}
+        <View style={styles.container}>
           <View style={styles.formGroup}>
             <TouchableOpacity style={styles.imagePicker} onPress={pickImage}>
               {profileImage ? (

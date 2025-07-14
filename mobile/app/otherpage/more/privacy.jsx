@@ -1,4 +1,10 @@
-import { View, Text, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -34,7 +40,10 @@ export default function Privacy() {
       setUser(data.user);
       Alert.alert("Success", "Privacy settings updated successfully!");
     } catch (error) {
-      Alert.alert("Error", error.message || "Failed to update privacy settings");
+      Alert.alert(
+        "Error",
+        error.message || "Failed to update privacy settings"
+      );
     } finally {
       setLoading(false);
     }
@@ -43,7 +52,7 @@ export default function Privacy() {
   const styles = {
     container: {
       flex: 1,
-      backgroundColor: "#2c2c2c",
+      backgroundColor: "#fff",
     },
     header: {
       alignItems: "center",
@@ -121,6 +130,9 @@ export default function Privacy() {
       borderWidth: 2,
       borderColor: COLORS.primary,
     },
+    contentContainer: {
+      margin: 25,
+    },
   };
 
   return (
@@ -137,9 +149,9 @@ export default function Privacy() {
       </View>
 
       {/* Content */}
-      <View style={styles.content}>
+      <View style={styles.contentContainer}>
         <Text style={styles.sectionTitle}>Who can see your foodcards?</Text>
-        
+
         <View style={styles.optionContainer}>
           <TouchableOpacity
             style={[
@@ -154,11 +166,16 @@ export default function Privacy() {
                 <Ionicons name="globe-outline" size={18} /> Public
               </Text>
               <Text style={styles.optionDescription}>
-                Anyone can see your foodcards on the main feed and visit your profile
+                Anyone can see your foodcards on the main feed and visit your
+                profile
               </Text>
             </View>
             {privacy === "public" && (
-              <Ionicons name="checkmark-circle" size={24} color={COLORS.primary} />
+              <Ionicons
+                name="checkmark-circle"
+                size={24}
+                color={COLORS.primary}
+              />
             )}
           </TouchableOpacity>
 
@@ -179,7 +196,11 @@ export default function Privacy() {
               </Text>
             </View>
             {privacy === "private" && (
-              <Ionicons name="checkmark-circle" size={24} color={COLORS.primary} />
+              <Ionicons
+                name="checkmark-circle"
+                size={24}
+                color={COLORS.primary}
+              />
             )}
           </TouchableOpacity>
         </View>

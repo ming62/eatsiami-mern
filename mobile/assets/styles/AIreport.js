@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
 
   sliderLabel: {
     fontSize: 20,
-    color: COLORS.text,
+    color: COLORS.textPrimary,
     margin: 15,
     fontFamily: "Konkhmer_Sleokchher-Regular",
   },
