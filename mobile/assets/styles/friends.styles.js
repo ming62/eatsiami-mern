@@ -84,19 +84,20 @@ const styles = StyleSheet.create({
   },
 
   username: {
-    fontSize: 18,
+    fontSize: 16,
     fontFamily: "Konkhmer_Sleokchher-Regular",
     fontWeight: "600",
-    color: "#333",
+    color: COLORS.textPrimary,
   },
 
   addButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 25,
-    borderRadius: 15,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 30,
     backgroundColor: COLORS.primary,
     alignItems: "center",
     justifyContent: "center",
+    margin: 3,
   },
 
   buttonText: {

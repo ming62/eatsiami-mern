@@ -54,15 +54,20 @@ const styles = StyleSheet.create({
     fontFamily: "Konkhmer_Sleokchher-Regular",
   },
   sliderContainer: {
-    marginVertical: 20,
+    marginTop: -10,
     alignItems: "stretch",
+    backgroundColor: COLORS.primary + 10,
+    margin: 20,
+    borderRadius: 15,
+    borderColor: COLORS.primary,
+    borderWidth: 2,
   },
 
   sliderLabel: {
     fontSize: 20,
     color: COLORS.text,
-    fontWeight: "500",
     margin: 15,
+    fontFamily: "Konkhmer_Sleokchher-Regular",
   },
 
   sliderValue: {
@@ -70,6 +75,7 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
     textAlign: "center",
     marginBottom: 0,
+    fontFamily: "Konkhmer_Sleokchher-Regular",
   },
 
   slider: {
@@ -103,6 +109,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 22,
     color: "#333",
+    fontFamily: "Konkhmer_Sleokchher-Regular",
   },
   disclaimer: {
     fontSize: 12,
@@ -111,6 +118,7 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
     textAlign: "center",
     paddingHorizontal: 16,
+    fontFamily: "Konkhmer_Sleokchher-Regular",
   },
   loadingContainer: {
     alignItems: "center",
@@ -120,8 +128,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: COLORS.primary,
     marginTop: 8,
-    fontStyle: "italic",
     textAlign: "center",
+    fontFamily: "Konkhmer_Sleokchher-Regular",
   },
 });
 

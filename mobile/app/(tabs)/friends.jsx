@@ -194,6 +194,7 @@ export default function Friends() {
             </View>
           )}
         </TouchableOpacity>
+
         <TouchableOpacity
           style={[
             styles.addButton,
@@ -202,9 +203,7 @@ export default function Friends() {
           onPress={() => handleSendJioRequest(item._id)}
           disabled={requestAlreadySent}
         >
-          <Text style={styles.buttonText}>
-            {requestAlreadySent ? "Requested" : "Jio"}
-          </Text>
+          <Ionicons name="restaurant-outline" size={20} color="#ffffff" />
         </TouchableOpacity>
         <View style={styles.buttons}>
           <TouchableOpacity
@@ -261,7 +260,7 @@ export default function Friends() {
       {/* Friends List Section */}
       <View style={styles.friendsSection}>
         {isLoading ? (
-          <ActivityIndicator size="large" color="#0000ff" />
+          <Loader />
         ) : friends.length > 0 ? (
           <FlatList
             data={friends}

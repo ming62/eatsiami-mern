@@ -202,17 +202,14 @@ export default function FriendDetail() {
   });
 
   return (
-    <SafeAreaView style={styles.container} edges={["bottom", "left", "right"]}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => router.back()}
         >
-          <Ionicons name="arrow-back" size={24} color={COLORS.white} />
+          <Ionicons name="arrow-back" size={24} color={COLORS.black} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>
-          {friendData?.username || "Friend!"}
-        </Text>
       </View>
 
       <ProfileHeader userData={friendData} showMore={false} />
@@ -224,7 +221,7 @@ export default function FriendDetail() {
         initialLayout={initialLayout}
         style={styles.tabView}
         renderTabBar={() => (
-          <View style={{ backgroundColor: "white", elevation: 20 }}>
+          <View style={{ backgroundColor: "white", elevation: 5 }}>
             <View style={{ flexDirection: "row" }}>
               <View
                 style={{
@@ -256,18 +253,16 @@ export default function FriendDetail() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#2c2c2c",
+    backgroundColor: COLORS.primary + 10,
+    flexDirection: "column",
+    paddingBottom: -24,
   },
 
   header: {
     alignItems: "center",
-    backgroundColor: COLORS.primary,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
     height: 70,
     justifyContent: "flex-end",
-    paddingTop: 10,
-    position: "relative",
+    marginTop: -20,
   },
 
   headerTitle: {
@@ -390,10 +385,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.white,
     height: "120%",
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
+    borderRadius: 15,
     elevation: 5,
-    marginTop: -15,
+    marginTop: -30,
   },
   privateAccountContainer: {
     flex: 1,

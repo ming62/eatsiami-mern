@@ -23,7 +23,7 @@ export default function ProfileHeader({ userData, showMore }) {
           <TouchableOpacity
             onPress={() => router.push("/otherpage/more/morePage")}
           >
-            <Ionicons name="menu-outline" size={30} color="#ffffff" />
+            <Ionicons name="menu-outline" size={30} color={COLORS.black} />
           </TouchableOpacity>
         </View>
       )}
@@ -44,9 +44,8 @@ const styles = StyleSheet.create({
   profileHeader: {
     flexDirection: "column",
     alignItems: "center",
-    paddingVertical: 20,
+    paddingVertical: 5,
     paddingHorizontal: 12,
-    backgroundColor: "#2c2c2c",
     position: "relative",
     marginBottom: 32,
   },
@@ -59,10 +58,9 @@ const styles = StyleSheet.create({
   },
   bio: {
     fontSize: 14,
-    color: "#ddd",
+    color: COLORS.textSecondary,
     textAlign: "center",
-    marginBottom: 4,
-    fontStyle: "italic",
+    fontFamily: "Konkhmer_Sleokchher-Regular",
   },
   menuIconContainer: {
     position: "absolute",
@@ -75,11 +73,16 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    borderWidth: 3,
-    borderColor: "black",
-    marginBottom: 12,
+    borderWidth: 2,
+    borderColor: COLORS.primary,
+
     alignSelf: "center",
     marginTop: 10,
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 2, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 15,
   },
 
   profileInfo: {
@@ -90,16 +93,8 @@ const styles = StyleSheet.create({
   username: {
     fontSize: 24,
     fontWeight: "600",
-    color: COLORS.white,
+    color: COLORS.grayDark,
     textAlign: "center",
     fontFamily: "Konkhmer_Sleokchher-Regular",
-    marginBottom: 8,
-  },
-
-  memberSince: {
-    fontSize: 14,
-    color: "#ccc",
-    textAlign: "center",
-    marginTop: -10,
   },
 });

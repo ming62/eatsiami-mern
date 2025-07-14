@@ -48,6 +48,14 @@ export default function MorePage() {
             <Ionicons name="analytics" size={24} color="#000" />
             <Text> AI report </Text>
           </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => router.push("/(auth)/forgotPassword")}
+            style={styles.card}
+          >
+            <Ionicons name="shield-half-outline" size={24} color="#000" />
+            <Text> Change Password </Text>
+          </TouchableOpacity>
         </View>
       </View>
 
