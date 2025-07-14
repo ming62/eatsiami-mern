@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
   },
 
   notificationName: {
-    fontSize: 18,
+    fontSize: 16,
     fontFamily: "Konkhmer_Sleokchher-Regular",
     fontWeight: "600",
     color: "#333",
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
 
   notificationText: {
     fontFamily: "Konkhmer_Sleokchher-Regular",
-    fontSize: 13,
+    fontSize: 12,
     color: COLORS.primary,
     marginTop: -10,
   },

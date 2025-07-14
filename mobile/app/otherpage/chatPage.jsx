@@ -36,15 +36,6 @@ export default function ChatPage() {
   console.log("user", user);
   const [channel, setChannel] = useState(null);
   const [loading, setLoading] = useState(true);
-  const theme = {
-    messageSimple: {
-      content: {
-        containerInner: {
-          backgroundColor: COLORS.primary + "30",
-        },
-      },
-    },
-  };
 
   const fetchStreamToken = async () => {
     try {
@@ -134,9 +125,21 @@ export default function ChatPage() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 35}
       >
-        <OverlayProvider value={{ style: theme }}>
+        <OverlayProvider>
           <Chat client={chatClient}>
-            <Channel channel={channel} MessageSimple={CustomMessageSimple}>
+            <Channel
+              channel={channel}
+              MessageSimple={CustomMessageSimple}
+              myMessageTheme={{
+                messageSimple: {
+                  content: {
+                    containerInner: {
+                      backgroundColor: COLORS.primary + 30,
+                    },
+                  },
+                },
+              }}
+            >
               <View style={styles.chatContainer}>
                 <View style={styles.customHeader}>
                   <TouchableOpacity
