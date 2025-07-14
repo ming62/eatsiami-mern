@@ -13,7 +13,8 @@ import {
   StyleSheet,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import styles from "../../assets/styles/create.styles";
 import COLORS from "../../constants/colors";
 import { Ionicons } from "@expo/vector-icons";
@@ -23,9 +24,11 @@ import { CameraView, useCameraPermissions } from "expo-camera";
 import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
 import { LinearGradient } from "expo-linear-gradient";
 
-const CARD_WIDTH = 303;
-const CARD_HEIGHT = 517;
-const CARD_ASPECT_RATIO = 9 / 16;
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
+
+const CARD_RATIO = 9 / 16;
+const CARD_HEIGHT = SCREEN_HEIGHT * 0.58;
+const CARD_WIDTH = CARD_HEIGHT * CARD_RATIO;
 
 export default function Create() {
   const [title, setTitle] = useState("");
@@ -39,6 +42,9 @@ export default function Create() {
 
   const [showCamera, setShowCamera] = useState(true);
   const [permission, requestPermission] = useCameraPermissions();
+
+  const [isCameraReady, setIsCameraReady] = useState(false);
+  const [isCapturing, setIsCapturing] = useState(false);
   const cameraRef = useRef(null);
 
   const tagOptions = [
@@ -52,11 +58,19 @@ export default function Create() {
 
   const router = useRouter();
 
-  useEffect(() => {
-    if (!permission?.granted) {
-      requestPermission();
-    }
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      if (!permission?.granted) {
+        requestPermission();
+      }
+      setShowCamera(true);
+      setImage(null);
+      setImageBase64(null);
+      return () => {
+        setShowCamera(false);
+      };
+    }, [permission])
+  );
 
   const handleBack = () => {
     if (showCamera) {
@@ -95,8 +109,10 @@ export default function Create() {
   };
 
   const takePicture = async () => {
-    if (cameraRef.current) {
+    if (cameraRef.current && isCameraReady && !isCapturing) {
       try {
+        setIsCapturing(true);
+
         const photo = await cameraRef.current.takePictureAsync({
           quality: 1.0,
           base64: false,
@@ -138,9 +154,12 @@ export default function Create() {
         setImage(processedImage.uri);
         setImageBase64(processedImage.base64);
         setShowCamera(false);
+        console.log("Image taken successfully:", processedImage.uri);
       } catch (error) {
         console.error("Error taking picture:", error);
         Alert.alert("Error", "Failed to take picture. Please try again.");
+      } finally {
+        setIsCapturing(false);
       }
     }
   };
@@ -282,7 +301,12 @@ export default function Create() {
   if (showCamera) {
     return (
       <View style={cameraStyles.container}>
-        <CameraView ref={cameraRef} style={cameraStyles.camera} facing="back" />
+        <CameraView
+          ref={cameraRef}
+          style={cameraStyles.camera}
+          facing="back"
+          onCameraReady={() => setIsCameraReady(true)}
+        />
 
         <TouchableOpacity onPress={handleBack} style={cameraStyles.backButton}>
           <Ionicons name="arrow-back" size={30} color="white" />
@@ -299,6 +323,7 @@ export default function Create() {
           <TouchableOpacity
             style={cameraStyles.captureButton}
             onPress={takePicture}
+            disabled={!isCameraReady || isCapturing}
           >
             <View style={cameraStyles.captureButtonInner} />
           </TouchableOpacity>
@@ -309,30 +334,24 @@ export default function Create() {
     );
   }
 
-const renderCardRatingStars = (rating) => {
-  const stars = [];
-  for (let i = 1; i <= rating; i++) {
-    stars.push(
-      <Ionicons
-        key={i}
-        name="star"
-        size={CARD_WIDTH * 0.066 * 0.7}
-        color={i <= rating ? "#F4B400" : COLORS.textSecondary}
-        style={{ marginRight: CARD_WIDTH * 0.0066  * 0.7}}
-      />
-    );
-  }
-  return (
-    <View
-      style={{
-        flexDirection: "row",
-        marginBottom: -CARD_HEIGHT * 0.015 * 0.7,
-      }}
-    >
-      {stars}
-    </View>
-  );
-};
+  const renderRatingStars = (rating) => {
+    const stars = [];
+    for (let i = 1; i <= rating; i++) {
+      stars.push(
+        <Ionicons
+          key={i}
+          name="star"
+          size={CARD_WIDTH * 0.7 * 0.066}
+          color={COLORS.starColor}
+          style={{
+            marginRight: CARD_WIDTH * 0.7 * 0.0066,
+            marginBottom: CARD_HEIGHT * 0.7 * 0.005,
+          }}
+        />
+      );
+    }
+    return <View style={{ flexDirection: "row" }}>{stars}</View>;
+  };
 
   const renderFoodCardPreview = () => {
     return (
@@ -351,16 +370,6 @@ const renderCardRatingStars = (rating) => {
             </View>
           )}
 
-          {image && (
-            <TouchableOpacity
-              style={foodCardStyles.retakeOverlay}
-              onPress={retakePhoto}
-            >
-              <Ionicons name="camera-outline" size={20} color="white" />
-              <Text style={foodCardStyles.retakeText}>Retake</Text>
-            </TouchableOpacity>
-          )}
-
           <LinearGradient
             colors={[
               "transparent",
@@ -373,36 +382,61 @@ const renderCardRatingStars = (rating) => {
             locations={[0, 0.5, 0.7, 0.8, 0.9, 1]}
             style={foodCardStyles.gradientOverlay}
           >
-            <View style={foodCardStyles.userInfo}>
-              <View style={foodCardStyles.avatarPlaceholder}>
-                <Ionicons
-                  name="person"
-                  size={30}
-                  color={COLORS.textSecondary}
-                />
-              </View>
-            </View>
-
-            <View style={foodCardStyles.foodcardDetails}>
-              <View style={foodCardStyles.ratingContainer}>
-                <Text style={foodCardStyles.foodcardTitle}>
+            <View style={foodCardStyles.detailsContainer}>
+              {/* Title and Rating Row */}
+              <View style={foodCardStyles.titleRatingRow}>
+                <Text
+                  style={foodCardStyles.foodcardTitle}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
                   {title || "Food Title"}
                 </Text>
-                {renderCardRatingStars(rating)}
-              </View>
-              <Text style={foodCardStyles.caption}>
-                {caption || "Add your caption here..."}
-              </Text>
-              <View style={foodCardStyles.tagContainer}>
-                <View style={foodCardStyles.locationContainer}>
-                  <Text style={foodCardStyles.location}>
-                    {location || "Location"}
-                  </Text>
+                <View style={foodCardStyles.ratingRight}>
+                  {renderRatingStars(rating)}
                 </View>
-                <View style={foodCardStyles.locationContainer}>
-                  <Text style={foodCardStyles.location}>
-                    {selectedTag || "Tag"}
+              </View>
+
+              {/* Caption, Location and User Profile Picture Row */}
+              <View style={foodCardStyles.bottomContentRow}>
+                <View style={foodCardStyles.textContent}>
+                  {/* Caption */}
+                  <Text
+                    style={foodCardStyles.caption}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    {caption || "Add your caption here..."}
                   </Text>
+
+                  {/* Location and Tag Row */}
+                  <View style={foodCardStyles.locationTagRow}>
+                    <Ionicons
+                      name="location"
+                      size={CARD_WIDTH * 0.7 * 0.053}
+                      color={COLORS.white}
+                      style={{
+                        marginRight: CARD_WIDTH * 0.7 * 0.01,
+                        marginBottom: CARD_HEIGHT * 0.7 * 0.005,
+                      }}
+                    />
+                    <Text style={foodCardStyles.location}>
+                      {location || "Location"}
+                    </Text>
+                    <Text style={foodCardStyles.tag}>
+                      {selectedTag || "Tag"}
+                    </Text>
+                  </View>
+                </View>
+
+                <View style={foodCardStyles.userInfo}>
+                  <View style={foodCardStyles.avatarPlaceholder}>
+                    <Ionicons
+                      name="person"
+                      size={CARD_WIDTH * 0.7 * 0.099}
+                      color={COLORS.textSecondary}
+                    />
+                  </View>
                 </View>
               </View>
             </View>
@@ -421,82 +455,56 @@ const renderCardRatingStars = (rating) => {
         contentContainerStyle={styles.scrollViewContainer}
         style={styles.scrollViewStyle}
       >
-        <View style={styles.container}>
-          <View style={styles.header}>
-            <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-              <Ionicons name="arrow-back" size={24} color={COLORS.black} />
-            </TouchableOpacity>
-            <Text style={styles.title}>Create</Text>
-          </View>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={handleBack} style={styles.backButton}>
+            <Ionicons name="arrow-back" size={24} color={COLORS.white} />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Create</Text>
+          <TouchableOpacity
+            style={styles.retakeHeaderButton}
+            onPress={retakePhoto}
+          >
+            <Ionicons name="camera-outline" size={24} color={COLORS.white} />
+          </TouchableOpacity>
+        </View>
 
+        <View style={styles.container}>
           <View style={styles.form}>
             <View style={styles.formGroup}>{renderFoodCardPreview()}</View>
 
             {/* Title */}
-            <View style={styles.formGroup}>
-              <Text style={styles.label}>Title:</Text>
-              <View style={styles.inputContainer}>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Enter title"
-                  value={title}
-                  onChangeText={setTitle}
-                  placeholderTextColor={COLORS.placeholderText}
-                />
-              </View>
-            </View>
-
-            {/* Tag */}
-            <View style={styles.formGroup}>
-              <Text style={styles.label}>Tag:</Text>
-              <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-                {tagOptions.map((tag) => (
-                  <TouchableOpacity
-                    key={tag}
-                    style={[
-                      styles.tagButton,
-                      {
-                        backgroundColor:
-                          selectedTag === tag
-                            ? COLORS.primary
-                            : COLORS.grayLight,
-                      },
-                    ]}
-                    onPress={() => setSelectedTag(tag)}
-                  >
-                    <Text
-                      style={[
-                        styles.tagInput,
-                        { color: selectedTag === tag ? "white" : "black" },
-                      ]}
-                    >
-                      {tag}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
+            <View style={inputStyles.inputContainer}>
+              <Text style={inputStyles.inputLabel}>title</Text>
+              <TextInput
+                style={inputStyles.textInput}
+                placeholder=""
+                value={title}
+                onChangeText={setTitle}
+                placeholderTextColor={COLORS.placeholderText}
+                autoCapitalize="sentences"
+              />
             </View>
 
             {/* Location */}
-            <View style={styles.formGroup}>
-              <Text style={styles.label}>Location:</Text>
-              <View style={styles.inputContainer}>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Enter location here"
-                  value={location}
-                  onChangeText={setLocation}
-                  placeholderTextColor={COLORS.placeholderText}
-                />
-              </View>
+            <View style={inputStyles.inputContainer}>
+              <Text style={inputStyles.inputLabel}>location</Text>
+              <TextInput
+                style={inputStyles.textInput}
+                placeholder=""
+                value={location}
+                onChangeText={setLocation}
+                placeholderTextColor={COLORS.placeholderText}
+                autoCapitalize="sentences"
+                maxLength={8}
+              />
             </View>
 
             {/* Caption */}
-            <View style={styles.formGroup}>
-              <Text style={styles.label}>Caption:</Text>
+            <View style={inputStyles.inputContainer}>
+              <Text style={inputStyles.inputLabel}>caption</Text>
               <TextInput
-                style={styles.textArea}
-                placeholder="Write your caption here..."
+                style={inputStyles.textArea}
+                placeholder=""
                 value={caption}
                 onChangeText={setCaption}
                 placeholderTextColor={COLORS.placeholderText}
@@ -504,10 +512,41 @@ const renderCardRatingStars = (rating) => {
               />
             </View>
 
-            {/* Rating */}
-            <View style={styles.formGroup}>
-              <Text style={styles.label}>Rating:</Text>
-              {renderRatingPicker()}
+            <View style={inputStyles.inputContainer}>
+              <View style={inputStyles.tagInputRow}>
+                {tagOptions.map((tag) => (
+                  <TouchableOpacity
+                    key={tag}
+                    style={[
+                      inputStyles.tagButton,
+                      {
+                        backgroundColor:
+                          selectedTag === tag
+                            ? COLORS.primary
+                            : COLORS.searchBarBackground,
+                      },
+                    ]}
+                    onPress={() => setSelectedTag(tag)}
+                  >
+                    <Text
+                      style={[
+                        inputStyles.tagText,
+                        {
+                          color:
+                            selectedTag === tag
+                              ? "white"
+                              : COLORS.searchBarLabel,
+                        },
+                      ]}
+                    >
+                      {tag}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+              <View style={inputStyles.ratingInputRow} paddingTop={24}>
+                {renderRatingPicker()}
+              </View>
             </View>
 
             {/* Preview Button */}
@@ -530,21 +569,81 @@ const renderCardRatingStars = (rating) => {
     </KeyboardAvoidingView>
   );
 }
+const inputStyles = StyleSheet.create({
+  inputContainer: {
+    marginBottom: 24,
+    position: "relative",
+  },
+  inputLabel: {
+    position: "absolute",
+    top: 4,
+    left: 21,
+    fontSize: 15,
+    color: COLORS.searchBarLabel,
+    fontWeight: "400",
+    zIndex: 1,
+    fontFamily: "Konkhmer_Sleokchher-Regular",
+  },
+  textInput: {
+    height: 67,
+    backgroundColor: COLORS.searchBarBackground,
+    borderRadius: 18,
+    paddingHorizontal: 21,
+    paddingTop: 24,
+    paddingBottom: 8,
+    fontSize: 16,
+    color: COLORS.searchBarText,
+    fontFamily: "Konkhmer_Sleokchher-Regular",
+    fontWeight: "400",
+  },
+  textArea: {
+    minHeight: 90,
+    backgroundColor: COLORS.searchBarBackground,
+    borderRadius: 18,
+    paddingHorizontal: 21,
+    paddingTop: 24,
+    paddingBottom: 8,
+    fontSize: 16,
+    color: COLORS.searchBarText,
+    fontFamily: "Konkhmer_Sleokchher-Regular",
+    fontWeight: "400",
+    textAlignVertical: "top",
+  },
 
-const foodCardStyles = {
+  tagInputRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    backgroundColor: COLORS.white,
+    borderRadius: 18,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    paddingTop: 12,
+  },
+  tagButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+    marginRight: 8,
+    marginBottom: 8,
+  },
+  tagText: {
+    fontFamily: "Konkhmer_Sleokchher-Regular",
+    fontSize: 14,
+    fontWeight: "400",
+    color: COLORS.searchBarText,
+  },
+});
+
+const foodCardStyles = StyleSheet.create({
   cardContainer: {
     height: CARD_HEIGHT * 0.7,
     width: CARD_WIDTH * 0.7,
     backgroundColor: COLORS.cardBackground,
     borderRadius: CARD_WIDTH * 0.7 * 0.053,
-    aspectRatio: CARD_ASPECT_RATIO,
     overflow: "hidden",
     alignSelf: "center",
     shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: CARD_HEIGHT * 0.7 * 0.015,
-    },
+    shadowOffset: { width: 0, height: CARD_HEIGHT * 0.7 * 0.015 },
     shadowOpacity: 0.25,
     shadowRadius: CARD_WIDTH * 0.7 * 0.04,
     elevation: CARD_WIDTH * 0.7 * 0.066,
@@ -559,6 +658,104 @@ const foodCardStyles = {
     width: "100%",
     height: "100%",
     borderRadius: CARD_WIDTH * 0.7 * 0.053,
+    contentFit: "cover",
+  },
+  gradientOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "flex-end",
+    borderRadius: CARD_WIDTH * 0.7 * 0.053,
+  },
+  detailsContainer: {
+    width: "100%",
+    paddingHorizontal: CARD_WIDTH * 0.7 * 0.053,
+    paddingBottom: CARD_HEIGHT * 0.7 * 0.031,
+    zIndex: 1,
+  },
+  titleRatingRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  foodcardTitle: {
+    fontSize: CARD_WIDTH * 0.7 * 0.08,
+    fontWeight: "600",
+    color: COLORS.white,
+    fontFamily: "Konkhmer_Sleokchher-Regular",
+    flex: 1,
+    marginRight: CARD_WIDTH * 0.7 * 0.026,
+  },
+  ratingRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-end",
+  },
+  bottomContentRow: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    justifyContent: "space-between",
+  },
+  textContent: {
+    flex: 1,
+    marginRight: CARD_WIDTH * 0.7 * 0.04,
+  },
+  caption: {
+    fontFamily: "Konkhmer_Sleokchher-Regular",
+    fontSize: CARD_WIDTH * 0.7 * 0.038,
+    fontWeight: "400",
+    opacity: 0.7,
+    color: COLORS.white,
+    marginBottom: CARD_HEIGHT * 0.7 * 0.012,
+    lineHeight: CARD_WIDTH * 0.7 * 0.055,
+    top: -CARD_HEIGHT * 0.7 * 0.02,
+  },
+  locationTagRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    bottom: -CARD_HEIGHT * 0.7 * 0.012,
+  },
+  location: {
+    fontFamily: "Konkhmer_Sleokchher-Regular",
+    fontSize: CARD_WIDTH * 0.7 * 0.053,
+    color: COLORS.white,
+    marginRight: CARD_WIDTH * 0.7 * 0.02,
+  },
+  tag: {
+    fontFamily: "Konkhmer_Sleokchher-Regular",
+    fontSize: CARD_WIDTH * 0.7 * 0.053,
+    color: COLORS.white,
+    opacity: 0.7,
+    marginLeft: CARD_WIDTH * 0.7 * 0.02,
+  },
+  userInfo: {
+    alignItems: "center",
+    justifyContent: "flex-end",
+  },
+  avatarPlaceholder: {
+    width: CARD_WIDTH * 0.7 * 0.198,
+    height: CARD_WIDTH * 0.7 * 0.198,
+    borderRadius: CARD_WIDTH * 0.7 * 0.099,
+    backgroundColor: COLORS.grayLight,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  retakeOverlay: {
+    position: "absolute",
+    top: CARD_HEIGHT * 0.7 * 0.019,
+    right: CARD_WIDTH * 0.7 * 0.033,
+    backgroundColor: "rgba(0,0,0,0.7)",
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: CARD_WIDTH * 0.7 * 0.026,
+    paddingVertical: CARD_HEIGHT * 0.7 * 0.012,
+    borderRadius: CARD_WIDTH * 0.7 * 0.04,
+    zIndex: 2,
+  },
+  retakeText: {
+    color: "white",
+    fontSize: CARD_WIDTH * 0.7 * 0.033,
+    marginLeft: CARD_WIDTH * 0.7 * 0.013,
+    fontWeight: "500",
   },
   placeholderContainer: {
     width: "100%",
@@ -569,98 +766,11 @@ const foodCardStyles = {
   },
   placeholderText: {
     color: COLORS.textSecondary,
-    fontSize: CARD_WIDTH * 0.7 * 0.046, 
-    marginTop: CARD_HEIGHT * 0.7 * 0.015, 
-    fontFamily: "Konkhmer_Sleokchher-Regular",
-  },
-  retakeOverlay: {
-    position: "absolute",
-    top: CARD_HEIGHT * 0.7 * 0.019, 
-    right: CARD_WIDTH * 0.7 * 0.033, 
-    backgroundColor: "rgba(0,0,0,0.7)",
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: CARD_WIDTH * 0.7 * 0.026, 
-    paddingVertical: CARD_HEIGHT * 0.7 * 0.012, 
-    borderRadius: CARD_WIDTH * 0.7 * 0.04, 
-    zIndex: 2,
-  },
-  retakeText: {
-    color: "white",
-    fontSize: CARD_WIDTH * 0.7 * 0.033, 
-    marginLeft: CARD_WIDTH * 0.7 * 0.013, 
-    fontWeight: "500",
-  },
-  gradientOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    justifyContent: "flex-end",
-    borderRadius: CARD_WIDTH * 0.7 * 0.053,
-  },
-  userInfo: {
-    position: "absolute",
-    alignItems: "center",
-    bottom: CARD_HEIGHT * 0.7 * 0.031,
-    right: CARD_WIDTH * 0.7 * 0.053,
-  },
-  avatarPlaceholder: {
-    width: CARD_WIDTH * 0.7 * 0.198,
-    height: CARD_WIDTH * 0.7 * 0.198,
-    borderRadius: CARD_WIDTH * 0.7 * 0.099,
-    backgroundColor: COLORS.grayLight,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  foodcardDetails: {
-    paddingHorizontal: CARD_WIDTH * 0.7 * 0.053,
-    paddingBottom: CARD_HEIGHT * 0.7 * 0.031,
-    marginTop: 0,
-    zIndex: 1,
-  },
-  foodcardTitle: {
-    fontSize: CARD_WIDTH * 0.7 * 0.099,
-    fontWeight: "600",
-    color: COLORS.white,
-    fontFamily: "Konkhmer_Sleokchher-Regular",
-    marginRight: CARD_WIDTH * 0.7 * 0.026,
-    marginVertical: CARD_HEIGHT * 0.7 * -0.006,
-  },
-  ratingContainer: {
-    flexDirection: "row",
-    marginVertical: CARD_HEIGHT * 0.7 * 0.015,
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: CARD_HEIGHT * 0.7 * 0.023,
-  },
-  caption: {
-    fontFamily: "Konkhmer_Sleokchher-Regular",
     fontSize: CARD_WIDTH * 0.7 * 0.046,
-    color: COLORS.white,
-    marginTop: CARD_HEIGHT * 0.7 * 0.008,
-    marginBottom: CARD_HEIGHT * 0.7 * 0.015,
-    lineHeight: CARD_WIDTH * 0.7 * 0.066,
-    top: -(CARD_HEIGHT * 0.7) * 0.023,
-  },
-  tagContainer: {
-    flexDirection: "row",
-  },
-  locationContainer: {
-    backgroundColor: COLORS.primary,
-    borderRadius: CARD_WIDTH * 0.7 * 0.04,
-    paddingHorizontal: CARD_WIDTH * 0.7 * 0.026,
-    paddingVertical: CARD_HEIGHT * 0.7 * 0.008,
-    alignSelf: "flex-start",
-    alignItems: "center",
-    justifyContent: "center",
-    marginEnd: CARD_WIDTH * 0.7 * 0.016,
-  },
-  location: {
+    marginTop: CARD_HEIGHT * 0.7 * 0.015,
     fontFamily: "Konkhmer_Sleokchher-Regular",
-    fontSize: CARD_WIDTH * 0.7 * 0.04,
-    color: COLORS.white,
-    textAlign: "center",
-    textAlignVertical: "center",
   },
-};
+});
 
 const cameraStyles = {
   container: {
@@ -673,7 +783,7 @@ const cameraStyles = {
   backButton: {
     position: "absolute",
     top: 60,
-    left: 20,
+    left: 40,
     padding: 12,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
     borderRadius: 25,
@@ -695,7 +805,7 @@ const cameraStyles = {
   galleryButton: {
     padding: 15,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
-    borderRadius: 50,
+    borderRadius: 25,
     alignItems: "center",
     justifyContent: "center",
   },

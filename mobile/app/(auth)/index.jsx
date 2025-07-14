@@ -1,7 +1,6 @@
 import {
   View,
   Text,
-  Image,
   TextInput,
   TouchableOpacity,
   ActivityIndicator,
@@ -13,7 +12,6 @@ import {
   StatusBar,
   SafeAreaView,
 } from "react-native";
-//import styles from "../../assets/styles/login.styles";
 import { useState, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import COLORS from "../../constants/colors";
@@ -34,6 +32,10 @@ export default function LoginContainer() {
 
   SplashScreen.preventAutoHideAsync();
 
+  const [fontsLoaded] = useFonts({
+    "Konkhmer_Sleokchher-Regular": require("../../assets/fonts/KonkhmerSleokchher-Regular.ttf"),
+  });
+
   useEffect(() => {
     if (fontsLoaded) {
       SplashScreen.hideAsync();
@@ -52,10 +54,6 @@ export default function LoginContainer() {
     return null;
   }
 
-  const [fontsLoaded] = useFonts({
-    "Konkhmer_Sleokchher-Regular": require("../../assets/fonts/KonkhmerSleokchher-Regular.ttf"),
-  });
-
   if (!fontsLoaded) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -65,7 +63,7 @@ export default function LoginContainer() {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#ff5f00" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.primary }}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -75,7 +73,7 @@ export default function LoginContainer() {
 
           {/* Gradient background */}
           <LinearGradient
-            colors={["#ff5f00", "#ff8c00", "#ffb300"]}
+            colors={[COLORS.primary, "#ff8c00", "#ffb300"]}
             start={{ x: 0, y: 0.25 }}
             end={{ x: 0.8, y: 0 }}
             style={styles.gradientBackground}
@@ -97,7 +95,7 @@ export default function LoginContainer() {
                 <TextInput
                   style={styles.textInput}
                   placeholder=""
-                  placeholderTextColor="#8e8e8e"
+                  placeholderTextColor={COLORS.searchBarLabel}
                   value={email}
                   onChangeText={setEmail}
                   keyboardType="email-address"
@@ -112,7 +110,7 @@ export default function LoginContainer() {
                   <TextInput
                     style={[styles.textInput, styles.passwordInput]}
                     placeholder=""
-                    placeholderTextColor="#8e8e8e"
+                    placeholderTextColor={COLORS.searchBarLabel}
                     value={password}
                     onChangeText={setPassword}
                     secureTextEntry={!showPassword}
@@ -125,10 +123,17 @@ export default function LoginContainer() {
                     <Ionicons
                       name={showPassword ? "eye-outline" : "eye-off-outline"}
                       size={23}
-                      color="#8e8e8e"
+                      color={COLORS.searchBarLabel}
                     />
                   </TouchableOpacity>
                 </View>
+                <Link href="/forgotPassword" asChild>
+                  <TouchableOpacity style={styles.forgotPassContainer}>
+                    <Text style={styles.forgotPassText}>
+                      forgot your password
+                    </Text>
+                  </TouchableOpacity>
+                </Link>
               </View>
 
               {/* Login button */}
@@ -139,7 +144,7 @@ export default function LoginContainer() {
                 disabled={isLoading}
               >
                 <LinearGradient
-                  colors={["#ff5f00", "#ff8c00", "#ffb300"]}
+                  colors={[COLORS.primary, "#ff8c00", "#ffb300"]}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
                   style={styles.loginButtonGradient}
@@ -157,16 +162,6 @@ export default function LoginContainer() {
                 </Text>
               </TouchableOpacity>
             </Link>
-
-            {/* Create account link */}
-            <Link href="/forgotPassword" asChild>
-              <TouchableOpacity style={styles.createAccountContainer}>
-                <Text style={styles.createAccountText}>
-                    forgot your password
-                </Text>
-              </TouchableOpacity>
-            </Link>
-
           </View>
         </View>
       </KeyboardAvoidingView>
@@ -177,7 +172,7 @@ export default function LoginContainer() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#ffffff",
+    backgroundColor: COLORS.white,
     width: screenWidth,
     height: screenHeight,
   },
@@ -185,14 +180,13 @@ const styles = StyleSheet.create({
     flex: 1,
     width: "100%",
   },
-
   loginCard: {
     position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
     height: 503,
-    backgroundColor: "#ffffff",
+    backgroundColor: COLORS.white,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingHorizontal: 0,
@@ -211,13 +205,13 @@ const styles = StyleSheet.create({
   },
   welcomeText: {
     fontSize: 34,
-    color: "#2c2c2c",
+    color: COLORS.searchBarText,
     fontWeight: "400",
     fontFamily: "Konkhmer_Sleokchher-Regular",
   },
   subtitleText: {
     fontSize: 15,
-    color: "#8e8e8e",
+    color: COLORS.searchBarLabel,
     fontWeight: "400",
     marginTop: -20,
     fontFamily: "Konkhmer_Sleokchher-Regular",
@@ -235,27 +229,27 @@ const styles = StyleSheet.create({
     top: 4,
     left: 21,
     fontSize: 15,
-    color: "#8e8e8e",
+    color: COLORS.searchBarLabel,
     fontWeight: "400",
     zIndex: 1,
     fontFamily: "Konkhmer_Sleokchher-Regular",
   },
   textInput: {
     height: 67,
-    backgroundColor: "#d9d9d9",
+    backgroundColor: COLORS.searchBarBackground,
     borderRadius: 18,
     paddingHorizontal: 21,
     paddingTop: 24,
     paddingBottom: 8,
     fontSize: 16,
-    color: "#2c2c2c",
+    color: COLORS.searchBarText,
     fontFamily: "Konkhmer_Sleokchher-Regular",
+    fontWeight: "400",
   },
   loginButton: {
     width: "100%",
     height: 67,
     borderRadius: 18,
-    marginTop: 8,
   },
   loginButtonGradient: {
     flex: 1,
@@ -264,7 +258,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   loginButtonText: {
-    color: "#ffffff",
+    color: COLORS.white,
     fontSize: 20,
     fontWeight: "400",
     fontFamily: "Konkhmer_Sleokchher-Regular",
@@ -275,19 +269,27 @@ const styles = StyleSheet.create({
   },
   createAccountText: {
     fontSize: 15,
-    color: "#f27609",
+    color: COLORS.lightOrangeText,
     fontWeight: "400",
     fontFamily: "Konkhmer_Sleokchher-Regular",
   },
-
+  forgotPassContainer: {
+    alignItems: "flex-start",
+    paddingLeft: 20,
+    marginTop: 5,
+  },
+  forgotPassText: {
+    fontSize: 13,
+    color: COLORS.searchBarLabel,
+    fontWeight: "400",
+    fontFamily: "Konkhmer_Sleokchher-Regular",
+  },
   passwordWrapper: {
     position: "relative",
   },
-
   passwordInput: {
     paddingRight: 40,
   },
-
   eyeIcon: {
     position: "absolute",
     right: 15,

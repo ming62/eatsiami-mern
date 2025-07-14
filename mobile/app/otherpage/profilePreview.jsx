@@ -113,10 +113,10 @@ export default function ProfilePreview() {
     <SafeAreaProvider style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Complete Your Profile</Text>
-        <Text style={styles.headerSubtitle}>Welcome, {user?.username}!</Text>
       </View>
 
       <View style={styles.centerContent}>
+        <Text style={styles.headerSubtitle}>{user?.username}</Text>
         <TouchableOpacity onPress={pickImage} style={styles.imagePicker}>
           {profileImage ? (
             <Image source={{ uri: profileImage }} style={styles.profileImage} />
@@ -178,17 +178,20 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 28,
     fontWeight: "bold",
-    color: "#2c2c2c",
+    color: COLORS.lightBlackText,
     marginBottom: 10,
     textAlign: "center",
+    fontWeight: "400",
     fontFamily: "Konkhmer_Sleokchher-Regular",
   },
   headerSubtitle: {
-    fontSize: 18,
-    color: "#2c2c2c",
+    fontSize: 24,
+    color: COLORS.lightOrangeText,
     textAlign: "center",
-    marginBottom: 8,
-    fontWeight: "600",
+    marginBottom: 4,
+    fontWeight: "400",
+    fontFamily: "Konkhmer_Sleokchher-Regular",
+
   },
   centerContent: {
     flex: 1,
@@ -263,7 +266,7 @@ const styles = StyleSheet.create({
   },
   skipButtonText: {
     fontSize: 15,
-    color: "#f27609",
+    color: COLORS.lightOrangeText,
     fontWeight: "400",
     fontFamily: "Konkhmer_Sleokchher-Regular",
   },
