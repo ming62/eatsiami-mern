@@ -19,29 +19,6 @@ export async function getUserById(req, res) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    if (user.privacy === "private" && userId !== currentUserId) {
-      const currentUser = await User.findById(currentUserId);
-      if (!currentUser.friends.includes(userId)) {
-        return res.status(403).json({
-          message: "This user's profile is private and only visible to friends",
-        });
-      }
-    }
-
-    const isFriend = user.friends.some(
-      (f) => f._id.toString() === currentUserId || userId === currentUserId
-    );
-
-    if (!isFriend) {
-      return res.status(200).json({
-        _id: user._id,
-        username: user.username,
-        profileImage: user.profileImage,
-        bio: user.bio,
-        createdAt: user.createdAt,
-      });
-    }
-
     res.status(200).json({
       _id: user._id,
       username: user.username,
