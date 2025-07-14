@@ -17,15 +17,15 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: "#2c2c2c",
+          backgroundColor: COLORS.white,
           height: 75 + insets.bottom,
           paddingBottom: insets.bottom,
-          borderTopLeftRadius: 20,
-          borderTopRightRadius: 20,
           paddingTop: 5,
           paddingLeft: 10,
           paddingRight: 10,
-          borderTopWidth: 0,
+          borderTopWidth: 5,
+          elevation: 24,
+          borderColor: "transparent",
           borderRadiusColor: "transparent",
         },
         tabBarLabelStyle: {
@@ -55,7 +55,7 @@ export default function TabLayout() {
           tabBarIcon: ({ focused }) => (
             <View
               style={{
-                marginTop: 30,
+                marginTop: 10,
                 width: 60,
                 height: 60,
                 borderRadius: 16,
@@ -89,7 +89,7 @@ export default function TabLayout() {
             return (
               <View
                 style={{
-                  marginTop: 30,
+                  marginTop: 10,
                   width: 60,
                   height: 60,
                   borderRadius: 16,
@@ -147,7 +147,7 @@ export default function TabLayout() {
           tabBarIcon: ({ focused }) => (
             <View
               style={{
-                marginTop: 30,
+                marginTop: 10,
                 width: 60,
                 height: 60,
                 borderRadius: 16,
@@ -181,7 +181,7 @@ export default function TabLayout() {
             return (
               <View
                 style={{
-                  marginTop: 30,
+                  marginTop: 10,
                   width: 60,
                   height: 60,
                   borderRadius: 16,
@@ -238,7 +238,7 @@ export default function TabLayout() {
           tabBarIcon: ({ focused }) => (
             <View
               style={{
-                marginTop: 30,
+                marginTop: 10,
                 width: 60,
                 height: 60,
                 borderRadius: 16,

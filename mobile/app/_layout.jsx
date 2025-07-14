@@ -35,10 +35,10 @@ export default function RootLayout() {
   const [fontsLoaded] = useFonts({
     "Konkhmer_Sleokchher-Regular": require("../assets/fonts/KonkhmerSleokchher-Regular.ttf"),
     "YoungSerif-Regular": require("../assets/fonts/YoungSerif-Regular.ttf"),
-    Bagnard: require("../assets/fonts/Bagnard.otf"),
-    Transicty: require("../assets/fonts/Transcity DEMO.otf"),
-    Manbow: require("../assets/fonts/Manbow Lines.otf"),
-    Milkyway: require("../assets/fonts/Milkyway DEMO.ttf"),
+    "Figtree": require("../assets/fonts/Figtree-VariableFont_wght.ttf"),
+    "Figtree-Italic": require("../assets/fonts/Figtree-Italic-VariableFont_wght.ttf"),
+    "Transicty": require("../assets/fonts/Transcity DEMO.otf"),
+
   });
 
   useEffect(() => {

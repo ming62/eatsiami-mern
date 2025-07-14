@@ -112,7 +112,7 @@ const FriendsWindow = ({ visible, onClose, foodcardId }) => {
       {sharing === item._id ? (
         <ActivityIndicator size="small" color={COLORS.primary} />
       ) : (
-        <Ionicons name="share-outline" size={24} color={COLORS.primary} />
+        <Ionicons name="share-social" size={24} color={COLORS.primary} />
       )}
     </TouchableOpacity>
   );
@@ -129,7 +129,7 @@ const FriendsWindow = ({ visible, onClose, foodcardId }) => {
           <View style={styles.header}>
             <Text style={styles.headerTitle}>Share Foodcard</Text>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <Ionicons name="close" size={24} color={COLORS.textPrimary} />
+              <Ionicons name="close" size={24} color={COLORS.lightBlackText} />
             </TouchableOpacity>
           </View>
 
@@ -190,8 +190,9 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 20,
-    fontWeight: "bold",
-    color: COLORS.textPrimary,
+    fontWeight: "400",
+    fontFamily: "Konkhmer_Sleokchher-Regular",
+    color: COLORS.primary,
   },
   closeButton: {
     padding: 4,
@@ -222,8 +223,8 @@ const styles = StyleSheet.create({
   },
   friendName: {
     fontSize: 16,
-    fontWeight: "600",
-    color: COLORS.textPrimary,
+    color: COLORS.lightBlackText,
+    fontFamily: "Konkhmer_Sleokchher-Regular",
     marginBottom: 2,
   },
   friendStatus: {
@@ -250,13 +251,13 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 18,
     fontWeight: "600",
-    color: COLORS.textPrimary,
+    color: COLORS.primary,
     marginTop: 16,
     marginBottom: 8,
   },
   emptySubtext: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.lightBlackText,
     textAlign: "center",
   },
 });

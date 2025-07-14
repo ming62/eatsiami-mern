@@ -32,6 +32,16 @@ const COLORS = {
   border: "#e2d6c1",
   white: "#ffffff",
   black: "#000000",
+
+  searchBarBackground: "#d9d9d9",
+  searchBarLabel: "#8e8e8e",
+  searchBarText: "#2c2c2c",
+
+  lightOrangeText: "#f27609",
+  lightBlackText: "#2c2c2c",
+
+  starColor: "#FFB400",
+
 };
 
 

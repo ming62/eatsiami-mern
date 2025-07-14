@@ -137,7 +137,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const FETCH_THRESHOLD = 3;
+    const FETCH_THRESHOLD = 5;
     const remainingCards = foodcards.length - currentIndex;
 
     if (
@@ -285,7 +285,8 @@ export default function Home() {
           onChangeText={(query) => {
             handleSearch(query);
           }}
-          placeholderTextColor={COLORS.textSecondary}
+          placeholderTextColor={COLORS.searchBarLabel}
+          placeholderTextWeight="400"
           maxLength={50}
           multiline={false}
           autoCapitalize="none"

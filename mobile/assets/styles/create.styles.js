@@ -2,6 +2,10 @@ import { StyleSheet } from "react-native";
 import COLORS from "../../constants/colors";
 
 const styles = StyleSheet.create({
+  headerContainer: {
+    flexGrow: 1,
+    backgroundColor: COLORS.primary,
+  },
   container: {
     flexGrow: 1,
     backgroundColor: COLORS.background,
@@ -27,22 +31,31 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: COLORS.primary,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+    height: 70,
+    paddingTop: 10,
+    paddingHorizontal: 10,
     marginBottom: 20,
-    marginTop: -20,
     position: "relative",
   },
   backButton: {
-    width: 32,
-    zIndex: 2,
-    padding: 8,
+    width: 40,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "transparent",
+    marginLeft: 0,
   },
-  title: {
-    flex: 1,
-    textAlign: "center",
-    fontSize: 24,
-    fontWeight: "bold",
-    color: COLORS.black,
+  headerTitle: {
+    fontSize: 30,
+    color: COLORS.white,
     fontFamily: "Konkhmer_Sleokchher-Regular",
+    textAlign: "center",
+    justifyContent: "center",
+    fontWeight: 1000,
   },
   subtitle: {
     fontSize: 14,
@@ -121,7 +134,7 @@ const styles = StyleSheet.create({
     borderWidth: 0,
     borderColor: COLORS.border,
     paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingVertical: 0,
   },
   starButton: {
     padding: 6,
@@ -169,7 +182,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: COLORS.white,
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: "400",
     fontFamily: "Konkhmer_Sleokchher-Regular",
   },
   buttonIcon: {
@@ -182,27 +195,13 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: "hidden",
   },
-  retakeButton: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-    backgroundColor: "rgba(0,0,0,0.7)",
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 20,
-  },
-  retakeButtonText: {
-    color: "white",
-    fontSize: 12,
-    marginLeft: 5,
-    fontWeight: "bold",
-  },
   retakeHeaderButton: {
-    padding: 10,
-    alignItems: "center",
+    width: 40,
+    height: 40,
     justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "transparent",
+    marginRight: 0,
   },
 });
 
