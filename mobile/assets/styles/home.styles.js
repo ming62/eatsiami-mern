@@ -63,9 +63,9 @@ const styles = StyleSheet.create({
   },
   searchText: {
     marginLeft: 10,
-    marginTop: 2,
-    color: "#2c2c2c",
+    color: COLORS.searchBarText,
     fontSize: 15,
+    fontWeight: "400",
     fontFamily: "Konkhmer_Sleokchher-Regular",
   },
   bookCard: {

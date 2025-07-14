@@ -8,14 +8,13 @@ import {
   ActivityIndicator,
   StyleSheet,
   TextInput,
+  KeyboardAvoidingView,
 } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
 import { useAuthStore } from "../../store/authStore";
-import { Keyboard, TouchableWithoutFeedback } from "react-native";
 import { API_URL } from "../../constants/api";
 import COLORS from "../../constants/colors";
 import { formatPublishDate } from "../../lib/utils";
@@ -23,7 +22,6 @@ import FriendsWindow from "../../components/FriendsWindow";
 
 const CARD_WIDTH = 303;
 const CARD_HEIGHT = 517;
-const CARD_ASPECT_RATIO = 9 / 16;
 
 export default function CardDetail() {
   const router = useRouter();
@@ -153,7 +151,6 @@ export default function CardDetail() {
 
       setFoodcard(data);
       setSaved(data.isSaved || false);
-
     } catch (error) {
       console.error("Error fetching card details:", error);
       Alert.alert("Error", error.message || "Failed to fetch card details");
@@ -240,10 +237,10 @@ export default function CardDetail() {
           key={i}
           name={i <= rating ? "star" : "star-outline"}
           size={26}
-          color={i <= rating ? "#FFD700" : "rgba(255, 255, 255, 0.3)"}
+          color={i <= rating ? COLORS.starColor : "rgba(0, 0, 0, 0.1)"}
           style={{
             marginRight: 3,
-            textShadowColor: "rgba(0, 0, 0, 0.3)",
+            textShadowColor: "rgba(0, 0, 0, 0.1)",
             textShadowOffset: { width: 0, height: 1 },
             textShadowRadius: 2,
           }}
@@ -299,7 +296,7 @@ export default function CardDetail() {
                 style={styles.replyAvatar}
               />
               <Text style={styles.replyUsername}>{reply.userId.username}</Text>
-              <Text style={styles.commentTime}>
+              <Text style={styles.replyTime}>
                 {formatPublishDate(reply.createdAt)}
               </Text>
             </View>
@@ -387,13 +384,12 @@ export default function CardDetail() {
         <Text style={styles.headerTitle}>
           {foodcard.user.username}'s {foodcard.title}
         </Text>
-
         {foodcard.user.privacy === "public" && (
           <TouchableOpacity
             onPress={handleShare}
             style={styles.shareHeaderButton}
           >
-            <Ionicons name="share-outline" size={24} color={COLORS.white} />
+            <Ionicons name="share-social" size={24} color={COLORS.white} />
           </TouchableOpacity>
         )}
       </View>
@@ -409,30 +405,28 @@ export default function CardDetail() {
           </View>
         </View>
 
-        {/*Card Details */}
-        <View style={styles.detailsCard}>
-          <View style={styles.titleSection}>
-            <Text style={styles.title}>{foodcard.title}</Text>
+        {/* Divider */}
+        <View style={styles.divider} />
 
-            <View style={styles.ratingLocationRow}>
-              <View style={styles.ratingContainer}>
-                {renderRatingStars(foodcard.rating)}
-                <Text style={styles.ratingText}>({foodcard.rating}/5)</Text>
-              </View>
-
-              <View style={styles.locationSection}>
-                <Text style={styles.locationText}>{foodcard.location}</Text>
-              </View>
-              <View style={styles.locationSection}>
-                <Text style={styles.locationText}>{foodcard.tag}</Text>
-              </View>
-            </View>
-          </View>
-
+        {/* Card Info Section */}
+        <View style={styles.infoSection}>
+          <Text style={styles.title}>{foodcard.title}</Text>
           <View style={styles.captionSection}>
             <Text style={styles.captionText}>{foodcard.caption}</Text>
           </View>
-
+          <View style={styles.locationTagRow}>
+            <Ionicons
+              name="location"
+              size={24}
+              color={COLORS.lightBlackText}
+              style={{ marginRight: 0 }}
+            />
+            <Text style={styles.locationText}>{foodcard.location}</Text>
+            <Text style={styles.tagText}>{foodcard.tag}</Text>
+          </View>
+          <View style={styles.ratingContainer}>
+            {renderRatingStars(foodcard.rating)}
+          </View>
           {/* Action Button */}
           <TouchableOpacity
             style={[
@@ -440,6 +434,7 @@ export default function CardDetail() {
               isAuthor
                 ? styles.deleteFloatingButton
                 : styles.saveFloatingButton,
+              { marginRight: 20 },
             ]}
             onPress={isAuthor ? handleDelete : handleSave}
             disabled={actionLoading}
@@ -458,26 +453,27 @@ export default function CardDetail() {
           </TouchableOpacity>
         </View>
 
-        {/* Comments part */}
-        <View style={styles.detailsCard}>
-          <View style={styles.titleSection}>
-            <Text style={styles.title}>
-              {" "}
-              Comments (
-              {comments.reduce(
-                (total, curr) => total + 1 + (curr.replies?.length || 0),
-                0
-              )}
-              )
-            </Text>
+        {/* Divider */}
+        <View style={styles.divider} />
 
-            {/* create new comment */}
+        {/* Comments Section */}
+        <View style={styles.commentsSection}>
+          <Text style={styles.commentTitle}>
+            Comments (
+            {comments.reduce(
+              (total, curr) => total + 1 + (curr.replies?.length || 0),
+              0
+            )}
+            )
+          </Text>
+          {/* create new comment */}
+          <KeyboardAvoidingView>
             <View style={styles.commentForm}>
               <TextInput
                 ref={inputRef}
                 style={styles.commentInput}
                 placeholder="Add a comment..."
-                placeholderTextColor="#aaa"
+                placeholderTextColor={COLORS.searchBarLabel}
                 value={newComment}
                 onChangeText={(text) => {
                   setNewComment(text);
@@ -487,8 +483,8 @@ export default function CardDetail() {
                     setNewComment("");
                   }
                 }}
-                multiline
               />
+
               <TouchableOpacity
                 style={styles.commentButton}
                 onPress={
@@ -498,30 +494,25 @@ export default function CardDetail() {
                 }
                 disabled={posting || !newComment.trim()}
               >
-                <View style={styles.commentButton}>
+                <View>
                   {posting ? (
                     <ActivityIndicator size="small" color="#fff" />
                   ) : (
-                    <Ionicons
-                      name="send-outline"
-                      size={16}
-                      color={COLORS.white}
-                    />
+                    <Ionicons name="send" size={24} color={COLORS.black} />
                   )}
                 </View>
               </TouchableOpacity>
             </View>
-
-            {comments.length === 0 && !commentsLoading ? (
-              <Text style={{ textAlign: "center", color: COLORS.white }}>
-                No comments yet.
-              </Text>
-            ) : (
-              comments.map((item) => (
-                <CommentsItem key={item._id} comment={item} />
-              ))
-            )}
-          </View>
+          </KeyboardAvoidingView>
+          {comments.length === 0 && !commentsLoading ? (
+            <Text style={{ textAlign: "center", color: COLORS.white }}>
+              No comments yet.
+            </Text>
+          ) : (
+            comments.map((item) => (
+              <CommentsItem key={item._id} comment={item} />
+            ))
+          )}
         </View>
 
         {/* Sharing */}
@@ -558,7 +549,7 @@ const styles = StyleSheet.create({
     fontSize: 26,
     color: COLORS.white,
     fontFamily: "Konkhmer_Sleokchher-Regular",
-    fontWeight: 600,
+    fontWeight: "400",
     textAlign: "center",
     paddingHorizontal: 60,
   },
@@ -571,6 +562,18 @@ const styles = StyleSheet.create({
     left: 20,
     top: "50%",
     marginTop: -10,
+    zIndex: 1,
+  },
+  shareHeaderButton: {
+    position: "absolute",
+    right: 20,
+    top: "50%",
+    marginTop: -12,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
     zIndex: 1,
   },
   scrollView: {
@@ -598,126 +601,78 @@ const styles = StyleSheet.create({
     borderRadius: CARD_WIDTH * 0.053,
     contentFit: "cover",
   },
-  gradientOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    justifyContent: "flex-end",
-    padding: 15,
-    borderRadius: CARD_WIDTH * 0.053,
-  },
-  userInfo: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  avatar: {
-    width: CARD_WIDTH * 0.198,
-    height: CARD_WIDTH * 0.198,
-    borderRadius: CARD_WIDTH * 0.099,
-    marginRight: 10,
-    backgroundColor: "#d3d3d3",
-    borderWidth: 2,
-    borderColor: COLORS.white,
-  },
-  username: {
-    color: COLORS.white,
-    fontSize: 16,
-    fontWeight: "600",
-    fontFamily: "Konkhmer_Sleokchher-Regular",
-  },
-
-  detailsCard: {
-    backgroundColor: "#2c2c2c",
+  divider: {
+    height: 1,
+    backgroundColor: COLORS.gray,
+    marginVertical: 18,
     marginHorizontal: 30,
-    marginBottom: 20,
-    borderRadius: 16,
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-    paddingTop: 10,
-    elevation: 10,
+    opacity: 0.4,
+  },
+  infoSection: {
+    paddingHorizontal: 30,
+    paddingBottom: 10,
+    paddingTop: 0,
+    backgroundColor: "transparent",
     position: "relative",
-    minHeight: 120,
-  },
-  headerActionButton: {
-    position: "absolute",
-    top: 15,
-    right: 15,
-    width: 40,
-    height: 40,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: COLORS.white,
-    borderRadius: 20,
-    shadowColor: COLORS.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  titleSection: {
-    marginBottom: 15,
   },
   title: {
     fontSize: 30,
-    fontWeight: 600,
-    color: COLORS.white,
-    marginBottom: 12,
+    fontWeight: "400",
+    color: COLORS.lightBlackText,
+    marginBottom: 8,
     fontFamily: "Konkhmer_Sleokchher-Regular",
   },
-  ratingLocationRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    width: "100%",
-  },
-  ratingContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  ratingText: {
-    marginLeft: 8,
-    fontSize: 16,
-    color: COLORS.textSecondary,
-  },
-  locationSection: {
-    backgroundColor: COLORS.white,
-    borderRadius: CARD_WIDTH * 0.04,
-    paddingHorizontal: CARD_WIDTH * 0.026,
-    paddingVertical: CARD_HEIGHT * 0.008,
-    alignItems: "center",
-    justifyContent: "center",
-    marginLeft: 10,
-  },
-  locationText: {
-    fontFamily: "Konkhmer_Sleokchher-Regular",
-    fontSize: 16,
-    color: "#2c2c2c",
-    fontWeight: "600",
-    textAlign: "center",
-    textAlignVertical: "center",
-  },
-  captionSection: {
-    marginBottom: 15,
-  },
-  captionLabel: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: COLORS.black,
+  commentTitle: {
+    fontSize: 20,
+    fontWeight: "400",
+    color: COLORS.lightBlackText,
     marginBottom: 8,
     fontFamily: "Konkhmer_Sleokchher-Regular",
   },
   captionText: {
     fontSize: 16,
     lineHeight: 24,
-    color: COLORS.white,
+    color: COLORS.lightBlackText,
+    opacity: 0.5,
     fontFamily: "Konkhmer_Sleokchher-Regular",
+    fontWeight: "400",
   },
-  dateSection: {
-    paddingTop: 5,
-    marginBottom: 20,
+  locationTagRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+    marginTop: 10,
+    gap: 8,
   },
-  dateText: {
-    fontSize: 14,
-    color: COLORS.white,
-    textAlign: "center",
+  locationText: {
+    fontFamily: "Konkhmer_Sleokchher-Regular",
+    fontSize: 16,
+    color: COLORS.lightBlackText,
+    fontWeight: "600",
+    marginRight: 12,
+  },
+  tagText: {
+    fontFamily: "Konkhmer_Sleokchher-Regular",
+    fontSize: 16,
+    color: COLORS.lightBlackText,
+    opacity: 0.5,
+    fontWeight: "400",
+  },
+  ratingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  ratingText: {
+    marginLeft: 8,
+    fontSize: 16,
+    color: COLORS.textSecondary,
+  },
+  commentsSection: {
+    paddingHorizontal: 30,
+    paddingBottom: 30,
+    paddingTop: 0,
+    backgroundColor: "transparent",
   },
   floatingActionButton: {
     position: "absolute",
@@ -734,25 +689,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
   },
-
   saveFloatingButton: {
     backgroundColor: COLORS.white,
   },
-
   deleteFloatingButton: {
     backgroundColor: COLORS.white,
-  },
-
-  captionSection: {
-    marginBottom: 15,
-    paddingBottom: 60,
-  },
-
-  actionButtonText: {
-    color: COLORS.white,
-    fontSize: 16,
-    fontWeight: "600",
-    fontFamily: "Konkhmer_Sleokchher-Regular",
   },
   loadingContainer: {
     flex: 1,
@@ -777,7 +718,7 @@ const styles = StyleSheet.create({
   backButtonText: {
     color: COLORS.primary,
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: "400",
   },
   commentContainer: {
     marginBottom: 12,
@@ -793,18 +734,36 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   commentUsername: {
-    fontWeight: "bold",
-    color: COLORS.white,
+    fontWeight: "400",
+    fontSize: 16,
+    fontFamily: "Konkhmer_Sleokchher-Regular",
+    color: COLORS.lightBlackText,
   },
   commentTime: {
     marginLeft: "auto",
     fontSize: 11,
-    color: COLORS.gray,
+    fontFamily: "Konkhmer_Sleokchher-Regular",
+    color: COLORS.lightBlackText,
+    opacity: 0.5,
     marginLeft: 10,
+    marginTop: 2,
   },
+  replyTime: {
+    marginLeft: "auto",
+    fontSize: 11,
+    fontFamily: "Konkhmer_Sleokchher-Regular",
+    color: COLORS.lightBlackText,
+    opacity: 0.5,
+    marginLeft: 10,
+    top: 6,
+  },
+
   commentContent: {
-    marginLeft: 38,
-    color: COLORS.grayLight,
+    marginLeft: 36,
+    color: COLORS.lightBlackText,
+    fontFamily: "Konkhmer_Sleokchher-Regular",
+    fontWeight: "400",
+    opacity: 0.7,
   },
   replyContainer: {
     marginLeft: 38,
@@ -824,60 +783,46 @@ const styles = StyleSheet.create({
     marginRight: 6,
   },
   replyUsername: {
-    fontWeight: "bold",
-    color: COLORS.white,
+    fontWeight: "400",
+    fontSize: 16,
+    fontFamily: "Konkhmer_Sleokchher-Regular",
+    color: COLORS.lightBlackText,
   },
   replyContent: {
-    marginLeft: 31,
-    color: COLORS.grayLight,
+    marginLeft: 36,
+    color: COLORS.lightBlackText,
+    fontFamily: "Konkhmer_Sleokchher-Regular",
+    fontWeight: "400",
+    opacity: 0.7,
   },
   commentForm: {
     flexDirection: "row",
     alignItems: "center",
     marginTop: 10,
-    marginHorizontal: 20,
-    gap: 8,
+    gap: 16,
   },
-
   commentInput: {
     flex: 1,
-    color: "#fff",
-    borderBottomWidth: 1,
-    borderColor: "#fff",
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 12,
-    fontSize: 14,
-    maxHeight: 100,
-    marginBottom: 15,
+    height: 48, 
+    backgroundColor: COLORS.searchBarBackground,
+    borderRadius: 18,
+    paddingHorizontal: 21,
+    paddingTop: 0,
+    paddingBottom: 0,
+    fontSize: 16,
+    color: COLORS.searchBarText,
+    fontFamily: "Konkhmer_Sleokchher-Regular",
+    fontWeight: "400",
+    marginBottom: 20,
   },
-  replyInput: {
-    flex: 1,
-    color: "#fff",
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 12,
-    fontSize: 12,
-    maxHeight: 100,
-    marginBottom: 15,
-  },
-
   commentButton: {
-    backgroundColor: COLORS.primary,
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    borderRadius: 12,
-  },
-  shareHeaderButton: {
-    position: "absolute",
-    right: 20,
-    top: "50%",
-    marginTop: -12,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    backgroundColor: COLORS.white,
+    elevation: 4,
+    width: 45,
+    height: 45,
+    borderRadius: 22.5,
     justifyContent: "center",
     alignItems: "center",
-    zIndex: 1,
+    marginBottom: 20,
   },
 });
