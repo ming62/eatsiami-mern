@@ -128,6 +128,7 @@ Begin your HTML report below:
       model: "gemini-2.5-flash",
       contents,
     });
+    console.log("result", result);
 
     console.log("AI Report received.");
     res.json({ aiReport: result.text });

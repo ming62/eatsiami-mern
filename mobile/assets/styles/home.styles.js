@@ -66,7 +66,6 @@ const styles = StyleSheet.create({
     color: COLORS.searchBarText,
     fontSize: 15,
     fontWeight: "400",
-    fontFamily: "Konkhmer_Sleokchher-Regular",
   },
   bookCard: {
     backgroundColor: COLORS.cardBackground,
@@ -252,7 +251,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    minHeight: "100%", 
+    minHeight: "100%",
   },
   CardContainer: {
     flex: 1,

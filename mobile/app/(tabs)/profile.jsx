@@ -27,10 +27,6 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Button } from "react-native-web";
 import { fetchNotificationCount } from "../../hooks/countNotifications";
 
-useEffect(() => {
-  console.log("👀 Profile mounted. Manually testing fetchNotificationCount...");
-  fetchNotificationCount();
-}, []);
 export default function Profile() {
   const [foodcards, setFoodcards] = useState([]);
   const [savedFoodcards, setSavedFoodcards] = useState([]);
@@ -296,8 +292,9 @@ export default function Profile() {
         <View style={styles.emptyListContainer}>
           <Ionicons
             name="fast-food-outline"
-            size={50}
+            size={48}
             color={COLORS.textSecondary}
+            style={styles.privateAccountIcon}
           />
           <Text style={styles.emptyListText}>No foodcards found.</Text>
           <TouchableOpacity
@@ -358,13 +355,6 @@ export default function Profile() {
       </View>
 
       <ProfileHeader userData={null} showMore={true} />
-
-      <TouchableOpacity
-        style={styles.forgotPasswordButton}
-        onPress={() => router.push("/(auth)/forgotPassword")}
-      >
-        <Text style={styles.forgotPasswordText}>Forgot Password</Text>
-      </TouchableOpacity>
 
       <TabView
         navigationState={{ index, routes }}

@@ -166,7 +166,11 @@ export default function Friends() {
             source={{ uri: item.profileImage }}
             style={styles.profileImage}
           />
-          <Text style={styles.username}>{item.username}</Text>
+          <Text style={styles.username}>
+            {item.username.length > 12
+              ? item.username.slice(0, 10) + "..."
+              : item.username}
+          </Text>
         </TouchableOpacity>
 
         {/* Chat Button */}
@@ -194,6 +198,7 @@ export default function Friends() {
             </View>
           )}
         </TouchableOpacity>
+
         <TouchableOpacity
           style={[
             styles.addButton,
@@ -202,9 +207,7 @@ export default function Friends() {
           onPress={() => handleSendJioRequest(item._id)}
           disabled={requestAlreadySent}
         >
-          <Text style={styles.buttonText}>
-            {requestAlreadySent ? "Requested" : "Jio"}
-          </Text>
+          <Ionicons name="restaurant-outline" size={20} color="#ffffff" />
         </TouchableOpacity>
         <View style={styles.buttons}>
           <TouchableOpacity
@@ -250,7 +253,7 @@ export default function Friends() {
           style={{ marginLeft: 5 }}
         />
         <TextInput
-          style={styles.searchInput}
+          style={styles.searchText}
           placeholder="search by username..."
           value={searchTerm}
           onFocus={() => router.push("otherpage/search")}
@@ -261,7 +264,7 @@ export default function Friends() {
       {/* Friends List Section */}
       <View style={styles.friendsSection}>
         {isLoading ? (
-          <ActivityIndicator size="large" color="#0000ff" />
+          <Loader />
         ) : friends.length > 0 ? (
           <FlatList
             data={friends}

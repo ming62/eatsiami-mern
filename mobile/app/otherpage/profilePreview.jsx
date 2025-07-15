@@ -109,7 +109,7 @@ export default function ProfilePreview() {
     router.replace("/(tabs)");
   };
 
-return (
+  return (
     <SafeAreaProvider style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Complete Your Profile</Text>
@@ -119,17 +119,10 @@ return (
         <Text style={styles.headerSubtitle}>{user?.username}</Text>
         <TouchableOpacity onPress={pickImage} style={styles.imagePicker}>
           {profileImage ? (
-            <Image
-              source={{ uri: profileImage }}
-              style={styles.profileImage}
-            />
+            <Image source={{ uri: profileImage }} style={styles.profileImage} />
           ) : (
             <View style={styles.placeholderImage}>
-              <Ionicons
-                name="person"
-                size={80}
-                color={COLORS.textSecondary}
-              />
+              <Ionicons name="person" size={80} color={COLORS.textSecondary} />
             </View>
           )}
           <View style={styles.cameraIcon}>
@@ -159,7 +152,11 @@ return (
           </LinearGradient>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.skipButton} onPress={handleSkip} disabled={isLoading}>
+        <TouchableOpacity
+          style={styles.skipButton}
+          onPress={handleSkip}
+          disabled={isLoading}
+        >
           <Text style={styles.skipButtonText}>Skip for now</Text>
         </TouchableOpacity>
       </View>

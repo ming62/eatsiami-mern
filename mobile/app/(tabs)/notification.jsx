@@ -182,7 +182,12 @@ export default function Notification() {
         />
         <View style={styles.userInfo}>
           <View style={styles.time}>
-            <Text style={styles.notificationName}>{item.sender.username}</Text>
+            <Text style={styles.notificationName}>
+              {" "}
+              {item.sender.username.length > 12
+                ? item.sender.username.slice(0, 9) + "..."
+                : item.sender.username}
+            </Text>
             <Text style={styles.notificationTime}>
               {formatPublishDate(item.createdAt)}
             </Text>
@@ -234,7 +239,12 @@ export default function Notification() {
         />
         <View style={styles.userInfo}>
           <View style={styles.time}>
-            <Text style={styles.notificationName}>{item.sender.username}</Text>
+            <Text style={styles.notificationName}>
+              {" "}
+              {item.sender.username.length > 12
+                ? item.sender.username.slice(0, 9) + "..."
+                : item.sender.username}
+            </Text>
             <Text style={styles.notificationTime}>
               {formatPublishDate(item.createdAt)}
             </Text>
@@ -295,7 +305,12 @@ export default function Notification() {
         <View style={styles.userInfo}>
           <View style={styles.time}>
             <Text style={styles.notificationName}>
-              {item.recipient?.username || item.userId?.username}
+              {(item.recipient?.username || item.userId?.username)?.length > 12
+                ? (item.recipient?.username || item.userId?.username).slice(
+                    0,
+                    12
+                  ) + "..."
+                : item.recipient?.username || item.userId?.username}
             </Text>
             <Text style={styles.notificationTime}>
               {formatPublishDate(item.createdAt)}
