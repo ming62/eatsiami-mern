@@ -285,7 +285,7 @@ export default function Home() {
           onChangeText={(query) => {
             handleSearch(query);
           }}
-          placeholderTextColor={COLORS.searchBarLabel}
+          placeholderTextColor={COLORS.textSecondary}
           placeholderTextWeight="400"
           maxLength={50}
           multiline={false}

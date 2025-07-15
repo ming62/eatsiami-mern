@@ -177,8 +177,8 @@ export default function SearchScreen() {
           style={{ marginLeft: 5 }}
         />
         <TextInput
-          style={styles.searchInput}
-          placeholder="Search by username..."
+          style={styles.searchText}
+          placeholder="search by username..."
           value={searchTerm}
           onChangeText={handleSearch}
           onSubmitEditing={() => handleSearch(searchTerm)}

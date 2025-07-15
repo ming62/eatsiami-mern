@@ -5,20 +5,19 @@ import { TabView } from "react-native-tab-view";
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.primary + 10,
     flexDirection: "column",
-    backgroundColor: "#2c2c2c",
     paddingBottom: -24,
   },
 
   header: {
     alignItems: "center",
     backgroundColor: COLORS.primary,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
     height: 70,
     justifyContent: "flex-end",
     paddingTop: 10,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
   },
 
   headerTitle: {
@@ -33,10 +32,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.white,
     height: "120%",
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
+    borderRadius: 15,
     elevation: 5,
-    marginTop: -15,
+    marginTop: -30,
   },
 
   foodcard: {
@@ -270,21 +268,43 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: "center",
   },
+  emptyListContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 40,
+    paddingHorizontal: 20,
+    backgroundColor: "#fff",
+  },
+  privateAccountIcon: {
+    marginBottom: 20,
+  },
+
+  emptyListText: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: COLORS.textPrimary,
+    textAlign: "center",
+    marginBottom: 8,
+  },
+
   addButton: {
     backgroundColor: COLORS.primary,
-    borderRadius: 12,
-    paddingVertical: 12,
+    borderRadius: 10,
+    paddingVertical: 5,
     paddingHorizontal: 20,
-    shadowColor: COLORS.black,
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.2,
     shadowRadius: 4,
-    elevation: 2,
+    elevation: 3,
   },
+
   addButtonText: {
-    color: COLORS.white,
-    fontWeight: "600",
+    color: "#fff",
     fontSize: 14,
+    textAlign: "center",
+    fontFamily: "Konkhmer_Sleokchher-Regular",
   },
   tabsContainer: {
     flexDirection: "row",

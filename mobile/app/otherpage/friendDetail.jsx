@@ -28,6 +28,7 @@ export default function FriendDetail() {
   const router = useRouter();
   const { friendId } = useLocalSearchParams();
   const { token } = useAuthStore();
+  const [isPrivate, setIsPrivate] = useState(false);
 
   const [friendData, setFriendData] = useState(null);
   const [friendFoodcards, setFriendFoodcards] = useState([]);
@@ -45,15 +46,6 @@ export default function FriendDetail() {
           Authorization: `Bearer ${token}`,
         },
       });
-
-      if (response.status === 403) {
-        Alert.alert(
-          "Private Profile",
-          "This user's profile is only visible to friends.",
-          [{ text: "OK", onPress: () => router.back() }]
-        );
-        return;
-      }
 
       if (!response.ok) {
         throw new Error("Failed to fetch friend data");
@@ -73,6 +65,7 @@ export default function FriendDetail() {
   const fetchFriendFoodcards = async () => {
     try {
       setLoading(true);
+      setIsPrivate(false);
       const response = await fetch(`${API_URL}/foodcards/user/${friendId}`, {
         method: "GET",
         headers: {
@@ -81,11 +74,7 @@ export default function FriendDetail() {
       });
 
       if (response.status === 403) {
-        Alert.alert(
-          "Private Profile",
-          "This user's profile is only visible to friends.",
-          [{ text: "OK", onPress: () => router.back() }]
-        );
+        setIsPrivate(true);
         return;
       }
 
@@ -169,12 +158,6 @@ export default function FriendDetail() {
             color={COLORS.textSecondary}
           />
           <Text style={styles.emptyListText}>No foodcards found.</Text>
-          <TouchableOpacity
-            style={styles.addButton}
-            onPress={() => router.push("/create")}
-          >
-            <Text style={styles.addButtonText}>Add Foodcard</Text>
-          </TouchableOpacity>
         </View>
       }
     />
@@ -197,21 +180,36 @@ export default function FriendDetail() {
   }
 
   const renderScene = SceneMap({
-    foodcards: FoodcardsRoute,
+    foodcards: () =>
+      isPrivate ? (
+        <View style={styles.privateAccountContainer}>
+          <Ionicons
+            name="lock-closed-outline"
+            size={48}
+            color={COLORS.textSecondary}
+            style={styles.privateAccountIcon}
+          />
+          <Text style={styles.privateAccountTitle}>
+            This is a private account.
+          </Text>
+          <Text style={styles.privateAccountSubtitle}>
+            Add friend to view food cards.
+          </Text>
+        </View>
+      ) : (
+        <FoodcardsRoute />
+      ),
   });
 
   return (
-    <SafeAreaView style={styles.container} edges={["bottom", "left", "right"]}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => router.back()}
         >
-          <Ionicons name="arrow-back" size={24} color={COLORS.white} />
+          <Ionicons name="arrow-back" size={24} color={COLORS.black} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>
-          {friendData?.username || "Friend!"}
-        </Text>
       </View>
 
       <ProfileHeader userData={friendData} showMore={false} />
@@ -223,7 +221,7 @@ export default function FriendDetail() {
         initialLayout={initialLayout}
         style={styles.tabView}
         renderTabBar={() => (
-          <View style={{ backgroundColor: "white", elevation: 20 }}>
+          <View style={{ backgroundColor: "white", elevation: 5 }}>
             <View style={{ flexDirection: "row" }}>
               <View
                 style={{
@@ -255,18 +253,16 @@ export default function FriendDetail() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#2c2c2c",
+    backgroundColor: COLORS.primary + 10,
+    flexDirection: "column",
+    paddingBottom: -24,
   },
 
   header: {
     alignItems: "center",
-    backgroundColor: COLORS.primary,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
     height: 70,
     justifyContent: "flex-end",
-    paddingTop: 10,
-    position: "relative",
+    marginTop: -20,
   },
 
   headerTitle: {
@@ -389,9 +385,34 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.white,
     height: "120%",
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
+    borderRadius: 15,
     elevation: 5,
-    marginTop: -15,
+    marginTop: -30,
+  },
+  privateAccountContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: COLORS.white,
+    paddingHorizontal: 32,
+    paddingTop: 40,
+  },
+
+  privateAccountIcon: {
+    marginBottom: 20,
+  },
+
+  privateAccountTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: COLORS.textPrimary,
+    textAlign: "center",
+    marginBottom: 8,
+  },
+
+  privateAccountSubtitle: {
+    fontSize: 15,
+    color: COLORS.textSecondary,
+    textAlign: "center",
   },
 });

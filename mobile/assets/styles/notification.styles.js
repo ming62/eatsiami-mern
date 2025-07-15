@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
   },
 
   notificationName: {
-    fontSize: 18,
+    fontSize: 16,
     fontFamily: "Konkhmer_Sleokchher-Regular",
     fontWeight: "600",
     color: "#333",
@@ -112,14 +112,12 @@ const styles = StyleSheet.create({
 
   notificationTime: {
     fontSize: 12,
-    fontFamily: "Konkhmer_Sleokchher-Regular",
-    color: "#2c2c2c",
-    marginLeft: 10,
-    paddingTop: 8,
+    color: COLORS.grayDark,
+    marginLeft: 8,
+    paddingTop: 0,
   },
 
   notificationText: {
-    fontFamily: "Konkhmer_Sleokchher-Regular",
     fontSize: 13,
     color: COLORS.primary,
     marginTop: -10,
@@ -133,12 +131,13 @@ const styles = StyleSheet.create({
 
   acceptButton: {
     paddingVertical: 10,
-    paddingHorizontal: 25,
+    paddingHorizontal: 10,
     borderRadius: 15,
     backgroundColor: COLORS.primary,
     alignItems: "center",
     justifyContent: "center",
-    marginRight: 8,
+    marginRight: 5,
+    marginLeft: 5,
   },
 
   deleteButton: {

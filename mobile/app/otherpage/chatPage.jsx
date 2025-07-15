@@ -25,12 +25,15 @@ import {
 } from "stream-chat-react-native";
 import { useAuthStore } from "../../store/authStore";
 import FoodcardMessage from "../../components/FoodcardMessage";
+import COLORS from "../../constants/colors";
+import { DeepPartial, Theme } from "stream-chat-react-native";
 
 export default function ChatPage() {
   const router = useRouter();
   const { friendId, friendName, friendImage } = useLocalSearchParams();
 
   const { token, user } = useAuthStore();
+  console.log("user", user);
   const [channel, setChannel] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -124,7 +127,19 @@ export default function ChatPage() {
       >
         <OverlayProvider>
           <Chat client={chatClient}>
-            <Channel channel={channel} MessageSimple={CustomMessageSimple}>
+            <Channel
+              channel={channel}
+              MessageSimple={CustomMessageSimple}
+              myMessageTheme={{
+                messageSimple: {
+                  content: {
+                    containerInner: {
+                      backgroundColor: COLORS.primary + 30,
+                    },
+                  },
+                },
+              }}
+            >
               <View style={styles.chatContainer}>
                 <View style={styles.customHeader}>
                   <TouchableOpacity

@@ -34,21 +34,17 @@ const styles = StyleSheet.create({
     borderColor: "#ddd",
     borderRadius: 20,
     backgroundColor: "#d9d9d9",
-    marginBottom: 20,
+    marginBottom: 40,
     marginLeft: 30,
     marginRight: 30,
     marginTop: 20,
   },
-
-  searchInput: {
+  searchText: {
     marginLeft: 10,
-    marginTop: 2,
-    color: "#2c2c2c",
+    color: COLORS.searchBarText,
     fontSize: 15,
-    fontFamily: "Konkhmer_Sleokchher-Regular",
-    flex: 1,
+    fontWeight: "400",
   },
-
   friendsSection: {
     flex: 1,
     paddingHorizontal: 15,
@@ -84,19 +80,20 @@ const styles = StyleSheet.create({
   },
 
   username: {
-    fontSize: 18,
+    fontSize: 16,
     fontFamily: "Konkhmer_Sleokchher-Regular",
     fontWeight: "600",
-    color: "#333",
+    color: COLORS.textPrimary,
   },
 
   addButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 25,
-    borderRadius: 15,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 30,
     backgroundColor: COLORS.primary,
     alignItems: "center",
     justifyContent: "center",
+    margin: 3,
   },
 
   buttonText: {

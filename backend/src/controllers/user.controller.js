@@ -19,29 +19,6 @@ export async function getUserById(req, res) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    if (user.privacy === "private" && userId !== currentUserId) {
-      const currentUser = await User.findById(currentUserId);
-      if (!currentUser.friends.includes(userId)) {
-        return res.status(403).json({
-          message: "This user's profile is private and only visible to friends",
-        });
-      }
-    }
-
-    const isFriend = user.friends.some(
-      (f) => f._id.toString() === currentUserId || userId === currentUserId
-    );
-
-    if (!isFriend) {
-      return res.status(200).json({
-        _id: user._id,
-        username: user.username,
-        profileImage: user.profileImage,
-        bio: user.bio,
-        createdAt: user.createdAt,
-      });
-    }
-
     res.status(200).json({
       _id: user._id,
       username: user.username,
@@ -526,6 +503,7 @@ export async function updateUserProfile(req, res) {
       return res.status(403).json({ message: "Unauthorized" });
     }
 
+    //update user name
     if (username && username !== user.username) {
       const existingUser = await User.findOne({ username });
       if (existingUser) {
@@ -534,18 +512,28 @@ export async function updateUserProfile(req, res) {
       user.username = username;
     }
 
-    let imageUrl;
-    if (profileImage) {
+    //update profile image
+    if (profileImage && profileImage !== user.profileImage) {
       const uploadResponse = await cloudinary.uploader.upload(profileImage);
-      imageUrl = uploadResponse.secure_url;
+      user.profileImage = uploadResponse.secure_url;
     }
 
     // Update other fields
     if (bio !== undefined) user.bio = bio;
-    if (imageUrl !== undefined) user.profileImage = imageUrl;
 
     const updatedUser = await user.save();
-    res.json({ message: "Profile updated successfully", user: updatedUser });
+    const formattedUser = {
+      id: updatedUser._id.toString(),
+      username: updatedUser.username,
+      email: updatedUser.email,
+      bio: updatedUser.bio,
+      profileImage: updatedUser.profileImage,
+      createdAt: updatedUser.createdAt,
+    };
+    res.json({
+      message: "Profile updated successfully",
+      user: formattedUser,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });

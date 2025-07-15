@@ -87,13 +87,11 @@ export default function AIreport() {
 
         <Text style={styles.headerTitle}>AI Report</Text>
       </View>
-
+      <Text style={styles.sliderLabel}>Select report range</Text>
       <View style={styles.sliderContainer}>
-        <Text style={styles.sliderLabel}>Select report range</Text>
         <Text style={styles.sliderValue}>
           Last {days} day{days > 1 ? "s" : ""}
         </Text>
-
         <Slider
           style={styles.slider}
           minimumValue={3}
