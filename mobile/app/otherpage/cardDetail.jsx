@@ -9,6 +9,7 @@ import {
   StyleSheet,
   TextInput,
   KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -270,7 +271,11 @@ export default function CardDetail() {
             source={{ uri: comment.userId.profileImage }}
             style={styles.commentAvatar}
           />
-          <Text style={styles.commentUsername}>{comment.userId.username}</Text>
+          <Text style={styles.commentUsername}>
+            {comment.userId.username.length > 20
+              ? comment.userId.username.slice(0, 15) + "..."
+              : comment.userId.username}
+          </Text>
           <Text style={styles.commentTime}>
             {formatPublishDate(comment.createdAt)}
           </Text>
@@ -295,7 +300,12 @@ export default function CardDetail() {
                 source={{ uri: reply.userId.profileImage }}
                 style={styles.replyAvatar}
               />
-              <Text style={styles.replyUsername}>{reply.userId.username}</Text>
+              <Text style={styles.replyUsername}>
+                {" "}
+                {reply.userId.username.length > 20
+                  ? reply.userId.username.slice(0, 15) + "..."
+                  : reply.userId.username}
+              </Text>
               <Text style={styles.replyTime}>
                 {formatPublishDate(reply.createdAt)}
               </Text>
@@ -373,101 +383,112 @@ export default function CardDetail() {
 
   return (
     <SafeAreaView style={styles.container} edges={["left", "right", "bottom"]}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backButton}
-        >
-          <Ionicons name="arrow-back" size={24} color={COLORS.white} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>
-          {foodcard.user.username}'s {foodcard.title}
-        </Text>
-        {foodcard.user.privacy === "public" && (
-          <TouchableOpacity
-            onPress={handleShare}
-            style={styles.shareHeaderButton}
-          >
-            <Ionicons name="share-social" size={24} color={COLORS.white} />
-          </TouchableOpacity>
-        )}
-      </View>
-
-      <ScrollView
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        {/* Card Image */}
-        <View style={styles.cardContainer}>
-          <View style={styles.imageContainer}>
-            <Image source={{ uri: foodcard.image }} style={styles.cardImage} />
-          </View>
-        </View>
-
-        {/* Divider */}
-        <View style={styles.divider} />
-
-        {/* Card Info Section */}
-        <View style={styles.infoSection}>
-          <Text style={styles.title}>{foodcard.title}</Text>
-          <View style={styles.captionSection}>
-            <Text style={styles.captionText}>{foodcard.caption}</Text>
-          </View>
-          <View style={styles.locationTagRow}>
-            <Ionicons
-              name="location"
-              size={24}
-              color={COLORS.lightBlackText}
-              style={{ marginRight: 0 }}
-            />
-            <Text style={styles.locationText}>{foodcard.location}</Text>
-            <Text style={styles.tagText}>{foodcard.tag}</Text>
-          </View>
-          <View style={styles.ratingContainer}>
-            {renderRatingStars(foodcard.rating)}
-          </View>
-          {/* Action Button */}
+        {/* Header */}
+        <View style={styles.header}>
           <TouchableOpacity
-            style={[
-              styles.floatingActionButton,
-              isAuthor
-                ? styles.deleteFloatingButton
-                : styles.saveFloatingButton,
-              { marginRight: 20 },
-            ]}
-            onPress={isAuthor ? handleDelete : handleSave}
-            disabled={actionLoading}
+            onPress={() => router.back()}
+            style={styles.backButton}
           >
-            {actionLoading ? (
-              <ActivityIndicator size="small" color="#2c2c2c" />
-            ) : (
-              <Ionicons
-                name={
-                  isAuthor ? "trash-outline" : saved ? "heart" : "heart-outline"
-                }
-                size={24}
-                color={isAuthor ? COLORS.black : "#2c2c2c"}
-              />
-            )}
+            <Ionicons name="arrow-back" size={24} color={COLORS.white} />
           </TouchableOpacity>
+          <Text style={styles.headerTitle}>
+            {foodcard.user.username}'s {foodcard.title}
+          </Text>
+          {foodcard.user.privacy === "public" && (
+            <TouchableOpacity
+              onPress={handleShare}
+              style={styles.shareHeaderButton}
+            >
+              <Ionicons name="share-social" size={24} color={COLORS.white} />
+            </TouchableOpacity>
+          )}
         </View>
 
-        {/* Divider */}
-        <View style={styles.divider} />
+        <ScrollView
+          style={styles.scrollView}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Card Image */}
+          <View style={styles.cardContainer}>
+            <View style={styles.imageContainer}>
+              <Image
+                source={{ uri: foodcard.image }}
+                style={styles.cardImage}
+              />
+            </View>
+          </View>
 
-        {/* Comments Section */}
-        <View style={styles.commentsSection}>
-          <Text style={styles.commentTitle}>
-            Comments (
-            {comments.reduce(
-              (total, curr) => total + 1 + (curr.replies?.length || 0),
-              0
-            )}
-            )
-          </Text>
-          {/* create new comment */}
-          <KeyboardAvoidingView>
+          {/* Divider */}
+          <View style={styles.divider} />
+
+          {/* Card Info Section */}
+          <View style={styles.infoSection}>
+            <Text style={styles.title}>{foodcard.title}</Text>
+            <View style={styles.captionSection}>
+              <Text style={styles.captionText}>{foodcard.caption}</Text>
+            </View>
+            <View style={styles.locationTagRow}>
+              <Ionicons
+                name="location"
+                size={24}
+                color={COLORS.lightBlackText}
+                style={{ marginRight: 0 }}
+              />
+              <Text style={styles.locationText}>{foodcard.location}</Text>
+              <Text style={styles.tagText}>{foodcard.tag}</Text>
+            </View>
+            <View style={styles.ratingContainer}>
+              {renderRatingStars(foodcard.rating)}
+            </View>
+            {/* Action Button */}
+            <TouchableOpacity
+              style={[
+                styles.floatingActionButton,
+                isAuthor
+                  ? styles.deleteFloatingButton
+                  : styles.saveFloatingButton,
+                { marginRight: 20 },
+              ]}
+              onPress={isAuthor ? handleDelete : handleSave}
+              disabled={actionLoading}
+            >
+              {actionLoading ? (
+                <ActivityIndicator size="small" color="#2c2c2c" />
+              ) : (
+                <Ionicons
+                  name={
+                    isAuthor
+                      ? "trash-outline"
+                      : saved
+                        ? "heart"
+                        : "heart-outline"
+                  }
+                  size={24}
+                  color={isAuthor ? COLORS.black : "#2c2c2c"}
+                />
+              )}
+            </TouchableOpacity>
+          </View>
+
+          {/* Divider */}
+          <View style={styles.divider} />
+
+          {/* Comments Section */}
+          <View style={styles.commentsSection}>
+            <Text style={styles.commentTitle}>
+              Comments (
+              {comments.reduce(
+                (total, curr) => total + 1 + (curr.replies?.length || 0),
+                0
+              )}
+              )
+            </Text>
+            {/* create new comment */}
+
             <View style={styles.commentForm}>
               <TextInput
                 ref={inputRef}
@@ -503,27 +524,28 @@ export default function CardDetail() {
                 </View>
               </TouchableOpacity>
             </View>
-          </KeyboardAvoidingView>
-          {comments.length === 0 && !commentsLoading ? (
-            <Text style={{ textAlign: "center", color: COLORS.white }}>
-              No comments yet.
-            </Text>
-          ) : (
-            comments.map((item) => (
-              <CommentsItem key={item._id} comment={item} />
-            ))
-          )}
-        </View>
 
-        {/* Sharing */}
-        {foodcard.user.privacy === "public" && (
-          <FriendsWindow
-            visible={showShareModal}
-            onClose={() => setShowShareModal(false)}
-            foodcardId={cardId}
-          />
-        )}
-      </ScrollView>
+            {comments.length === 0 && !commentsLoading ? (
+              <Text style={{ textAlign: "center", color: COLORS.white }}>
+                No comments yet.
+              </Text>
+            ) : (
+              comments.map((item) => (
+                <CommentsItem key={item._id} comment={item} />
+              ))
+            )}
+          </View>
+
+          {/* Sharing */}
+          {foodcard.user.privacy === "public" && (
+            <FriendsWindow
+              visible={showShareModal}
+              onClose={() => setShowShareModal(false)}
+              foodcardId={cardId}
+            />
+          )}
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -742,7 +764,7 @@ const styles = StyleSheet.create({
   commentTime: {
     marginLeft: "auto",
     fontSize: 11,
-    fontFamily: "Konkhmer_Sleokchher-Regular",
+    fontFamily: "Figtree",
     color: COLORS.lightBlackText,
     opacity: 0.5,
     marginLeft: 10,
@@ -751,7 +773,7 @@ const styles = StyleSheet.create({
   replyTime: {
     marginLeft: "auto",
     fontSize: 11,
-    fontFamily: "Konkhmer_Sleokchher-Regular",
+    fontFamily: "Figtree",
     color: COLORS.lightBlackText,
     opacity: 0.5,
     marginLeft: 10,
@@ -761,7 +783,7 @@ const styles = StyleSheet.create({
   commentContent: {
     marginLeft: 36,
     color: COLORS.lightBlackText,
-    fontFamily: "Konkhmer_Sleokchher-Regular",
+    fontFamily: "Figtree",
     fontWeight: "400",
     opacity: 0.7,
   },
@@ -791,7 +813,7 @@ const styles = StyleSheet.create({
   replyContent: {
     marginLeft: 36,
     color: COLORS.lightBlackText,
-    fontFamily: "Konkhmer_Sleokchher-Regular",
+    fontFamily: "Figtree",
     fontWeight: "400",
     opacity: 0.7,
   },
@@ -803,7 +825,7 @@ const styles = StyleSheet.create({
   },
   commentInput: {
     flex: 1,
-    height: 48, 
+    height: 48,
     backgroundColor: COLORS.searchBarBackground,
     borderRadius: 18,
     paddingHorizontal: 21,
@@ -811,7 +833,7 @@ const styles = StyleSheet.create({
     paddingBottom: 0,
     fontSize: 16,
     color: COLORS.searchBarText,
-    fontFamily: "Konkhmer_Sleokchher-Regular",
+    fontFamily: "Figtree",
     fontWeight: "400",
     marginBottom: 20,
   },

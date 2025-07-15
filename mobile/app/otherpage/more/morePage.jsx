@@ -66,8 +66,6 @@ export default function MorePage() {
             <Ionicons name="refresh-circle" size={24} color="#000" />
             <Text style={styles.LabelText}> Reset Password </Text>
           </TouchableOpacity>
-
-\
         </View>
       </View>
 

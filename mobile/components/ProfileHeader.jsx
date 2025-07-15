@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: COLORS.textSecondary,
     textAlign: "center",
-    fontFamily: "Konkhmer_Sleokchher-Regular",
+    fontFamily: "Figtree",
   },
   menuIconContainer: {
     position: "absolute",
