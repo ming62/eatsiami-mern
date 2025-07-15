@@ -33,6 +33,7 @@ export async function getAIReport(req, res) {
 
     if (foodcards.length === 0) {
       return res.json({
+        success: false,
         aiReport: `No food cards found for the past ${days} days.`,
       });
     }
@@ -131,7 +132,7 @@ Begin your HTML report below:
     console.log("result", result);
 
     console.log("AI Report received.");
-    res.json({ aiReport: result.text });
+    res.json({ success: true, aiReport: result.text });
   } catch (err) {
     console.error("Error generating AI report:", err);
     res.status(500).json({ error: "Failed to generate AI report" });
