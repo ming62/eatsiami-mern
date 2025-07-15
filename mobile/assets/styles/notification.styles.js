@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "Konkhmer_Sleokchher-Regular",
     fontWeight: "600",
-    color: "#333",
+    color: COLORS.grayDark,
   },
 
   notificationTime: {
