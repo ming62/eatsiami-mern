@@ -253,7 +253,7 @@ export default function Friends() {
           style={{ marginLeft: 5 }}
         />
         <TextInput
-          style={styles.searchInput}
+          style={styles.searchText}
           placeholder="search by username..."
           value={searchTerm}
           onFocus={() => router.push("otherpage/search")}
