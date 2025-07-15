@@ -1,4 +1,11 @@
-import { View, Text, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+  StyleSheet,
+} from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -34,93 +41,13 @@ export default function Privacy() {
       setUser(data.user);
       Alert.alert("Success", "Privacy settings updated successfully!");
     } catch (error) {
-      Alert.alert("Error", error.message || "Failed to update privacy settings");
+      Alert.alert(
+        "Error",
+        error.message || "Failed to update privacy settings"
+      );
     } finally {
       setLoading(false);
     }
-  };
-
-  const styles = {
-    container: {
-      flex: 1,
-      backgroundColor: "#2c2c2c",
-    },
-    header: {
-      alignItems: "center",
-      backgroundColor: COLORS.primary,
-      borderBottomLeftRadius: 30,
-      borderBottomRightRadius: 30,
-      height: 70,
-      justifyContent: "flex-end",
-      paddingTop: 10,
-      position: "relative",
-    },
-    headerTitle: {
-      fontSize: 30,
-      color: COLORS.white,
-      fontFamily: "Konkhmer_Sleokchher-Regular",
-      textAlign: "center",
-      fontWeight: "600",
-    },
-    backButton: {
-      position: "absolute",
-      left: 20,
-      top: "50%",
-      marginTop: -12,
-      width: 40,
-      height: 40,
-      borderRadius: 20,
-      justifyContent: "center",
-      alignItems: "center",
-      zIndex: 1,
-    },
-    content: {
-      flex: 1,
-      backgroundColor: COLORS.white,
-      marginTop: -15,
-      borderTopLeftRadius: 30,
-      borderTopRightRadius: 30,
-      paddingTop: 30,
-      paddingHorizontal: 20,
-    },
-    sectionTitle: {
-      fontSize: 20,
-      fontWeight: "600",
-      color: COLORS.textPrimary,
-      marginBottom: 20,
-      fontFamily: "Konkhmer_Sleokchher-Regular",
-    },
-    optionContainer: {
-      marginBottom: 20,
-    },
-    option: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      backgroundColor: COLORS.background,
-      padding: 15,
-      borderRadius: 12,
-      marginBottom: 10,
-    },
-    optionLeft: {
-      flex: 1,
-    },
-    optionTitle: {
-      fontSize: 16,
-      fontWeight: "600",
-      color: COLORS.textPrimary,
-      marginBottom: 5,
-    },
-    optionDescription: {
-      fontSize: 14,
-      color: COLORS.textSecondary,
-      lineHeight: 20,
-    },
-    selectedOption: {
-      backgroundColor: COLORS.primary + "20",
-      borderWidth: 2,
-      borderColor: COLORS.primary,
-    },
   };
 
   return (
@@ -133,13 +60,12 @@ export default function Privacy() {
         >
           <Ionicons name="arrow-back" size={24} color={COLORS.white} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Privacy Settings</Text>
+        <Text style={styles.headerTitle}>Privacy</Text>
+        <View style={styles.rightSpace} />
       </View>
 
       {/* Content */}
       <View style={styles.content}>
-        <Text style={styles.sectionTitle}>Who can see your foodcards?</Text>
-        
         <View style={styles.optionContainer}>
           <TouchableOpacity
             style={[
@@ -150,15 +76,18 @@ export default function Privacy() {
             disabled={loading}
           >
             <View style={styles.optionLeft}>
-              <Text style={styles.optionTitle}>
-                <Ionicons name="globe-outline" size={18} /> Public
-              </Text>
+              <Text style={styles.optionTitle}>Public</Text>
               <Text style={styles.optionDescription}>
-                Anyone can see your foodcards on the main feed and visit your profile
+                Anyone can see your foodcards on the main feed and visit your
+                profile
               </Text>
             </View>
             {privacy === "public" && (
-              <Ionicons name="checkmark-circle" size={24} color={COLORS.primary} />
+              <Ionicons
+                name="checkmark-circle"
+                size={24}
+                color={COLORS.primary}
+              />
             )}
           </TouchableOpacity>
 
@@ -171,15 +100,17 @@ export default function Privacy() {
             disabled={loading}
           >
             <View style={styles.optionLeft}>
-              <Text style={styles.optionTitle}>
-                <Ionicons name="people-outline" size={18} /> Friends Only
-              </Text>
+              <Text style={styles.optionTitle}>Friends Only</Text>
               <Text style={styles.optionDescription}>
                 Only your friends can see your foodcards and visit your profile
               </Text>
             </View>
             {privacy === "private" && (
-              <Ionicons name="checkmark-circle" size={24} color={COLORS.primary} />
+              <Ionicons
+                name="checkmark-circle"
+                size={24}
+                color={COLORS.primary}
+              />
             )}
           </TouchableOpacity>
         </View>
@@ -196,3 +127,91 @@ export default function Privacy() {
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    flexGrow: 1,
+    backgroundColor: "#eee",
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: COLORS.primary,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+    height: 70,
+    paddingTop: 10,
+    paddingHorizontal: 10,
+    position: "relative",
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "transparent",
+    marginLeft: 0,
+  },
+  headerTitle: {
+    fontSize: 30,
+    color: COLORS.white,
+    fontFamily: "Konkhmer_Sleokchher-Regular",
+    textAlign: "center",
+    justifyContent: "center",
+    fontWeight: "bold",
+  },
+  rightSpace: {
+    width: 40,
+    height: 40,
+  },
+  content: {
+    flex: 1,
+    backgroundColor: "#eee",
+    paddingTop: 30,
+    paddingHorizontal: 20,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: "400",
+    color: COLORS.textPrimary,
+    marginBottom: 20,
+    fontFamily: "Konkhmer_Sleokchher-Regular",
+  },
+  optionContainer: {
+    marginBottom: 20,
+  },
+  option: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: COLORS.background,
+
+    padding: 15,
+    paddingTop: 10,
+    borderRadius: 12,
+    marginBottom: 10,
+  },
+  optionLeft: {
+    flex: 1,
+  },
+  optionTitle: {
+    fontSize: 24,
+    fontWeight: "400",
+    color: COLORS.lightBlackText,
+    fontFamily: "Konkhmer_Sleokchher-Regular",
+  },
+  optionDescription: {
+    fontSize: 14,
+    color: COLORS.lightBlackText,
+    lineHeight: 20,
+    fontFamily: "Konkhmer_Sleokchher-Regular",
+    fontWeight: "400",
+    opacity: 0.5,
+  },
+  selectedOption: {
+    borderWidth: 4,
+    borderColor: COLORS.primary,
+  },
+});
