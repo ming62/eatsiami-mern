@@ -324,7 +324,7 @@ export default function Notification() {
                 : isJioRejected
                   ? "don't want jia beng"
                   : isComment
-                    ? "comment on your food card"
+                    ? "commented on your food card"
                     : isReplies
                       ? "reply to your comment"
                       : null}

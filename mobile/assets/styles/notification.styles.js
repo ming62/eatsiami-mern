@@ -115,12 +115,14 @@ const styles = StyleSheet.create({
     color: COLORS.grayDark,
     marginLeft: 8,
     paddingTop: 0,
+    fontFamily: "Figtree",
   },
 
   notificationText: {
     fontSize: 13,
     color: COLORS.primary,
     marginTop: -10,
+    fontFamily: "Figtree",
   },
 
   buttons: {
@@ -130,7 +132,7 @@ const styles = StyleSheet.create({
   },
 
   acceptButton: {
-    paddingVertical: 10,
+    paddingVertical: 5,
     paddingHorizontal: 10,
     borderRadius: 15,
     backgroundColor: COLORS.primary,
@@ -151,6 +153,7 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     fontSize: 14,
     fontWeight: "600",
+    fontFamily: "Konkhmer_Sleokchher-Regular",
   },
 
   emptyContainer: {
@@ -164,6 +167,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#666",
     textAlign: "center",
+    fontFamily: "Konkhmer_Sleokchher-Regular",
   },
 });
 

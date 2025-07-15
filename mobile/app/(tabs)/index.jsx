@@ -155,14 +155,6 @@ export default function Home() {
     animatedValue.value = currentIndex;
   }, [foodcards, currentIndex]);
 
-  // useEffect(() => {
-  //   if (currentIndex >= foodcards.length && foodcards.length > 0) {
-  //     if (!hasMore) {
-  //       setCurrentIndex(0);
-  //     }
-  //   }
-  // }, [currentIndex, foodcards.length, hasMore]);
-
   const saveFoodcard = async (foodcardId) => {
     try {
       const response = await fetch(
@@ -214,37 +206,6 @@ export default function Home() {
     }
     return <View style={{ flexDirection: "row" }}>{stars}</View>;
   };
-
-  // const renderItem = ({ item }) => {
-  //   return (
-  //     <View style={styles.bookCard}>
-  //       <View style={styles.bookImageContainer}>
-  //         <Image source={{ uri: item.image }} style={styles.bookImage} />
-
-  //         <View style={styles.overlayContent}>
-  //           <View style={styles.infoBackground} />
-  //           <View style={styles.bookDetails}>
-  //             <View style={styles.userInfo}>
-  //               <Image
-  //                 source={{ uri: item.user.profileImage }}
-  //                 style={styles.avatar}
-  //               />
-  //             </View>
-
-  //             <View style={styles.ratingContainer}>
-  //               <Text style={styles.bookTitle}>{item.title}</Text>
-  //               {renderRatingStars(item.rating)}
-  //             </View>
-  //             <Text style={styles.caption}>{item.caption}</Text>
-  //             <Text style={styles.date}>
-  //               Shared on {formatPublishDate(item.createdAt)}
-  //             </Text>
-  //           </View>
-  //         </View>
-  //       </View>
-  //     </View>
-  //   );
-  // };
 
   if (loading) {
     return <Loader size="large" />;

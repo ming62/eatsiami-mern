@@ -22,7 +22,7 @@ export function formatPublishDate(dateString) {
   }
 
   if (diffInMinutes < 60) {
-    return `${diffInMinutes}s ago`;
+    return `${diffInMinutes}m ago`;
   }
 
   if (diffInHours < 24) {

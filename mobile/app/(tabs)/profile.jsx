@@ -384,6 +384,7 @@ export default function Profile() {
                         color: isActive ? "white" : "#2c2c2c",
                         fontWeight: "600",
                         fontSize: 16,
+                        fontFamily: "Figtree",
                       }}
                     >
                       {route.title}
