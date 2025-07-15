@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import LogoutButton from "../../../components/LogoutButton";
+import COLORS from "../../../constants/colors";
 import { useRouter } from "expo-router";
 
 export default function MorePage() {
@@ -15,22 +16,31 @@ export default function MorePage() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* header */}
+      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
-          style={styles.backButton}
           onPress={() => router.back()}
+          style={styles.backButton}
         >
-          <Ionicons name="arrow-back" size={24} color="#000" />
+          <Ionicons
+            name="arrow-back"
+            size={24}
+            color={COLORS.white}
+            style={{ marginTop: 10, marginLeft: 10 }}
+          />
         </TouchableOpacity>
+        <Text style={styles.headerTitle}>Settings</Text>
+        <View style={styles.rightSpace} />
+      </View>
 
+      <View style={styles.contentContainer}>
         <View style={styles.cardContainer}>
           <TouchableOpacity
             onPress={() => router.push("../more/updateUser")}
             style={styles.card}
           >
             <Ionicons name="person" size={24} color="#000" />
-            <Text> Edit Profile </Text>
+            <Text style={styles.LabelText}> Edit Profile </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -38,7 +48,7 @@ export default function MorePage() {
             style={styles.card}
           >
             <Ionicons name="key" size={24} color="#000" />
-            <Text> Privacy </Text>
+            <Text style={styles.LabelText}> Privacy </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -46,7 +56,15 @@ export default function MorePage() {
             style={styles.card}
           >
             <Ionicons name="analytics" size={24} color="#000" />
-            <Text> AI report </Text>
+            <Text style={styles.LabelText}> AI report </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => router.push("(auth)/forgotPassword")}
+            style={styles.card}
+          >
+            <Ionicons name="refresh-circle" size={24} color="#000" />
+            <Text style={styles.LabelText}> Reset Password </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -70,11 +88,45 @@ export default function MorePage() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    flexGrow: 1,
     backgroundColor: "#eee",
-    paddingHorizontal: 20,
   },
   header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: COLORS.primary,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+    height: 70,
+    paddingTop: 10,
+    paddingHorizontal: 10,
+    marginBottom: 20,
+    position: "relative",
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "transparent",
+    marginLeft: 0,
+  },
+  headerTitle: {
+    fontSize: 30,
+    color: COLORS.white,
+    fontFamily: "Konkhmer_Sleokchher-Regular",
+    textAlign: "center",
+    justifyContent: "center",
+    fontWeight: "bold",
+  },
+  rightSpace: {
+    width: 40,
+    height: 40,
+  },
+  contentContainer: {
     flex: 1,
+    paddingHorizontal: 20,
   },
   backButton: {
     marginTop: 10,
@@ -95,5 +147,11 @@ const styles = StyleSheet.create({
   footer: {
     paddingVertical: 35,
     alignItems: "center",
+  },
+  LabelText: {
+    fontSize: 14,
+    color: COLORS.lightBlackText,
+    marginLeft: 10,
+    fontFamily: "Konkhmer_Sleokchher-Regular",
   },
 });
