@@ -67,13 +67,7 @@ export default function MorePage() {
             <Text style={styles.LabelText}> Reset Password </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            onPress={() => router.push("/(auth)/forgotPassword")}
-            style={styles.card}
-          >
-            <Ionicons name="shield-half-outline" size={24} color="#000" />
-            <Text> Change Password </Text>
-          </TouchableOpacity>
+\
         </View>
       </View>
 

@@ -79,26 +79,31 @@ export default function Preview() {
     }
   };
 
-  const renderRatingStars = (rating) => {
-    const stars = [];
-    for (let i = 1; i <= 5; i++) {
-      stars.push(
-        <Ionicons
-          key={i}
-          name="star"
-          size={CARD_WIDTH * 0.066}
-          color={
-            i <= rating ? COLORS.starColor || "#F4B400" : COLORS.textSecondary
-          }
-          style={{
-            marginRight: CARD_WIDTH * 0.0066,
-            marginBottom: CARD_HEIGHT * 0.005,
-          }}
-        />
-      );
-    }
-    return <View style={{ flexDirection: "row" }}>{stars}</View>;
-  };
+const renderRatingStars = (rating) => {
+  const stars = [];
+  for (let i = 1; i <= rating; i++) {
+    stars.push(
+      <Ionicons
+        key={i}
+        name="star"
+        size={CARD_WIDTH * 0.066}
+        color={i <= rating ? COLORS.starColor : COLORS.textSecondary}
+        style={{
+          marginRight: CARD_WIDTH * 0.0066, marginBottom: CARD_HEIGHT * 0.005,
+        }}
+      />
+    );
+  }
+  return (
+    <View
+      style={{
+        flexDirection: "row",
+      }}
+    >
+      {stars}
+    </View>
+  );
+};
 
   const PreviewFoodCard = ({
     title,
@@ -191,7 +196,7 @@ export default function Preview() {
 
   return (
     <View style={styles.container}>
-      {/* Header - similar to Create page */}
+      {/* Header  */}
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => router.replace("/(tabs)/create")}
