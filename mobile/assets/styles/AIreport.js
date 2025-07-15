@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: 14,
     color: COLORS.primary,
-    marginTop: 8,
+    marginTop: 20,
     textAlign: "center",
     fontFamily: "Konkhmer_Sleokchher-Regular",
   },

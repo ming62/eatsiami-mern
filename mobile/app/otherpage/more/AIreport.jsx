@@ -54,6 +54,12 @@ export default function AIreport() {
       }
 
       const data = await response.json();
+
+      if (!data.success) {
+        setStatusMessage(`No meals found in the past ${days} days.`);
+        setAiReport("");
+        return;
+      }
       console.log("data", data);
       let cleaned = (data.aiReport || "").trim();
 
@@ -118,6 +124,14 @@ export default function AIreport() {
           <Loader />
           <Text style={styles.statusText}>{statusMessage}</Text>
         </View>
+      )}
+
+      {!loading && statusMessage.includes("No meals") && aiReport === "" && (
+        <Text
+          style={[styles.statusText, { textAlign: "center", marginTop: 20 }]}
+        >
+          {statusMessage}
+        </Text>
       )}
 
       {aiReport !== "" && (

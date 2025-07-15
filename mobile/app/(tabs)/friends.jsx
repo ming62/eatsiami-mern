@@ -286,55 +286,5 @@ export default function Friends() {
         )}
       </View>
     </SafeAreaView>
-    // <SafeAreaView style={styles.container}>
-
-    //   {/* header */}
-    //   <View style={styles.header}>
-    //     <Text style={styles.title}>Friends</Text>
-    //   </View>
-
-    //   {/* Search Section */}
-    //   <View style={styles.searchSection}>
-    //     <View style={styles.searchContainer}>
-    //       <Ionicons
-    //         name="search"
-    //         size={20}
-    //         color="#666"
-    //         style={styles.searchIcon}
-    //       />
-    //       <TextInput
-    //         style={styles.searchInput}
-    //         placeholder="Search by username..."
-    //         value={searchTerm}
-    //         onFocus={() => router.push("otherpage/search")}
-    //         placeholderTextColor="#666"
-    //       />
-    //     </View>
-    //   </View>
-    //   {/* Friends List Section */}
-    //   <View style={styles.friendsSection}>
-    //     {isLoading ? (
-    //       <ActivityIndicator size="large" color="#0000ff" />
-    //     ) : friends.length > 0 ? (
-    //       <FlatList
-    //         data={friends}
-    //         renderItem={renderFriend}
-    //         keyExtractor={(item) => item._id}
-    //         showsVerticalScrollIndicator={false}
-    //         refreshControl={
-    //           <RefreshControl
-    //             refreshing={refreshing}
-    //             onRefresh={onRefresh}
-    //             colors={[COLORS.primary]}
-    //           />
-    //         }
-    //       />
-    //     ) : (
-    //       <Text style={styles.emptyText}>
-    //         No friends yet. Start adding some!
-    //       </Text>
-    //     )}
-    //   </View>
-    // </SafeAreaView>
   );
 }
