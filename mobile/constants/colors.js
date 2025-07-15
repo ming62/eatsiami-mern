@@ -27,7 +27,7 @@ const COLORS = {
   success: "#34C759",
   danger: "#FF3B30",
   gray: "#8E8E93",
-  grayDark: "#636366",
+  grayDark: "#454547ff",
   grayLight: "#D1D1D6",
   border: "#e2d6c1",
   white: "#ffffff",
@@ -41,9 +41,7 @@ const COLORS = {
   lightBlackText: "#2c2c2c",
 
   starColor: "#FFB400",
-
 };
-
 
 // OCEAN
 /*
