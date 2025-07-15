@@ -58,9 +58,11 @@ const styles = StyleSheet.create({
   },
   bio: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.gray,
     textAlign: "center",
     fontFamily: "Figtree",
+    marginTop: -10,
+    marginBottom: 15,
   },
   menuIconContainer: {
     position: "absolute",
