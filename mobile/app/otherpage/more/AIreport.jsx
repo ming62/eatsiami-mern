@@ -126,7 +126,7 @@ export default function AIreport() {
         </View>
       )}
 
-      {!loading && statusMessage !== "" && aiReport === "" && (
+      {!loading && statusMessage.includes("No meals") && aiReport === "" && (
         <Text
           style={[styles.statusText, { textAlign: "center", marginTop: 20 }]}
         >
