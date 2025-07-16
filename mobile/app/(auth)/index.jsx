@@ -30,36 +30,18 @@ export default function LoginContainer() {
   const [showPassword, setShowPassword] = useState(false);
   const { isLoading, login, isCheckingAuth } = useAuthStore();
 
-  SplashScreen.preventAutoHideAsync();
-
-  const [fontsLoaded] = useFonts({
-    "Konkhmer_Sleokchher-Regular": require("../../assets/fonts/KonkhmerSleokchher-Regular.ttf"),
-  });
-
-  useEffect(() => {
-    if (fontsLoaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
-
   const handleLogin = async () => {
     const reuslt = await login(email, password);
 
     if (!reuslt.success) {
       Alert.alert("Error", reuslt.error);
+    } else {
+      router.push("/(tabs)");
     }
   };
 
   if (isCheckingAuth) {
     return null;
-  }
-
-  if (!fontsLoaded) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" color={COLORS.primary} />
-      </View>
-    );
   }
 
   return (
@@ -94,6 +76,7 @@ export default function LoginContainer() {
                 <Text style={styles.inputLabel}>email address</Text>
                 <TextInput
                   style={styles.textInput}
+                  accessibilityLabel="email address"
                   placeholder=""
                   placeholderTextColor={COLORS.searchBarLabel}
                   value={email}
@@ -109,6 +92,7 @@ export default function LoginContainer() {
                 <View style={styles.passwordWrapper}>
                   <TextInput
                     style={[styles.textInput, styles.passwordInput]}
+                    accessibilityLabel="password"
                     placeholder=""
                     placeholderTextColor={COLORS.searchBarLabel}
                     value={password}
