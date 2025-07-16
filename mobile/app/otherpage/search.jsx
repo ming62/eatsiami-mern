@@ -140,7 +140,11 @@ export default function SearchScreen() {
             source={{ uri: item.profileImage }}
             style={styles.profileImage}
           />
-          <Text style={styles.username}>{item.username}</Text>
+          <Text style={styles.username}>
+            {item.username.length > 15
+              ? item.username.slice(0, 12) + "..."
+              : item.username}
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[
