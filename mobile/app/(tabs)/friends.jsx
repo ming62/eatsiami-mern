@@ -254,6 +254,7 @@ export default function Friends() {
         />
         <TextInput
           style={styles.searchText}
+          accessibilityLabel="search bar"
           placeholder="search by username..."
           value={searchTerm}
           onFocus={() => router.push("otherpage/search")}

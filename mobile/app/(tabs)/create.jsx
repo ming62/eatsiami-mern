@@ -315,6 +315,7 @@ export default function Create() {
         <View style={cameraStyles.bottomControls}>
           <TouchableOpacity
             style={cameraStyles.galleryButton}
+            accessibilityLabel="pick from gallery"
             onPress={pickFromGallery}
           >
             <Ionicons name="images-outline" size={28} color="white" />
@@ -322,6 +323,7 @@ export default function Create() {
 
           <TouchableOpacity
             style={cameraStyles.captureButton}
+            accessibilityLabel="take picture"
             onPress={takePicture}
             disabled={!isCameraReady || isCapturing}
           >
@@ -477,6 +479,7 @@ export default function Create() {
               <Text style={inputStyles.inputLabel}>title</Text>
               <TextInput
                 style={inputStyles.textInput}
+                accessibilityLabel="title-test"
                 placeholder=""
                 value={title}
                 onChangeText={setTitle}
@@ -490,6 +493,7 @@ export default function Create() {
               <Text style={inputStyles.inputLabel}>location</Text>
               <TextInput
                 style={inputStyles.textInput}
+                accessibilityLabel="location"
                 placeholder=""
                 value={location}
                 onChangeText={setLocation}
@@ -504,6 +508,7 @@ export default function Create() {
               <Text style={inputStyles.inputLabel}>caption</Text>
               <TextInput
                 style={inputStyles.textArea}
+                accessibilityLabel="caption"
                 placeholder=""
                 value={caption}
                 onChangeText={setCaption}

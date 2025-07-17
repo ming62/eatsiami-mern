@@ -403,7 +403,7 @@ export default function CardDetail() {
               onPress={handleShare}
               style={styles.shareHeaderButton}
             >
-              <Ionicons name="share-social" size={24} color={COLORS.white} />
+              <Ionicons name="share-social" size={24} color={COLORS.white} accessibilityLabel="share" />
             </TouchableOpacity>
           )}
         </View>
@@ -454,6 +454,7 @@ export default function CardDetail() {
                 { marginRight: 20 },
               ]}
               onPress={isAuthor ? handleDelete : handleSave}
+              accessibilityLabel="action button"
               disabled={actionLoading}
             >
               {actionLoading ? (
@@ -513,6 +514,7 @@ export default function CardDetail() {
                     ? () => handleReplyComment(replyToCommentId)
                     : handleCreateComment
                 }
+                accessibilityLabel="send comment"
                 disabled={posting || !newComment.trim()}
               >
                 <View>

@@ -118,6 +118,7 @@ export default function SignUpContainer() {
                   <Text style={styles.inputLabel}>email address</Text>
                   <TextInput
                     style={styles.textInput}
+                    accessibilityLabel="email address"
                     placeholder=""
                     placeholderTextColor={COLORS.searchBarLabel}
                     value={email}
@@ -132,6 +133,7 @@ export default function SignUpContainer() {
                   <Text style={styles.inputLabel}>username</Text>
                   <TextInput
                     style={styles.textInput}
+                    accessibilityLabel="username"
                     placeholder=""
                     placeholderTextColor={COLORS.searchBarLabel}
                     value={username}
@@ -145,6 +147,7 @@ export default function SignUpContainer() {
                   <Text style={styles.inputLabel}>password</Text>
                   <TextInput
                     style={styles.textInput}
+                    accessibilityLabel="password"
                     placeholder=""
                     placeholderTextColor={COLORS.searchBarLabel}
                     value={password}
@@ -169,6 +172,7 @@ export default function SignUpContainer() {
                   <Text style={styles.inputLabel}>confirm password</Text>
                   <TextInput
                     style={styles.textInput}
+                    accessibilityLabel="confirm password"
                     placeholder=""
                     placeholderTextColor={COLORS.searchBarLabel}
                     value={confirmPassword}

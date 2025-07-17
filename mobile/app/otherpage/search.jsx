@@ -183,6 +183,7 @@ export default function SearchScreen() {
         <TextInput
           style={styles.searchText}
           placeholder="search by username..."
+          accessibilityLabel="search bar"
           value={searchTerm}
           onChangeText={handleSearch}
           onSubmitEditing={() => handleSearch(searchTerm)}
