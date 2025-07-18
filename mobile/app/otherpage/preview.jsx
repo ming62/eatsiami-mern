@@ -47,7 +47,7 @@ export default function Preview() {
         ? `image/${fileType.toLowerCase()}`
         : "image/jpeg";
       const imageDataUrl = `data:${imageType};base64,${imageBase64}`;
-      console.log(imageDataUrl);
+
       const response = await fetch(`${API_URL}/foodcards/`, {
         method: "POST",
         headers: {
@@ -79,31 +79,32 @@ export default function Preview() {
     }
   };
 
-const renderRatingStars = (rating) => {
-  const stars = [];
-  for (let i = 1; i <= rating; i++) {
-    stars.push(
-      <Ionicons
-        key={i}
-        name="star"
-        size={CARD_WIDTH * 0.066}
-        color={i <= rating ? COLORS.starColor : COLORS.textSecondary}
+  const renderRatingStars = (rating) => {
+    const stars = [];
+    for (let i = 1; i <= rating; i++) {
+      stars.push(
+        <Ionicons
+          key={i}
+          name="star"
+          size={CARD_WIDTH * 0.066}
+          color={i <= rating ? COLORS.starColor : COLORS.textSecondary}
+          style={{
+            marginRight: CARD_WIDTH * 0.0066,
+            marginBottom: CARD_HEIGHT * 0.005,
+          }}
+        />
+      );
+    }
+    return (
+      <View
         style={{
-          marginRight: CARD_WIDTH * 0.0066, marginBottom: CARD_HEIGHT * 0.005,
+          flexDirection: "row",
         }}
-      />
+      >
+        {stars}
+      </View>
     );
-  }
-  return (
-    <View
-      style={{
-        flexDirection: "row",
-      }}
-    >
-      {stars}
-    </View>
-  );
-};
+  };
 
   const PreviewFoodCard = ({
     title,
@@ -237,8 +238,6 @@ const renderRatingStars = (rating) => {
     </View>
   );
 }
-
-
 
 const previewCardStyles = StyleSheet.create({
   cardContainer: {

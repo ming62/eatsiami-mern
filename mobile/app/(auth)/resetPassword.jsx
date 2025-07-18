@@ -114,6 +114,7 @@ export default function ResetPassword() {
                   onChangeText={setNewPassword}
                   secureTextEntry={!showPassword}
                   autoCapitalize="none"
+                  accessibilityLabel="new-password-input"
                 />
                 <TouchableOpacity
                   onPress={() => setShowPassword(!showPassword)}
@@ -133,6 +134,7 @@ export default function ResetPassword() {
               <Text style={styles.inputLabel}>confirm password</Text>
               <View style={styles.inputWrapper}>
                 <TextInput
+                  accessibilityLabel="confirm-password-input"
                   style={[styles.textInput]}
                   placeholder=""
                   placeholderTextColor={COLORS.searchBarLabel}
@@ -166,6 +168,7 @@ export default function ResetPassword() {
             onPress={handleResetPassword}
             disabled={isLoading || !newPassword || !confirmPassword}
             activeOpacity={0.8}
+            accessibilityLabel="reset-password-button"
           >
             <View
               style={{

@@ -60,7 +60,7 @@ export default function AIreport() {
         setAiReport("");
         return;
       }
-      console.log("data", data);
+
       let cleaned = (data.aiReport || "").trim();
 
       // Remove ```html and ```
