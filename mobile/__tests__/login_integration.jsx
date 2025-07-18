@@ -5,7 +5,15 @@ import LoginContainer from "../app/(auth)/index";
 // Use mockToken for Jest compatibility
 let mockLogin;
 jest.mock("../store/authStore", () => {
-  mockLogin = jest.fn(async () => ({ success: true }));
+  mockLogin = jest.fn(async (email, password) => {
+    if (!email || !password) {
+      return { success: false, error: "Email and password required" };
+    }
+    if (email === "wrong@example.com" || password === "wrongpass") {
+      return { success: false, error: "Invalid credentials" };
+    }
+    return { success: true };
+  });
   return {
     useAuthStore: () => ({
       isLoading: false,
@@ -61,6 +69,15 @@ jest.mock("../constants/colors", () => ({
   lightOrangeText: "#f90",
 }));
 
+// Mock Alert
+import { Alert } from "react-native";
+beforeAll(() => {
+  jest.spyOn(Alert, "alert").mockImplementation(() => {});
+});
+afterAll(() => {
+  Alert.alert.mockRestore();
+});
+
 describe("<LoginContainer />", () => {
   it("renders Welcome Back text", () => {
     const { getByText } = render(<LoginContainer />);
@@ -80,7 +97,46 @@ describe("<LoginContainer />", () => {
 
     await waitFor(() => {
       expect(mockPush).toHaveBeenCalledWith("/(tabs)");
+    });
+  });
 
+  // --- Unit tests for edge cases ---
+
+  it("shows alert if email is empty", async () => {
+    const { getByText, getByLabelText } = render(<LoginContainer />);
+    const passwordInput = getByLabelText("password");
+    fireEvent.changeText(passwordInput, "testing");
+    const loginButton = getByText("Login");
+    fireEvent.press(loginButton);
+
+    await waitFor(() => {
+      expect(Alert.alert).toHaveBeenCalledWith("Error", "Email and password required");
+    });
+  });
+
+  it("shows alert if password is empty", async () => {
+    const { getByText, getByLabelText } = render(<LoginContainer />);
+    const emailInput = getByLabelText("email address");
+    fireEvent.changeText(emailInput, "limmingyou@gmail.com");
+    const loginButton = getByText("Login");
+    fireEvent.press(loginButton);
+
+    await waitFor(() => {
+      expect(Alert.alert).toHaveBeenCalledWith("Error", "Email and password required");
+    });
+  });
+
+  it("shows alert if credentials are incorrect", async () => {
+    const { getByText, getByLabelText } = render(<LoginContainer />);
+    const emailInput = getByLabelText("email address");
+    const passwordInput = getByLabelText("password");
+    fireEvent.changeText(emailInput, "wrong@example.com");
+    fireEvent.changeText(passwordInput, "wrongpass");
+    const loginButton = getByText("Login");
+    fireEvent.press(loginButton);
+
+    await waitFor(() => {
+      expect(Alert.alert).toHaveBeenCalledWith("Error", "Invalid credentials");
     });
   });
 });

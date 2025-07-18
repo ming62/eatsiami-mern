@@ -41,11 +41,27 @@ export default function CardDetail() {
   const [replyToUsername, setReplyToUsername] = useState(null);
   const [showShareModal, setShowShareModal] = useState(false);
 
+  const [isFriend, setIsFriend] = useState(false);
+
   const [cardLoading, setCardLoading] = useState(true);
   const [commentsLoading, setCommentsLoading] = useState(true);
 
   const handleShare = () => {
     setShowShareModal(true);
+  };
+
+  const checkFriendship = async (ownerId) => {
+    try {
+      const response = await fetch(`${API_URL}/users/friends`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+      if (Array.isArray(data)) {
+        setIsFriend(data.some((f) => f._id === ownerId));
+      }
+    } catch {
+      setIsFriend(false);
+    }
   };
 
   const fetchComments = async () => {
@@ -152,6 +168,10 @@ export default function CardDetail() {
 
       setFoodcard(data);
       setSaved(data.isSaved || false);
+
+      if (data.user.privacy === "private" && user.id !== data.user._id) {
+        await checkFriendship(data.user._id);
+      }
     } catch (error) {
       console.error("Error fetching card details:", error);
       Alert.alert("Error", error.message || "Failed to fetch card details");
@@ -381,6 +401,29 @@ export default function CardDetail() {
 
   const isAuthor = user && foodcard?.user?._id && user.id === foodcard.user._id;
 
+  if (
+    foodcard &&
+    foodcard.user.privacy === "private" &&
+    user.id !== foodcard.user._id &&
+    !isFriend
+  ) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>
+            This foodcard is private and only visible to friends.
+          </Text>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => router.back()}
+          >
+            <Text style={styles.backButtonText}>Go Back</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.container} edges={["left", "right", "bottom"]}>
       <KeyboardAvoidingView
@@ -403,7 +446,12 @@ export default function CardDetail() {
               onPress={handleShare}
               style={styles.shareHeaderButton}
             >
-              <Ionicons name="share-social" size={24} color={COLORS.white} accessibilityLabel="share" />
+              <Ionicons
+                name="share-social"
+                size={24}
+                color={COLORS.white}
+                accessibilityLabel="share"
+              />
             </TouchableOpacity>
           )}
         </View>
@@ -465,8 +513,8 @@ export default function CardDetail() {
                     isAuthor
                       ? "trash-outline"
                       : saved
-                        ? "heart"
-                        : "heart-outline"
+                      ? "heart"
+                      : "heart-outline"
                   }
                   size={24}
                   color={isAuthor ? COLORS.black : "#2c2c2c"}

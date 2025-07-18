@@ -274,6 +274,7 @@ export default function Profile() {
     <FlatList
       key={"2-columns"}
       data={foodcards}
+      testID="flatlist-foodcards"
       renderItem={renderFoodcard}
       keyExtractor={(item) => item._id}
       numColumns={2}
@@ -312,6 +313,7 @@ export default function Profile() {
     <FlatList
       key={"saved-2-columns"}
       data={savedFoodcards}
+      testID="flatlist-saved-foodcards"
       renderItem={renderSavedFoodcard}
       keyExtractor={(item) => item._id}
       numColumns={2}

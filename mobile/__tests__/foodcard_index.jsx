@@ -29,40 +29,116 @@ jest.mock("../constants/colors", () => ({
   starColor: "#f4b400",
 }));
 
+let mockShouldTriggerSwipe = false;
 jest.mock("../components/SwipeableCard", () => {
+  const { useEffect } = require("react");
   const { Text } = require("react-native");
-  return (props) => (
-    <>{props.item?.title && <Text>{props.item.title}</Text>}</>
-  );
+  return (props) => {
+    useEffect(() => {
+      if (mockShouldTriggerSwipe && props.onSwipeRight) {
+        props.onSwipeRight(props.item, props.index);
+      }
+    }, []);
+    return <>{props.item?.title && <Text>{props.item.title}</Text>}</>;
+  };
 });
 
-global.fetch = jest.fn(() =>
-  Promise.resolve({
-    ok: true,
-    json: () =>
-      Promise.resolve({
-        foodcards: [
-          {
-            _id: "1",
-            title: "Test Foodcard",
-            caption: "Yummy!",
-            location: "Canteen",
-            tag: "lunch",
-            rating: 4,
-            image: "mock-image-uri",
-            user: { profileImage: "mock-profile" },
-          },
-        ],
-        totalPages: 1,
-      }),
-  })
-);
-
 describe("Home Foodcard List", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockShouldTriggerSwipe = false;
+  });
+
   it("displays a foodcard from API", async () => {
+    global.fetch = jest.fn(() =>
+      Promise.resolve({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            foodcards: [
+              {
+                _id: "1",
+                title: "Test Foodcard",
+                caption: "Yummy!",
+                location: "Canteen",
+                tag: "lunch",
+                rating: 4,
+                image: "mock-image-uri",
+                user: { profileImage: "mock-profile", privacy: "public" },
+              },
+            ],
+            totalPages: 1,
+          }),
+      })
+    );
+
     const { getByText } = render(<Home />);
     await waitFor(() => {
       expect(getByText("Test Foodcard")).toBeTruthy();
+    });
+  });
+
+  it("does not display foodcards with privacy set to private", async () => {
+    // Do NOT trigger swipe here!
+    mockShouldTriggerSwipe = false;
+    global.fetch = jest.fn(() =>
+      Promise.resolve({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            foodcards: [
+              {
+                _id: "2",
+                title: "Private Foodcard",
+                caption: "Secret!",
+                location: "Hidden",
+                tag: "dinner",
+                rating: 5,
+                image: "mock-image-uri",
+                user: { profileImage: "mock-profile", privacy: "private" },
+              },
+            ],
+            totalPages: 1,
+          }),
+      })
+    );
+
+    const { queryByText } = render(<Home />);
+    await waitFor(() => {
+      expect(queryByText("Private Foodcard")).toBeNull();
+    });
+  });
+
+  it("calls saveFoodcard API when swiped right", async () => {
+    mockShouldTriggerSwipe = true; 
+    global.fetch = jest.fn(() =>
+      Promise.resolve({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            foodcards: [
+              {
+                _id: "1",
+                title: "Test Foodcard",
+                caption: "Yummy!",
+                location: "Canteen",
+                tag: "lunch",
+                rating: 4,
+                image: "mock-image-uri",
+                user: { profileImage: "mock-profile", privacy: "public" },
+              },
+            ],
+            totalPages: 1,
+          }),
+      })
+    );
+
+    render(<Home />);
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledWith(
+        expect.stringContaining("/foodcards/save-foodcard/1"),
+        expect.objectContaining({ method: "POST" })
+      );
     });
   });
 });

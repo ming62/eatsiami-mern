@@ -262,4 +262,96 @@ describe("Foodcard CardDetail Display", () => {
       );
     });
   });
+
+  it("does not show share button for private foodcards", async () => {
+    // Mock fetch to return a private foodcard
+    global.fetch.mockImplementationOnce((url) => {
+      if (url.endsWith("/foodcards/card1")) {
+        return Promise.resolve({
+          ok: true,
+          json: () =>
+            Promise.resolve({
+              _id: "card1",
+              title: "Private Card",
+              caption: "A private card",
+              location: "Secret",
+              tag: "dinner",
+              rating: 5,
+              image: "mock-image-uri",
+              user: { _id: "user1", username: "testuser", privacy: "private" },
+              isSaved: false,
+            }),
+        });
+      }
+      if (url.endsWith("/comments/card1")) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve([]),
+        });
+      }
+      return Promise.resolve({ ok: true, json: () => Promise.resolve([]) });
+    });
+
+    const { queryByLabelText, getByText } = render(
+      <NavigationContainer>
+        <CardDetail />
+      </NavigationContainer>
+    );
+
+    // Wait for the card title to appear
+    await waitFor(() => {
+      expect(getByText("Private Card")).toBeTruthy();
+    });
+
+    // The share button should NOT be rendered
+    expect(queryByLabelText("share")).toBeNull();
+  });
+
+  it("does not allow non-friends to view a private foodcard", async () => {
+    global.fetch.mockImplementation((url) => {
+      if (url.endsWith("/foodcards/card1")) {
+        return Promise.resolve({
+          ok: true,
+          json: () =>
+            Promise.resolve({
+              _id: "card1",
+              title: "Private Card",
+              caption: "A private card",
+              location: "Secret",
+              tag: "dinner",
+              rating: 5,
+              image: "mock-image-uri",
+              user: { _id: "ownerId", username: "owner", privacy: "private" },
+              isSaved: false,
+            }),
+        });
+      }
+      if (url.endsWith("/users/friends")) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve([]), 
+        });
+      }
+      if (url.endsWith("/comments/card1")) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve([]),
+        });
+      }
+      return Promise.resolve({ ok: true, json: () => Promise.resolve([]) });
+    });
+
+    const { getByText, queryByText } = render(
+      <NavigationContainer>
+        <CardDetail />
+      </NavigationContainer>
+    );
+
+    await waitFor(() => {
+      expect(
+        getByText("This foodcard is private and only visible to friends.")
+      ).toBeTruthy();
+      expect(queryByText("Private Card")).toBeNull();
+    });
+  });
 });

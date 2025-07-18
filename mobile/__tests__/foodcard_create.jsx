@@ -7,6 +7,16 @@ const mockPush = jest.fn();
 const mockReplace = jest.fn();
 const mockBack = jest.fn();
 
+beforeAll(() => {
+  jest.spyOn(console, "log").mockImplementation(() => {});
+  jest.spyOn(console, "error").mockImplementation(() => {});
+});
+
+afterAll(() => {
+  console.log.mockRestore();
+  console.error.mockRestore();
+});
+
 jest.mock("expo-router", () => {
   const actual = jest.requireActual("expo-router");
   return {
@@ -44,7 +54,6 @@ jest.mock("expo-linear-gradient", () => {
   const { View } = require("react-native");
   return { LinearGradient: View };
 });
-
 
 jest.mock("../store/authStore", () => ({
   useAuthStore: () => ({
@@ -110,8 +119,12 @@ jest.mock("expo-image-picker", () => ({
 
 jest.mock("expo-image-manipulator", () => {
   function Chainable() {}
-  Chainable.prototype.crop = function () { return this; };
-  Chainable.prototype.resize = function () { return this; };
+  Chainable.prototype.crop = function () {
+    return this;
+  };
+  Chainable.prototype.resize = function () {
+    return this;
+  };
   Chainable.prototype.renderAsync = async function () {
     return {
       saveAsync: async () => ({
@@ -129,7 +142,6 @@ jest.mock("expo-image-manipulator", () => {
   };
 });
 
-
 jest.mock("@react-navigation/native", () => {
   // Add this line to import React into the mock's scope
   const mockReact = require("react");
@@ -145,13 +157,10 @@ jest.mock("@react-navigation/native", () => {
 });
 // Now import everything else
 
-
 describe("<Create /> Food Card Integration", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
-
-
 
   it("simulates picking from gallery, fills in fields, navigates to preview, and submits to tabs page", async () => {
     const { getByText, getByLabelText } = render(
@@ -171,9 +180,12 @@ describe("<Create /> Food Card Integration", () => {
     });
 
     // Wait for the form to appear
-    await waitFor(() => {
-      expect(getByLabelText("title-test")).toBeTruthy();
-    }, { timeout: 3000 });
+    await waitFor(
+      () => {
+        expect(getByLabelText("title-test")).toBeTruthy();
+      },
+      { timeout: 3000 }
+    );
 
     // Fill in the form fields
     fireEvent.changeText(getByLabelText("title-test"), "Gallery Food");
@@ -206,20 +218,104 @@ describe("<Create /> Food Card Integration", () => {
         <Preview />
       </NavigationContainer>
     );
-    
+
     // Wait for preview to load and then press submit
     await waitFor(() => {
       expect(getByTextPreview("Submit")).toBeTruthy();
     });
-    
+
     // Simulate pressing the submit button in preview
     await act(async () => {
       fireEvent.press(getByTextPreview("Submit"));
     });
-    
+
     // Wait for navigation to tabs page
     await waitFor(() => {
       expect(mockReplace).toHaveBeenCalledWith("/");
+    });
+  });
+
+  // --- Unit tests for edge cases ---
+
+  it("shows alert if any field is empty before preview", async () => {
+    const { getByText, getByLabelText } = render(
+      <NavigationContainer>
+        <Create />
+      </NavigationContainer>
+    );
+
+    // Wait for camera to be ready and pick from gallery
+    await waitFor(() =>
+      expect(getByLabelText("pick from gallery")).toBeTruthy()
+    );
+    await act(async () => {
+      fireEvent.press(getByLabelText("pick from gallery"));
+    });
+
+    // Wait for form to appear
+    await waitFor(() => expect(getByLabelText("title-test")).toBeTruthy(), {
+      timeout: 3000,
+    });
+
+    // Leave fields empty and press preview
+    fireEvent.press(getByText("Preview Food Card"));
+
+    await waitFor(() => {
+      expect(
+        require("react-native/Libraries/Alert/Alert").default.alert
+      ).toHaveBeenCalledWith("Error", "Please fill in all fields");
+    });
+  });
+
+  it("shows alert if API fails on submit", async () => {
+    // Mock fetch to fail
+    global.fetch.mockImplementationOnce(() =>
+      Promise.resolve({
+        ok: false,
+        json: () => Promise.resolve({ message: "Something went wrong" }),
+      })
+    );
+
+    // Go through the normal flow
+    const { getByText, getByLabelText } = render(
+      <NavigationContainer>
+        <Create />
+      </NavigationContainer>
+    );
+    await waitFor(() =>
+      expect(getByLabelText("pick from gallery")).toBeTruthy()
+    );
+    await act(async () => {
+      fireEvent.press(getByLabelText("pick from gallery"));
+    });
+    await waitFor(() => expect(getByLabelText("title-test")).toBeTruthy(), {
+      timeout: 3000,
+    });
+
+    fireEvent.changeText(getByLabelText("title-test"), "Gallery Food");
+    fireEvent.changeText(getByLabelText("location"), "Kitchen");
+    fireEvent.changeText(getByLabelText("caption"), "From gallery!");
+    fireEvent.press(getByText("dinner"));
+    fireEvent.press(getByText("Preview Food Card"));
+
+    // Render preview page
+    const { getByText: getByTextPreview } = render(
+      <NavigationContainer>
+        <Preview />
+      </NavigationContainer>
+    );
+    await waitFor(() => expect(getByTextPreview("Submit")).toBeTruthy());
+    await act(async () => {
+      fireEvent.press(getByTextPreview("Submit"));
+    });
+
+    await waitFor(() => {
+      expect(
+        require("react-native/Libraries/Alert/Alert").default.alert
+      ).toHaveBeenCalledWith(
+        "Error",
+        "Could not create food card. Please try again."
+      );
     });
   });
 });

@@ -89,7 +89,6 @@ describe("Friend detail navigation and display", () => {
     const friend = await waitFor(() => getByText("Ming"));
     fireEvent.press(friend);
 
-
     const { getByText: getByTextDetail } = render(
       <NavigationContainer>
         <FriendDetail />
@@ -102,6 +101,93 @@ describe("Friend detail navigation and display", () => {
 
     await waitFor(() => {
       expect(getByTextDetail("Ming's Foodcard")).toBeTruthy();
+    });
+  });
+
+  it("shows 'No foodcards found.' if friend has no foodcards", async () => {
+    // Mock fetch to return no foodcards for friend1
+    global.fetch.mockImplementation((url) => {
+      if (url.endsWith("/users/friends")) {
+        return Promise.resolve({
+          ok: true,
+          json: () =>
+            Promise.resolve([
+              { _id: "friend1", username: "Ming", profileImage: "img1" },
+            ]),
+        });
+      }
+      if (url.endsWith("/users/friend1")) {
+        return Promise.resolve({
+          ok: true,
+          json: () =>
+            Promise.resolve({
+              _id: "friend1",
+              username: "Ming",
+              profileImage: "img1",
+            }),
+        });
+      }
+      if (url.endsWith("/foodcards/user/friend1")) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve([]), // No foodcards
+        });
+      }
+      return Promise.resolve({ ok: true, json: () => Promise.resolve([]) });
+    });
+
+    const { getByText } = render(
+      <NavigationContainer>
+        <FriendDetail />
+      </NavigationContainer>
+    );
+
+    await waitFor(() => {
+      expect(getByText("No foodcards found.")).toBeTruthy();
+    });
+  });
+
+  it("shows private account message if friend foodcards API returns 403", async () => {
+    global.fetch.mockImplementation((url) => {
+      if (url.endsWith("/users/friends")) {
+        return Promise.resolve({
+          ok: true,
+          json: () =>
+            Promise.resolve([
+              { _id: "friend1", username: "Ming", profileImage: "img1" },
+            ]),
+        });
+      }
+      if (url.endsWith("/users/friend1")) {
+        return Promise.resolve({
+          ok: true,
+          json: () =>
+            Promise.resolve({
+              _id: "friend1",
+              username: "Ming",
+              profileImage: "img1",
+            }),
+        });
+      }
+      if (url.endsWith("/foodcards/user/friend1")) {
+        return Promise.resolve({
+          ok: false,
+          status: 403,
+          json: () => Promise.resolve({ message: "Private account" }),
+        });
+      }
+      return Promise.resolve({ ok: true, json: () => Promise.resolve([]) });
+    });
+
+    const { getByText } = render(
+      <NavigationContainer>
+        <FriendDetail />
+      </NavigationContainer>
+    );
+
+    await waitFor(() => {
+      expect(getByText("This is a private account.")).toBeTruthy();
+      expect(getByText("Add friend to view food cards.")).toBeTruthy();
     });
   });
 });
