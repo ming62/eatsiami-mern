@@ -23,13 +23,11 @@ import { API_URL } from "../../../constants/api";
 export default function UpdateProfile() {
   const { user, token, setUser } = useAuthStore();
   const router = useRouter();
-  console.log("user", user);
   const [username, setUsername] = useState(user.username);
   const [bio, setBio] = useState(user.bio);
   const [profileImage, setProfileImage] = useState(user.profileImage);
   const [imageBase64, setImageBase64] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  console.log("userprofile", user.profileImage);
   const pickImage = async () => {
     try {
       if (Platform.OS !== "web") {

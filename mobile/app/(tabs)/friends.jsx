@@ -175,6 +175,7 @@ export default function Friends() {
 
         {/* Chat Button */}
         <TouchableOpacity
+          accessibilityLabel={`chat-button-${item.username}`}
           style={styles.addButton}
           onPress={() =>
             router.push({
@@ -200,6 +201,7 @@ export default function Friends() {
         </TouchableOpacity>
 
         <TouchableOpacity
+          accessibilityLabel={`jio-button-${item.username}`}
           style={[
             styles.addButton,
             requestAlreadySent && { backgroundColor: "#d3d3d3" },
