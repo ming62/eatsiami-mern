@@ -1,4 +1,5 @@
 import React from "react";
+import { Alert } from "react-native";
 import { render, fireEvent, waitFor, act } from "@testing-library/react-native";
 import ForgotPassword from "../app/(auth)/forgotPassword";
 import { useAuthStore } from "../store/authStore";
@@ -8,6 +9,10 @@ import { useRouter } from "expo-router";
 jest.mock("expo-router", () => ({
   useRouter: jest.fn(),
 }));
+
+beforeEach(() => {
+  jest.spyOn(Alert, "alert").mockImplementation(() => {});
+});
 
 jest.mock("../store/authStore", () => ({
   useAuthStore: jest.fn(),
@@ -81,6 +86,10 @@ describe("ForgotPassword screen (Unit Tests)", () => {
     await act(async () => {
       fireEvent.press(getByText("Send Reset Code"));
     });
+    expect(Alert.alert).toHaveBeenCalledWith(
+      "Error",
+      "Please enter a valid email address"
+    );
   });
 
   it("resets step and code on back press from step 2", async () => {

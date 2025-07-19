@@ -138,6 +138,7 @@ export default function UpdateProfile() {
           <TouchableOpacity
             onPress={() => router.back()}
             style={updateStyles.backButton}
+            accessibilityLabel="arrow-back"
           >
             <Ionicons name="arrow-back" size={24} color={COLORS.white} />
           </TouchableOpacity>
@@ -180,6 +181,7 @@ export default function UpdateProfile() {
               onChangeText={setUsername}
               placeholderTextColor={COLORS.placeholderText}
               autoCapitalize="none"
+              accessibilityLabel="username-input"
             />
           </View>
 
@@ -193,6 +195,7 @@ export default function UpdateProfile() {
               onChangeText={setBio}
               placeholderTextColor={COLORS.placeholderText}
               multiline
+              accessibilityLabel="bio-input"
             />
           </View>
 
@@ -201,6 +204,7 @@ export default function UpdateProfile() {
             style={updateStyles.button}
             onPress={handleUpdate}
             disabled={isLoading}
+            accessibilityLabel="update-button"
           >
             {isLoading ? (
               <ActivityIndicator color={COLORS.white} />

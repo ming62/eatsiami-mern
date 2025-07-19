@@ -223,7 +223,12 @@ export default function Notification() {
               );
             }}
           >
-            <Ionicons name="trash-outline" size={20} color="#6A6968" />
+            <Ionicons
+              name="trash-outline"
+              size={20}
+              color="#6A6968"
+              accessibilityLabel="trash-outline"
+            />
           </TouchableOpacity>
         </View>
       </View>
@@ -280,7 +285,12 @@ export default function Notification() {
               );
             }}
           >
-            <Ionicons name="trash-outline" size={20} color="#6A6968" />
+            <Ionicons
+              name="trash-outline"
+              size={20}
+              color="#6A6968"
+              accessibilityLabel="trash-outline"
+            />
           </TouchableOpacity>
         </View>
       </View>
@@ -345,9 +355,11 @@ export default function Notification() {
           size="large"
           color={COLORS.primary}
           style={{ marginTop: 20 }}
+          testID="activity-indicator"
         />
       ) : (
         <FlatList
+          testID="flatlist"
           data={[...pendingFriendReqs, ...pendingJioReqs, ...otherNotification]}
           keyExtractor={(item) => `${item.type}-${item._id}`}
           renderItem={({ item }) => {
