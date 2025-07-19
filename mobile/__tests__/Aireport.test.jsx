@@ -2,7 +2,7 @@ import React from "react";
 import { render, fireEvent, waitFor } from "@testing-library/react-native";
 import AIreport from "../app/otherpage/more/AIreport";
 
-// Mock WebView to show the report content
+// === MOCKS ===
 jest.mock("react-native-webview", () => {
   const { View, Text } = require("react-native");
   return {
@@ -14,7 +14,6 @@ jest.mock("react-native-webview", () => {
   };
 });
 
-// Mock auth store
 jest.mock("../store/authStore", () => ({
   useAuthStore: () => ({
     token: "mock-token",
@@ -23,23 +22,19 @@ jest.mock("../store/authStore", () => ({
   }),
 }));
 
-// Mock API constants
 jest.mock("../constants/api", () => ({
   API_URL: "http://mock-api",
 }));
 
-// Mock icons
 jest.mock("@expo/vector-icons", () => {
   const { View } = require("react-native");
   return new Proxy({}, { get: () => View });
 });
 
-// Mock image
 jest.mock("expo-image", () => ({
   Image: () => null,
 }));
 
-// Mock colors
 jest.mock("../constants/colors", () => ({
   primary: "#000",
   white: "#fff",
@@ -51,20 +46,18 @@ jest.mock("../constants/colors", () => ({
   textPrimary: "#222",
 }));
 
-// Mock Slider
 jest.mock("@react-native-community/slider", () => {
   const { View } = require("react-native");
   return (props) => <View {...props} testID="mock-slider" />;
 });
 
-// Mock router
 jest.mock("expo-router", () => ({
   useRouter: () => ({
     push: jest.fn(),
   }),
 }));
 
-// Mock fetch for report
+// Mock fetch
 global.fetch = jest.fn((url) => {
   if (url.endsWith("ai/generate-report")) {
     return Promise.resolve({
@@ -79,24 +72,50 @@ global.fetch = jest.fn((url) => {
   return Promise.reject(new Error("Unhandled fetch URL: " + url));
 });
 
-// Test suite
-describe("AIreport", () => {
-  it("renders slider and Generate Report button", () => {
-    const { getByText, getByTestId } = render(<AIreport />);
+// UNIT TESTS
+describe("AIreport - Unit Tests", () => {
+  it("renders the slider component", () => {
+    const { getByTestId } = render(<AIreport />);
     expect(getByTestId("mock-slider")).toBeTruthy();
+  });
+
+  it("renders the Generate Report button", () => {
+    const { getByText } = render(<AIreport />);
     expect(getByText("Generate Report")).toBeTruthy();
   });
 
+  it("shows appropriate message when no food cards exist in time range", async () => {
+    fetch.mockImplementationOnce(() =>
+      Promise.resolve({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            success: true,
+            aiReport: "<p>No meals found in the selected time range</p>",
+          }),
+      })
+    );
+
+    const { getByText, queryByText } = render(<AIreport />);
+    fireEvent.press(getByText("Generate Report"));
+
+    await waitFor(() =>
+      expect(
+        getByText(/No meals found in the selected time range/i)
+      ).toBeTruthy()
+    );
+  });
+});
+
+//INTEGRATION TESTS
+describe("AIreport - Integration Tests", () => {
   it("shows AI report when Generate Report is clicked", async () => {
     const { getByText, queryByText } = render(<AIreport />);
 
-    // Initially no report
     expect(queryByText(/Your AI Meal Report/i)).toBeNull();
 
-    // Press button
     fireEvent.press(getByText("Generate Report"));
 
-    // Wait for report to show
     await waitFor(() => expect(getByText(/Your AI Meal Report/i)).toBeTruthy());
   });
 });

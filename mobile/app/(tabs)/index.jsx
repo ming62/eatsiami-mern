@@ -172,20 +172,16 @@ export default function Home() {
       if (!response.ok) {
         throw new Error(data.message || "Failed to save foodcard");
       }
-
-      console.log("Foodcard saved successfully:", data);
     } catch (error) {
       console.error("Error saving foodcard:", error);
     }
   };
 
   const handleSwipeLeft = useCallback(async (item, index) => {
-    console.log(`Swiped LEFT on card ${index}:`, item.title);
     setCurrentIndex((prev) => prev + 1);
   }, []);
 
   const handleSwipeRight = useCallback(async (item, index) => {
-    console.log(`Swiped RIGHT on card ${index}:`, item.title);
     setCurrentIndex((prev) => prev + 1);
 
     await saveFoodcard(item._id);

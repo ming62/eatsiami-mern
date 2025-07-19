@@ -12,7 +12,6 @@ import {
   Platform,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuthStore } from "../../store/authStore";
 import { API_URL } from "../../constants/api";
@@ -151,8 +150,9 @@ export default function ForgotPassword() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
-          onPress={() => router.back()}
+          onPress={handleBack}
           style={styles.backButton}
+          accessibilityLabel="arrow-back"
         >
           <Ionicons name="arrow-back" size={24} color={COLORS.white} />
         </TouchableOpacity>
@@ -200,12 +200,11 @@ export default function ForgotPassword() {
                   <Text style={styles.inputLabel}>email address</Text>
                   <View style={styles.inputWrapper}>
                     <TextInput
+                      accessibilityLabel="email address"
                       style={[
                         styles.textInput,
                         isLoggedIn && styles.inputDisabled,
                       ]}
-                      placeholder=""
-                      placeholderTextColor={COLORS.searchBarLabel}
                       value={email}
                       onChangeText={setEmail}
                       keyboardType="email-address"
@@ -225,32 +224,23 @@ export default function ForgotPassword() {
                   </View>
                 </View>
               </View>
+
               <TouchableOpacity
                 style={[
                   styles.actionButton,
                   (!email || isLoading) && styles.disabledButton,
                 ]}
                 onPress={handleSendCode}
+                accessibilityLabel="Send Reset Code"
                 disabled={isLoading || !email}
-                activeOpacity={0.8}
               >
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  {isLoading ? (
-                    <ActivityIndicator
-                      size="small"
-                      color="#ffffff"
-                    />
-                  ) : (
-                    <Text style={styles.buttonText}>Send Reset Code</Text>
-                  )}
-                </View>
+                {isLoading ? (
+                  <ActivityIndicator size="small" color="#ffffff" />
+                ) : (
+                  <Text style={styles.buttonText}>Send Reset Code</Text>
+                )}
               </TouchableOpacity>
+
               <Text style={styles.infoText}>
                 A reset code will be sent to your registered email address and
                 will expire in 10 minutes.
@@ -262,13 +252,14 @@ export default function ForgotPassword() {
                 Enter the 6-digit code we sent to{" "}
                 <Text style={styles.emailHighlight}>{email}</Text>
               </Text>
+
               <View style={styles.formContainer}>
                 <View style={styles.inputContainer}>
                   <Text style={styles.inputLabel}>reset code</Text>
                   <TextInput
+                    accessibilityLabel="reset code"
                     style={styles.codeInput}
                     placeholder="000000"
-                    placeholderTextColor={COLORS.searchBarLabel}
                     value={code}
                     onChangeText={setCode}
                     keyboardType="numeric"
@@ -277,14 +268,16 @@ export default function ForgotPassword() {
                   />
                 </View>
               </View>
+
               <TouchableOpacity
                 style={[
                   styles.actionButton,
-                  (!code || code.length !== 6 || isLoading) && styles.disabledButton,
+                  (!code || code.length !== 6 || isLoading) &&
+                    styles.disabledButton,
                 ]}
                 onPress={handleVerifyCode}
+                accessibilityLabel="Verify Code"
                 disabled={isLoading || !code}
-                activeOpacity={0.8}
               >
                 {isLoading ? (
                   <ActivityIndicator size="small" color="#ffffff" />
@@ -292,9 +285,11 @@ export default function ForgotPassword() {
                   <Text style={styles.buttonText}>Verify Code</Text>
                 )}
               </TouchableOpacity>
+
               <View style={styles.resendContainer}>
                 <Text style={styles.resendText}>Didn't receive the code?</Text>
                 <TouchableOpacity
+                  accessibilityLabel="Resend Code"
                   onPress={handleResendCode}
                   disabled={countdown > 0}
                   style={styles.resendButton}
