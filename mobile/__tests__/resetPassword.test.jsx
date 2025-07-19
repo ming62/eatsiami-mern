@@ -1,155 +1,361 @@
 import React from "react";
-import { render, fireEvent, waitFor } from "@testing-library/react-native";
-import ResetPassword from "../app/(auth)/resetPassword";
 import { Alert } from "react-native";
+import { render, fireEvent, waitFor, act } from "@testing-library/react-native";
+import ResetPassword from "../app/(auth)/resetPassword";
+import { useRouter, useLocalSearchParams } from "expo-router";
+import { useAuthStore } from "../store/authStore";
 
-// Mock router
-const mockPush = jest.fn();
-const mockBack = jest.fn();
-const mockReplace = jest.fn();
+//MOCKS
 jest.mock("expo-router", () => ({
-  useRouter: () => ({ replace: mockReplace, push: mockPush, back: mockBack }),
-  useLocalSearchParams: () => ({
-    email: "test@example.com",
-    resetCode: "123456",
-  }),
+  useRouter: jest.fn(),
+  useLocalSearchParams: jest.fn(),
 }));
 
-// Mock auth store
 jest.mock("../store/authStore", () => ({
-  useAuthStore: () => ({
-    token: "mock-token",
-    user: { id: "user0", username: "me" },
-    perChannelUnread: {},
-    logout: jest.fn(),
-  }),
+  useAuthStore: jest.fn(),
 }));
 
-// Mock constants
-jest.mock("../constants/api", () => ({ API_URL: "http://mock-api" }));
+jest.mock("../constants/api", () => ({
+  API_URL: "http://mock-api",
+}));
+
 jest.mock("@expo/vector-icons", () => {
   const { View } = require("react-native");
   return new Proxy({}, { get: () => View });
 });
-jest.mock("expo-image", () => ({ Image: () => null }));
-jest.mock("../constants/colors", () => ({
-  primary: "#000",
-  white: "#fff",
-  background: "#fff",
-  textSecondary: "#888",
-  cardBackground: "#fff",
-  border: "#eee",
-  black: "#000",
-  textPrimary: "#222",
-}));
 
-// Mock Alert.alert (simulate pressing OK)
-jest.spyOn(Alert, "alert").mockImplementation((title, message, buttons) => {
-  if (buttons && buttons[0]?.onPress) buttons[0].onPress();
+beforeEach(() => {
+  jest.spyOn(Alert, "alert").mockImplementation(() => {});
+  jest.spyOn(console, "error").mockImplementation(() => {});
 });
 
-// Default fetch mock
-global.fetch = jest.fn((url, options) => {
-  if (url.endsWith("/email/reset-password")) {
-    return Promise.resolve({
-      ok: true,
-      json: () => Promise.resolve({ message: "Password reset successful" }),
-    });
-  }
-  return Promise.resolve({
-    ok: false,
-    json: () => Promise.resolve({ message: "Error occurred" }),
+global.fetch = jest.fn();
+
+//SHARED MOCK SETUP
+const mockRouterBack = jest.fn();
+const mockRouterReplace = jest.fn();
+const mockLogout = jest.fn();
+
+beforeEach(() => {
+  require("expo-router").useRouter.mockReturnValue({
+    back: mockRouterBack,
+    replace: mockRouterReplace,
   });
-});
 
-afterEach(() => {
+  require("expo-router").useLocalSearchParams.mockReturnValue({
+    email: "test@example.com",
+    resetCode: "123456",
+  });
+
+  require("../store/authStore").useAuthStore.mockReturnValue({
+    logout: mockLogout,
+  });
+
   jest.clearAllMocks();
 });
 
-describe("ResetPassword screen", () => {
-  it("renders inputs and button with accessibility labels", () => {
-    const { getByLabelText } = render(<ResetPassword />);
+//UNIT TESTS
+
+describe("ResetPassword screen (Unit Tests)", () => {
+  it("renders password inputs and button correctly", () => {
+    const { getByLabelText, getAllByText, getByText } = render(
+      <ResetPassword />
+    );
+
     expect(getByLabelText("new-password-input")).toBeTruthy();
     expect(getByLabelText("confirm-password-input")).toBeTruthy();
     expect(getByLabelText("reset-password-button")).toBeTruthy();
+    expect(getAllByText("Reset Password")).toHaveLength(2);
+    expect(getByText("Enter your new password")).toBeTruthy();
   });
 
-  it("shows error if fields are empty", async () => {
+  it("toggles password visibility", async () => {
     const { getByLabelText } = render(<ResetPassword />);
-    fireEvent.press(getByLabelText("reset-password-button"));
+    const toggleButton = getByLabelText("toggle-password-visibility");
 
-    await waitFor(() => {
-      expect(getByLabelText("reset-password-button")).toBeTruthy();
+    await act(async () => {
+      fireEvent.press(toggleButton);
     });
+
+    expect(toggleButton).toBeTruthy();
+  });
+
+  it("toggles confirm password visibility", async () => {
+    const { getByLabelText } = render(<ResetPassword />);
+    const toggleButton = getByLabelText("toggle-confirm-password-visibility");
+
+    await act(async () => {
+      fireEvent.press(toggleButton);
+    });
+
+    expect(toggleButton).toBeTruthy();
+  });
+
+  it("disables button when fields are empty", () => {
+    const { getByLabelText } = render(<ResetPassword />);
+    const button = getByLabelText("reset-password-button");
+
+    expect(button.props.accessibilityState?.disabled).toBe(true);
+  });
+
+  it("enables button when both fields are filled", async () => {
+    const { getByLabelText } = render(<ResetPassword />);
+
+    await act(async () => {
+      fireEvent.changeText(getByLabelText("new-password-input"), "password123");
+      fireEvent.changeText(
+        getByLabelText("confirm-password-input"),
+        "password123"
+      );
+    });
+
+    const button = getByLabelText("reset-password-button");
+    expect(button.props.accessibilityState?.disabled).toBe(false);
   });
 
   it("shows error if passwords don't match", async () => {
     const { getByLabelText } = render(<ResetPassword />);
-    fireEvent.changeText(getByLabelText("new-password-input"), "abc12345");
-    fireEvent.changeText(getByLabelText("confirm-password-input"), "xyz999");
-    fireEvent.press(getByLabelText("reset-password-button"));
+
+    await act(async () => {
+      fireEvent.changeText(getByLabelText("new-password-input"), "password123");
+      fireEvent.changeText(
+        getByLabelText("confirm-password-input"),
+        "differentpassword"
+      );
+    });
+
+    await act(async () => {
+      fireEvent.press(getByLabelText("reset-password-button"));
+    });
 
     await waitFor(() => {
-      expect(getByLabelText("reset-password-button")).toBeTruthy();
+      expect(Alert.alert).toHaveBeenCalledWith(
+        "Error",
+        "Passwords do not match"
+      );
     });
   });
 
   it("shows error if password is too short", async () => {
     const { getByLabelText } = render(<ResetPassword />);
-    fireEvent.changeText(getByLabelText("new-password-input"), "123");
-    fireEvent.changeText(getByLabelText("confirm-password-input"), "123");
-    fireEvent.press(getByLabelText("reset-password-button"));
+
+    await act(async () => {
+      fireEvent.changeText(getByLabelText("new-password-input"), "123");
+      fireEvent.changeText(getByLabelText("confirm-password-input"), "123");
+    });
+
+    await act(async () => {
+      fireEvent.press(getByLabelText("reset-password-button"));
+    });
 
     await waitFor(() => {
-      expect(getByLabelText("reset-password-button")).toBeTruthy();
+      expect(Alert.alert).toHaveBeenCalledWith(
+        "Error",
+        "Password must be at least 6 characters"
+      );
     });
   });
+});
 
-  it("calls API and navigates on successful reset", async () => {
+//INTEGRATION TESTS
+
+describe("ResetPassword screen (Integration Tests)", () => {
+  it("successfully resets password and navigates", async () => {
+    fetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        message: "Password reset successful",
+      }),
+    });
+
     const { getByLabelText } = render(<ResetPassword />);
-    fireEvent.changeText(getByLabelText("new-password-input"), "valid12345");
-    fireEvent.changeText(
-      getByLabelText("confirm-password-input"),
-      "valid12345"
-    );
-    fireEvent.press(getByLabelText("reset-password-button"));
+
+    await act(async () => {
+      fireEvent.changeText(
+        getByLabelText("new-password-input"),
+        "validpassword123"
+      );
+      fireEvent.changeText(
+        getByLabelText("confirm-password-input"),
+        "validpassword123"
+      );
+    });
+
+    await act(async () => {
+      fireEvent.press(getByLabelText("reset-password-button"));
+    });
 
     await waitFor(() => {
       expect(fetch).toHaveBeenCalledWith(
         "http://mock-api/email/reset-password",
         expect.objectContaining({
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: expect.objectContaining({
+            "Content-Type": "application/json",
+          }),
           body: JSON.stringify({
             email: "test@example.com",
             resetCode: "123456",
-            newPassword: "valid12345",
+            newPassword: "validpassword123",
           }),
         })
       );
-      expect(mockReplace).toHaveBeenCalledWith("/(auth)");
+    });
+
+    await waitFor(() => {
+      expect(Alert.alert).toHaveBeenCalledWith(
+        "Success",
+        "Password reset successful! Please login with your new password.",
+        expect.arrayContaining([
+          expect.objectContaining({
+            text: "OK",
+            onPress: expect.any(Function),
+          }),
+        ])
+      );
     });
   });
 
-  it("shows alert if API returns error", async () => {
-    global.fetch.mockImplementationOnce(() =>
-      Promise.resolve({
-        ok: false,
-        json: () => Promise.resolve({ message: "Invalid code" }),
-      })
-    );
+  it("handles API error when resetting password", async () => {
+    fetch.mockResolvedValueOnce({
+      ok: false,
+      json: async () => ({
+        message: "Invalid reset code",
+      }),
+    });
 
     const { getByLabelText } = render(<ResetPassword />);
-    fireEvent.changeText(getByLabelText("new-password-input"), "valid12345");
-    fireEvent.changeText(
-      getByLabelText("confirm-password-input"),
-      "valid12345"
-    );
-    fireEvent.press(getByLabelText("reset-password-button"));
+
+    await act(async () => {
+      fireEvent.changeText(
+        getByLabelText("new-password-input"),
+        "validpassword123"
+      );
+      fireEvent.changeText(
+        getByLabelText("confirm-password-input"),
+        "validpassword123"
+      );
+    });
+
+    await act(async () => {
+      fireEvent.press(getByLabelText("reset-password-button"));
+    });
 
     await waitFor(() => {
-      expect(fetch).toHaveBeenCalled();
-      expect(getByLabelText("reset-password-button")).toBeTruthy(); // stays on screen
+      expect(Alert.alert).toHaveBeenCalledWith("Error", "Invalid reset code");
+    });
+
+    expect(mockLogout).not.toHaveBeenCalled();
+    expect(mockRouterReplace).not.toHaveBeenCalled();
+  });
+
+  it("handles network error when resetting password", async () => {
+    fetch.mockRejectedValueOnce(new Error("Network error"));
+
+    const { getByLabelText } = render(<ResetPassword />);
+
+    await act(async () => {
+      fireEvent.changeText(
+        getByLabelText("new-password-input"),
+        "validpassword123"
+      );
+      fireEvent.changeText(
+        getByLabelText("confirm-password-input"),
+        "validpassword123"
+      );
+    });
+
+    await act(async () => {
+      fireEvent.press(getByLabelText("reset-password-button"));
+    });
+
+    await waitFor(() => {
+      expect(Alert.alert).toHaveBeenCalledWith(
+        "Error",
+        "Network error. Please try again."
+      );
+    });
+
+    expect(mockLogout).not.toHaveBeenCalled();
+    expect(mockRouterReplace).not.toHaveBeenCalled();
+  });
+
+  it("shows and hides loading state during password reset", async () => {
+    let resolvePromise;
+    const promise = new Promise((resolve) => {
+      resolvePromise = resolve;
+    });
+
+    fetch.mockReturnValueOnce(promise);
+
+    const { getByLabelText } = render(<ResetPassword />);
+
+    await act(async () => {
+      fireEvent.changeText(
+        getByLabelText("new-password-input"),
+        "validpassword123"
+      );
+      fireEvent.changeText(
+        getByLabelText("confirm-password-input"),
+        "validpassword123"
+      );
+    });
+
+    await act(async () => {
+      fireEvent.press(getByLabelText("reset-password-button"));
+    });
+
+    const button = getByLabelText("reset-password-button");
+    expect(button.props.accessibilityState?.disabled).toBe(true);
+
+    await act(async () => {
+      resolvePromise({
+        ok: true,
+        json: async () => ({
+          message: "Password reset successful",
+        }),
+      });
+    });
+
+    await waitFor(() => {
+      expect(Alert.alert).toHaveBeenCalled();
+    });
+  });
+
+  it("executes logout and navigation on successful alert confirmation", async () => {
+    fetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        message: "Password reset successful",
+      }),
+    });
+
+    Alert.alert.mockImplementation((title, message, buttons) => {
+      if (buttons && buttons[0]?.onPress) {
+        buttons[0].onPress();
+      }
+    });
+
+    const { getByLabelText } = render(<ResetPassword />);
+
+    await act(async () => {
+      fireEvent.changeText(
+        getByLabelText("new-password-input"),
+        "validpassword123"
+      );
+      fireEvent.changeText(
+        getByLabelText("confirm-password-input"),
+        "validpassword123"
+      );
+    });
+
+    await act(async () => {
+      fireEvent.press(getByLabelText("reset-password-button"));
+    });
+
+    await waitFor(() => {
+      expect(mockLogout).toHaveBeenCalled();
+      expect(mockRouterReplace).toHaveBeenCalledWith("/(auth)");
     });
   });
 });

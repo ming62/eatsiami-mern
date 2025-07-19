@@ -87,6 +87,7 @@ export default function ResetPassword() {
         <TouchableOpacity
           onPress={() => router.back()}
           style={styles.backButton}
+          accessibilityLabel="arrow-back"
         >
           <Ionicons name="arrow-back" size={24} color={COLORS.white} />
         </TouchableOpacity>
@@ -119,6 +120,7 @@ export default function ResetPassword() {
                 <TouchableOpacity
                   onPress={() => setShowPassword(!showPassword)}
                   style={styles.eyeIcon}
+                  accessibilityLabel="toggle-password-visibility"
                 >
                   <Ionicons
                     name={showPassword ? "eye-outline" : "eye-off-outline"}
@@ -146,6 +148,7 @@ export default function ResetPassword() {
                 <TouchableOpacity
                   onPress={() => setShowConfirmPassword(!showConfirmPassword)}
                   style={styles.eyeIcon}
+                  accessibilityLabel="toggle-confirm-password-visibility"
                 >
                   <Ionicons
                     name={
@@ -166,9 +169,11 @@ export default function ResetPassword() {
                 styles.disabledButton,
             ]}
             onPress={handleResetPassword}
-            disabled={isLoading || !newPassword || !confirmPassword}
             activeOpacity={0.8}
             accessibilityLabel="reset-password-button"
+            accessibilityState={{
+              disabled: isLoading || !newPassword || !confirmPassword,
+            }}
           >
             <View
               style={{

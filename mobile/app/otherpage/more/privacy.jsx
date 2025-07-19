@@ -57,6 +57,7 @@ export default function Privacy() {
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => router.back()}
+          accessibilityLabel="arrow-back"
         >
           <Ionicons name="arrow-back" size={24} color={COLORS.white} />
         </TouchableOpacity>
@@ -87,6 +88,7 @@ export default function Privacy() {
                 name="checkmark-circle"
                 size={24}
                 color={COLORS.primary}
+                accessibilityLabel="checkmark-circle"
               />
             )}
           </TouchableOpacity>
@@ -110,6 +112,7 @@ export default function Privacy() {
                 name="checkmark-circle"
                 size={24}
                 color={COLORS.primary}
+                accessibilityLabel="checkmark-circle"
               />
             )}
           </TouchableOpacity>
