@@ -250,7 +250,7 @@ const updateStyles = StyleSheet.create({
     fontFamily: "Konkhmer_Sleokchher-Regular",
     textAlign: "center",
     justifyContent: "center",
-    fontWeight: "bold",
+    fontWeight: "400",
   },
   rightSpace: {
     width: 40,

@@ -21,9 +21,6 @@ export const sendEmail = async (email, resetCode)   => {
           <h2 style="color: #333; margin-bottom: 20px;">Password Reset Request</h2>
         </div>
         
-        <p style="color: #666; line-height: 1.6; margin-bottom: 20px;">
-          You requested to reset your password for your EatSiami account.
-        </p>
         
         <p style="color: #666; line-height: 1.6; margin-bottom: 20px;">
           Your reset code is:
@@ -34,20 +31,7 @@ export const sendEmail = async (email, resetCode)   => {
             ${resetCode}
           </div>
         </div>
-        
-        <p style="color: #666; line-height: 1.6; margin-bottom: 20px;">
-          Enter this code in the app to reset your password.
-        </p>
-        
-        <div style="background-color: #fff3cd; padding: 15px; border-radius: 8px; margin: 20px 0;">
-          <p style="color: #856404; margin: 0; font-size: 14px;">
-            ⚠️ This code will expire in 10 minutes for security reasons.
-          </p>
-        </div>
-        
-        <p style="color: #666; line-height: 1.6; margin-bottom: 20px;">
-          If you didn't request this password reset, please ignore this email. Your account remains secure.
-        </p>
+
         
         <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
           <p style="color: #999; font-size: 12px;">
