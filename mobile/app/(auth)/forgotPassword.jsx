@@ -293,7 +293,7 @@ export default function ForgotPassword() {
                 )}
               </TouchableOpacity>
               <View style={styles.resendContainer}>
-                <Text style={styles.resendText}>Didn't receive the code?</Text>
+                <Text style={styles.resendText}>Didn't receive the code</Text>
                 <TouchableOpacity
                   onPress={handleResendCode}
                   disabled={countdown > 0}
