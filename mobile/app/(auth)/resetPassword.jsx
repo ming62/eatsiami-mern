@@ -90,7 +90,7 @@ export default function ResetPassword() {
         >
           <Ionicons name="arrow-back" size={24} color={COLORS.white} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Reset Password</Text>
+        <Text style={styles.headerTitle}>Edit Profile</Text>
         <View style={styles.rightSpace} />
       </View>
 
